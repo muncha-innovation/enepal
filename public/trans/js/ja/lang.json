@@ -1,0 +1,13 @@
+{
+    "lengthMenu" : "見せる _MENU_ エントリ",
+    "zeroRecords": "何も見つかりません-申し訳ありません",
+    "info": "ページを表示しています _PAGE_ の _PAGES_",
+    "infoEmpty": "利用可能なレコードはありません",
+    "infoFiltered": "(からフィルタリング _MAX_ 合計レコード)",
+    "search" : "検索",
+    "paginate": {
+      "previous": "前",
+      "next" : "次"
+    },
+    "processing": "処理中..."
+}

@@ -1,0 +1,301 @@
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}
+ 
+table.dataTable.no-footer,
+table.dataTable thead th, 
+table.dataTable thead td {
+    border-bottom: 1px solid #d1d5db !important;
+}
+
+.dataTables_length {
+    width: auto !important;
+} 
+
+.dataTables_length>label>select {
+    width: 4rem;
+}
+
+.dataTables_filter>label>input {
+    border-radius: 10%;
+}
+
+
+.custom-scroll3::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0.4em;
+    cursor: pointer;
+}
+
+.custom-scroll3::-webkit-scrollbar-track {
+    background: #d8e9ff;
+}
+
+.custom-scroll3::-webkit-scrollbar-thumb {
+    background: rgb(104, 104, 101);
+}
+
+.custom-scroll2::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0.4em;
+    cursor: pointer;
+}
+
+.custom-scroll2::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+.custom-scroll2::-webkit-scrollbar-thumb {
+    background: rgb(104, 104, 101);
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 1px;
+    height: 0.4em;
+    cursor: pointer;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+}
+
+.select2 {
+    width: 100% !important;
+}
+
+.select2-selection {
+    padding-bottom: 42px;
+}
+
+.select2-selection__rendered {
+    padding-top: 8px;
+}
+
+.select2-selection__arrow {
+    padding-top: 42px;
+}
+
+.treeview .btn-default {
+    border-color: #e3e5ef;
+}
+
+.treeview .btn-default:hover {
+    background-color: #f7faea;
+    color: #bada55;
+}
+
+.treeview ul {
+    list-style: none;
+    padding-left: 32px;
+}
+
+.treeview ul li {
+    padding-top: 50px;
+    position: relative;
+}
+
+.treeview ul li:before {
+    content: "";
+    position: absolute;
+    top: -26px;
+    left: -30px;
+    border-left: 2px dashed #a2a5b5;
+    width: 1px;
+    height: 100%;
+}
+
+.treeview ul li:after {
+    content: "";
+    position: absolute;
+    border-top: 2px dashed #a2a5b5;
+    top: 70px;
+    left: -30px;
+    width: 65px;
+}
+
+.horizontal-line {
+    position: relative;
+}
+
+.horizontal-line:after {
+    content: "";
+    position: absolute;
+    border-top: 2px dashed #a2a5b5;
+    top: 18px;
+    left: -42px;
+    width: 42px;
+}
+
+.treeview ul li:last-child:before {
+    top: -22px;
+    height: 90px;
+}
+
+.treeview>ul>li:after,
+.treeview>ul>li:last-child:before {
+    content: unset;
+}
+
+.treeview>ul>li>ul {
+    padding-left: 34px;
+}
+.treeview__level-btns {
+    margin-left: 15px;
+    display: inline-block;
+    position: relative;
+}
+
+.treeview__level .level-same,
+.treeview__level .level-sub {
+    position: absolute;
+    display: none;
+    transition: opacity 250ms cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.treeview__level .level-same.in,
+.treeview__level .level-sub.in {
+    display: block;
+}
+
+.treeview__level .level-same.in .btn-default,
+.treeview__level .level-sub.in .btn-default {
+    background-color: #faeaea;
+    color: #da5555;
+}
+
+.treeview__level .level-same {
+    top: 0;
+    left: 45px;
+}
+
+.treeview__level .level-sub {
+    top: 42px;
+    left: 0px;
+}
+
+.treeview__level .level-remove {
+    display: none;
+}
+
+.treeview__level.selected {
+    background-color: #f9f9fb;
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.1);
+}
+
+.treeview__level.selected .level-remove {
+    display: inline-block;
+}
+
+.treeview__level.selected .level-add {
+    display: none;
+}
+
+.treeview__level.selected .level-same,
+.treeview__level.selected .level-sub {
+    display: none;
+}
+
+
+.treeview--mapview ul {
+    justify-content: center;
+    display: flex;
+}
+
+.treeview .btn-default {
+    border-color: #e3e5ef;
+}
+
+.treeview .btn-default:hover {
+    background-color: #f7faea;
+    color: #bada55;
+}
+
+.treeview ul {
+    list-style: none;
+    padding-left: 32px;
+}
+
+.treeview>ul>li>ul {
+    padding-left: 3rem;
+}
+
+.treeview__level-btns {
+    margin-left: 15px;
+    display: inline-block;
+    position: relative;
+}
+
+.treeview__level .level-same,
+.treeview__level .level-sub {
+    position: absolute;
+    display: none;
+    transition: opacity 250ms cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.treeview__level .level-same.in,
+.treeview__level .level-sub.in {
+    display: block;
+}
+
+.treeview__level .level-same.in .btn-default,
+.treeview__level .level-sub.in .btn-default {
+    background-color: #faeaea;
+    color: #da5555;
+}
+
+.treeview__level .level-same {
+    top: 0;
+    left: 45px;
+}
+
+.treeview__level .level-sub {
+    top: 42px;
+    left: 0px;
+}
+
+.treeview__level .level-remove {
+    display: none;
+}
+
+.treeview__level.selected {
+    background-color: #f9f9fb;
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.1);
+}
+
+.treeview__level.selected .level-remove {
+    display: inline-block;
+}
+
+.treeview__level.selected .level-add {
+    display: none;
+}
+
+.treeview__level.selected .level-same,
+.treeview__level.selected .level-sub {
+    display: none;
+}
+
+.treeview--mapview ul {
+    justify-content: center;
+    display: flex;
+}
+
+.treeview--mapview ul li:before {
+    content: unset;
+}
+
+.treeview--mapview ul li:after {
+    content: unset;
+}
