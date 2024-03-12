@@ -42,7 +42,7 @@
                     </div>
 
                 </div>
-                @auth
+                {{-- @auth
                     <!-- Profile dropdown -->
                     <div class="ml-3 relative">
 
@@ -67,7 +67,7 @@
                         </form>
 
                     </div>
-                @endauth
+                @endauth --}}
             </div>
         </div>
     </div>

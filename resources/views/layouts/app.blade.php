@@ -16,9 +16,9 @@
 
         @include('layouts.sidebar')
         <div class="md:pl-64 flex flex-col flex-1">
-            @include('modules.includes.navbar')
+            {{-- @include('modules.includes.navbar') --}}
             <main class="flex-1 min-h-screen bg-gray-100">
-                <div class="py-6">
+                <div class="p-4">
                     @yield('content')
                 </div>
             </main>

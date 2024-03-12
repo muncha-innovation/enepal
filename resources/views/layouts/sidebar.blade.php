@@ -11,7 +11,7 @@
 @endphp
 <div class="fixed inset-0 flex z-40 md:hidden transition-opacity ease-linear duration-300 side-nav pointer-events-none opacity-0"
     role="dialog" aria-modal="true">
-    <div onclick="toggleSidebar()" class="overlay fixed inset-0 bg-gray-600 bg-opacity-75" aria-hidden="true"></div>
+    <div onclick="toggleSidebar()" class="overlay fixed inset-0 bg-gray-700 bg-opacity-75" aria-hidden="true"></div>
     <div
         class="relative transition ease-in-out duration-300 transform side-nav-container -translate-x-full flex-1 flex flex-col max-w-xs w-full bg-gray-800 pointer-events-auto">
         <div class="absolute top-0 right-0 -mr-12 pt-2 ease-in-out duration-300">
@@ -42,8 +42,8 @@
 <!-- Static sidebar for desktop -->
 <div class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <div class="flex-1 flex flex-col min-h-0 bg-gray-800">
-        <div class="flex flex-col pt-5 pb-4 overflow-y-auto custom-scroll2">
+    <div class="flex-1 flex flex-col min-h-0 bg-white">
+        <div class="flex flex-col pb-4 overflow-y-auto custom-scroll2 h-full">
             @include('layouts._nav')
         </div>
     </div>
