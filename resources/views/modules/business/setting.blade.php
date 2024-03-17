@@ -1,58 +1,42 @@
 @extends('layouts.app')
 
 @section('content')
-<h1 class="text-2xl font-semibold text-gray-700 mb-2">Nepalese Association of Houston</h1>
-
-<section class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-4">
-  <ul class="flex flex-wrap -mb-px">
-    <li class="me-2">
-      <a href="#" class="inline-block p-3 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active " aria-current="page">Overview</a>
-    </li>
-    <li class="me-2">
-      <a href="#" class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ">Posts</a>
-    </li>
-    <li class="me-2">
-      <a href="#" class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ">Setting</a>
-    </li>
-    <li class="me-2">
-      <a href="#" class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ">Members</a>
-    </li>
-  </ul>
-</section>
+<h1 class="text-2xl font-semibold text-gray-700 mb-4">Create Business / Organization</h1>
 
 <section>
-  <div class="bg-white p-3 shadow rounded">
+  <div class="bg-white p-4 shadow rounded">
     <form>
-      <div class="grid grid-cols-2 gap-2 mb-2">
-        <div>
-          <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
-          <div class="mt-2 rounded-md shadow-sm">
-            <input type="text" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
-          </div>
-        </div>
-
-        <div>
-          <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
-          <div class="mt-2 rounded-md shadow-sm">
-            <input type="text" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
-          </div>
-        </div>
-
-        <div>
-          <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
-          <div class="mt-2 rounded-md shadow-sm">
-            <input type="text" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
-          </div>
-        </div>
-
-        <div>
-          <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
-          <div class="mt-2 rounded-md shadow-sm">
-            <input type="text" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
-          </div>
+      <div class="mb-2">
+        <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
+        <div class="mt-2 rounded-md shadow-sm">
+          <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Nepalese Association of Houston">
         </div>
       </div>
 
+      <div class="mb-2">
+        <label for="business_type" class="block text-sm font-medium leading-6 text-gray-900">Contact Person</label>
+        <select id="business_type" name="business_type" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <option>James Shrestha</option>
+          <option selected="">John Doe</option>
+          <option>James Carter</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label for="address" class="block text-sm font-medium leading-6 text-gray-900">Business address</label>
+        <div class="mt-2 rounded-md shadow-sm">
+          <input type="text" name="address" id="address" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Kathmandu">
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <label for="contact_person" class="block text-sm font-medium leading-6 text-gray-900">Contact Person</label>
+        <select id="contact_person" name="contact_person" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <option>James Shrestha</option>
+          <option selected="">John Doe</option>
+          <option>James Carter</option>
+        </select>
+      </div>
 
       <div class="mb-2">
         <label for="type" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
@@ -70,6 +54,30 @@
         </div>
       </div>
 
+      <div class="mb-2">
+        <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
+        <input type="file" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+      </div>
+
+      <div class="mb-2">
+        <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+        <div class="mt-2 flex gap-4">
+          <div class="flex items-center">
+            <input id="active" name="status" type="radio" checked="" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+            <label for="active" class="ml-3 block text-sm font-medium leading-6 text-gray-900">Email</label>
+          </div>
+          <div class="flex items-center">
+            <input id="inactive" name="status" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+            <label for="inactive" class="ml-3 block text-sm font-medium leading-6 text-gray-900">Phone (SMS)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end w-full">
+        <div>
+          <button type="submit" class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+        </div>
+      </div>
     </form>
   </div>
 </section>

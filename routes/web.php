@@ -41,6 +41,18 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
 });
 
+Route::get('/setting', function () {
+    return view('modules.business.setting');
+});
+
+Route::get('/business', function () {
+    return view('modules.business.members');
+});
+
+Route::get('/create', function () {
+    return view('modules.business.create');
+});
+
 Route::get(
     'locale/{lang}',
     function ($lang) {
