@@ -25,7 +25,7 @@ use App\Http\Controllers\RapidApiController;
 Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
-    
+
     Route::resource('users', UsersController::class);
     Route::resource('checklist', ChecklistController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
@@ -51,6 +51,10 @@ Route::get('/business', function () {
 
 Route::get('/create', function () {
     return view('modules.business.create');
+});
+
+Route::get('/profile', function () {
+    return view('modules.profile.show');
 });
 
 Route::get(
