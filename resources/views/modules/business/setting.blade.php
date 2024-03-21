@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<h1 class="text-2xl font-semibold text-gray-700 mb-4">Create Business / Organization</h1>
+@include('modules.business.header', ['title' => 'Create Business / Organization'])
 
 <section>
   <div class="bg-white p-4 shadow rounded">

@@ -45,17 +45,33 @@ Route::get('/setting', function () {
     return view('modules.business.setting');
 });
 
-Route::get('/business', function () {
+Route::get('/business/members', function () {
     return view('modules.business.members');
-});
+})->name('business.members');
+
+Route::get('/business/list', function () {
+    return view('modules.business.index');
+})->name('business.list');
+
+Route::get('/business/setting', function () {
+    return view('modules.business.setting');
+})->name('business.setting');
+
+Route::get('/business/posts', function () {
+    return view('modules.business.posts');
+})->name('business.posts.list');
 
 Route::get('/create', function () {
     return view('modules.business.create');
-});
+})->name('business.create');
+
+Route::get('/show', function () {
+    return view('modules.business.show');
+})->name('business.show');
 
 Route::get('/profile', function () {
     return view('modules.profile.show');
-});
+})->name('profile');
 
 Route::get(
     'locale/{lang}',
