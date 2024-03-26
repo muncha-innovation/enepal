@@ -41,6 +41,10 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
 });
 
+Route::get('/home', function () {
+    return view('modules.frontend.index');
+});
+
 Route::get('/setting', function () {
     return view('modules.business.setting');
 });
@@ -48,6 +52,10 @@ Route::get('/setting', function () {
 Route::get('/business/members', function () {
     return view('modules.business.members');
 })->name('business.members');
+
+Route::get('/business/add-member', function () {
+    return view('modules.business.add-member');
+})->name('business.member.add');
 
 Route::get('/business/list', function () {
     return view('modules.business.index');
