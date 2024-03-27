@@ -60,10 +60,8 @@ class StoreUserRequest extends FormRequest
                 'mimes:png,jpg,jpeg,svg,bmp',
                 'max:2048',
             ],
-            'is_active' => 'required',
+            'active' => 'required',
             'role' => ['required', 'exists:roles,id'],
-            'departmentids' => 'nullable|sometimes|array',
-            'departmentids.*' => 'exists:branches,id',
         ];
     }
 

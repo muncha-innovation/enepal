@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-@include('modules.business.header', ['title' => 'Create Business / Organization'])
+@include('modules.business.header', ['title' => 'Create Business / Organization', 'business' => $business])
 
 <section>
   <div class="bg-white p-4 shadow rounded">
-    <form>
+    <form action="{{route('business.update', $business)}}" method="POST">
+      @csrf
+      @method('PUT')
       <div class="mb-2">
         <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
         <div class="mt-2 rounded-md shadow-sm">

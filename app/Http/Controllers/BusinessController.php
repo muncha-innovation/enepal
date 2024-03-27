@@ -69,6 +69,9 @@ class BusinessController extends Controller
     public function show(Business $business)
     {
         //
+        
+    return view('modules.business.show', compact('business'));
+
     }
 
     /**
@@ -104,4 +107,18 @@ class BusinessController extends Controller
     {
         //
     }
+    public function setting(Business $business) {
+        return view('modules.business.setting', compact('business'));
+    }
+    public function members(Business $business) {
+        return view('modules.business.members', compact('business'));
+    }
+    public function posts(Business $business) {
+        
+        return view('modules.business.posts', compact('business'));
+    }
+    public function addMember(Business $business) {
+        return view('modules.business.add-member', compact('business'));
+    }
+    
 }

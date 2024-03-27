@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Models\Department;
 use Illuminate\Http\Response;
 use App\DataTables\UsersDataTable;
+use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -159,4 +160,5 @@ class UsersController extends Controller
             'message' => trans('User deleted successfully')
         ]);
     }
+
 }

@@ -15,4 +15,5 @@ class Business extends Model
     {
         return $this->morphOne(Address::class, 'addressable');
     }
+    
 }

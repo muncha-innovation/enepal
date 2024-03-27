@@ -66,3 +66,15 @@ if(!function_exists('upload')) {
         return $imageName;
     }
 }
+if(!function_exists('getImage')) {
+    function getImage(string $fileName = null, string $dir = null)
+    {
+        if($fileName==null) {
+            return asset('images/profile/default.png');
+        }
+        if($dir!=null) {
+            return Storage::disk('public')->url($dir.$fileName);
+        } else {
+            return Storage::disk('public')->url($fileName);
+        }}
+}

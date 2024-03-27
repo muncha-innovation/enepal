@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\DataTables\LogsDataTable;
+use App\Http\Controllers\Controller;
 use App\Models\Process;
 use App\Models\Product;
 use Carbon\Carbon;

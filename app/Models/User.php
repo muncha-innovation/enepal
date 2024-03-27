@@ -83,22 +83,8 @@ class User extends Authenticatable
     {
         return $this->morphOne(Address::class, 'addressable');
     }
-    public function getFullPathAttribute()
-    {
-        if ($this->image) {
-            return Storage::disk('public')->url($this->image);
-        }
-        return asset('default_image.png');
-    }
     
-    public function getPFullNameAttribute(): string
-    {
-        return $this->p_last_name . ' ' . $this->p_first_name;
-    }
-    public function getFullNameAttribute(): string
-    {
-        return $this->last_name . ' ' . $this->first_name;
-    }
+    
     public function isSupervisorOrAdmin() {
         return true;
         $roles = $this->roles()->pluck('name');

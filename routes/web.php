@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 
 /*
@@ -27,10 +28,19 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
-    Route::resource('users', UsersController::class);
+    // Route::resource('users', UsersController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
+    Route::group(['prefix'=>'business', 'as' => 'business.'],function() {
+        Route::get('members/{business}', [BusinessController::class, 'members'])->name('members');
+        Route::get('add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
+        Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
+        Route::get('posts/{business}', [BusinessController::class, 'posts'])->name('posts.list');
+    });
     Route::resource('business',BusinessController::class);
+   
 
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Logs Route
     // Route::get('logs/all', [LogsController::class, 'getAllLogs'])->name('logs.all');
     // Route::match(['get', 'post'], 'logs/{userId}', [LogsController::class, 'getLogsByUser'])->name('user.logs');
@@ -41,37 +51,10 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
 });
 
-Route::get('/setting', function () {
-    return view('modules.business.setting');
+Route::get('/home', function () {
+    return view('modules.frontend.index');
 });
 
-Route::get('/business/members', function () {
-    return view('modules.business.members');
-})->name('business.members');
-
-// Route::get('/business/list', function () {
-//     return view('modules.business.index');
-// })->name('business.list');
-
-Route::get('/business/setting', function () {
-    return view('modules.business.setting');
-})->name('business.setting');
-
-Route::get('/business/posts', function () {
-    return view('modules.business.posts');
-})->name('business.posts.list');
-
-// Route::get('/create', function () {
-//     return view('modules.business.create');
-// })->name('business.create');
-
-Route::get('/show', function () {
-    return view('modules.business.show');
-})->name('business.show');
-
-Route::get('/profile', function () {
-    return view('modules.profile.show');
-})->name('profile');
 
 Route::get(
     'locale/{lang}',
