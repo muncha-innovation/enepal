@@ -18,7 +18,7 @@
                 @endauth
 
 
-                <div class="ml-3 relative">
+                {{-- <div class="ml-3 relative">
 
                     <button type="button"
                         class="dropdown bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -41,7 +41,7 @@
                         @endforeach
                     </div>
 
-                </div>
+                </div> --}}
                 {{-- @auth
                     <!-- Profile dropdown -->
                     <div class="ml-3 relative">

@@ -60,7 +60,7 @@
                 </svg>
             </button>
             <div x-show="open" class="space-y-1">
-                <a href="{{ route('business.list') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('users.index')) bg-gray-700 @endif">List</a>
+                <a href="{{ route('business.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('users.index')) bg-gray-700 @endif">List</a>
                 <a href="{{ route('business.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('users.create')) bg-gray-700 @endif">{{ __('Create') }}</a>
             </div>
         </div>

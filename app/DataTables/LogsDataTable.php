@@ -27,7 +27,7 @@ class LogsDataTable extends DataTable
                 return DateFormatter::utcToJp($result->created_at);
             })
             ->addColumn('user', function ($result) {
-                return $result->causer?->full_name;
+                return $result->causer?->name;
             })
             ->editColumn('description', function ($result) {
                 return LogFormatter::format($result);

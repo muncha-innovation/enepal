@@ -22,13 +22,7 @@ class UsersDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            ->addColumn('name', function ($result) {
-                return $result->full_name;
-            })
 
-            ->orderColumn('name', function ($query, $order) {
-                return $query->orderBy('last_name', $order);
-            })
 
             ->addColumn('user_type', function ($result) {
                 return trans($result->getRoleNames()[0]);

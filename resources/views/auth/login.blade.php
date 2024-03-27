@@ -39,10 +39,10 @@
                             <label for="remember" class="ml-2 block text-sm text-gray-900"> {{ __('Remember me') }} </label>
                         </div>
 
-                        {{-- <div class="text-sm">
+                        <div class="text-sm">
                             <a href="{{ route('password.request') }}"
                                 class="font-medium text-indigo-600 hover:text-indigo-500"> {{ __('Forgot password?') }} </a>
-                        </div> --}}
+                        </div>
                     </div>
 
                     <div>
@@ -50,7 +50,13 @@
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Sign In') }}</button>
                     </div>
+                    
                 </form>
+                <div>
+                    <a href="{{ route('register') }}"
+                        class="w-full flex justify-center  my-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-lime-600 hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ __('Register') }}</a>
+                </div>
             </div>
         </div>
     </div>

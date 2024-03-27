@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Middleware\StatusMiddleware;
 use App\Models\Process;
@@ -27,9 +28,8 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('users', UsersController::class);
-    Route::resource('checklist', ChecklistController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
-
+    Route::resource('business',BusinessController::class);
 
     // Logs Route
     // Route::get('logs/all', [LogsController::class, 'getAllLogs'])->name('logs.all');
@@ -49,9 +49,9 @@ Route::get('/business/members', function () {
     return view('modules.business.members');
 })->name('business.members');
 
-Route::get('/business/list', function () {
-    return view('modules.business.index');
-})->name('business.list');
+// Route::get('/business/list', function () {
+//     return view('modules.business.index');
+// })->name('business.list');
 
 Route::get('/business/setting', function () {
     return view('modules.business.setting');
@@ -61,9 +61,9 @@ Route::get('/business/posts', function () {
     return view('modules.business.posts');
 })->name('business.posts.list');
 
-Route::get('/create', function () {
-    return view('modules.business.create');
-})->name('business.create');
+// Route::get('/create', function () {
+//     return view('modules.business.create');
+// })->name('business.create');
 
 Route::get('/show', function () {
     return view('modules.business.show');

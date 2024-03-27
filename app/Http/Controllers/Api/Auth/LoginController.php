@@ -21,7 +21,7 @@ class LoginController extends Controller
             'email' => ['required'],
             'password' => ['required'],
         ]);
-        $tokenName = 'goko_denko';
+        $tokenName = 'enepal';
 
         $user = User::where('email', $request->email)->orWhere('user_name',$request->email)->with(['address','departments'])->first();
         $departments = $user->departments->pluck('name')->toArray();
