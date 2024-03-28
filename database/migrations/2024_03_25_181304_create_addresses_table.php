@@ -17,7 +17,7 @@ class CreateAddressesTable extends Migration
             $table->id();
             $table->integer('addressable_id');
             $table->string('addressable_type');
-            $table->string('country')->nullable();
+            $table->unsignedInteger('country_id')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
@@ -25,6 +25,7 @@ class CreateAddressesTable extends Migration
             $table->string('town')->nullable();
             $table->string('street')->nullable();
             $table->string('building')->nullable();
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
             $table->timestamps();
         });
     }

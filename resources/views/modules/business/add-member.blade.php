@@ -5,78 +5,85 @@
 
 <section>
   <div class="bg-white p-4 shadow rounded">
-    <form>
-      <div class="mb-2">
-        <label for="firstName" class="block text-sm font-medium leading-6 text-gray-900">First Name</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="firstName" id="firstName" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. John">
+    <form class="space-y-6" action="{{ route('business.member.add', $business) }}" method="POST">
+      @csrf
+      <input type="hidden" name="member_type" value='new_user'>
+      <div>
+        <label for="position" class="block text-sm font-medium text-gray-700">
+            {{ __('Position/Title') }}</label>
+        <div class="mt-1">
+            <input id="position" name="position" type="text" autocomplete="position" required autofocus
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
         </div>
+    </div>
+      <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+              {{ __('Email') }}</label>
+          <div class="mt-1">
+              <input id="email" name="email" type="text" autocomplete="new-email" required autofocus
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+      </div>
+      <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">
+              {{ __('Full Name') }}</label>
+          <div class="mt-1">
+              <input id="name" name="name" type="text" autocomplete="name" required autofocus
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+      </div>
+      {{-- input field for country code (selectable from variable $countries) and phone number in same row--}}
+      <div class="grid grid-cols-2 gap-4">
+          <div>
+              <label for="country" class="block text-sm font-medium text-gray-700">
+                  {{ __('Country') }}</label>
+              <div class="mt-1">
+                  <select id="country" name="country" required
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                      @foreach ($countries as $country)
+                          <option value="{{ $country->id }}">
+                          {{-- country flag and country code --}}
+                          <img class="pointer-events-none h-8 w-8 rounded-full"
+                              src="{{$country->flag}}" alt="" style="display: inline">
+                          {{$country->name}} ({{ $country->dial_code }})
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
+          </div>
+          <div>
+              <label for="phone" class="block text-sm font-medium text-gray-700">
+                  {{ __('Phone Number') }}</label>
+              <div class="mt-1">
+                  <input id="phone" name="phone" type="text" autocomplete="phone" required
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              </div>
+          </div>
       </div>
 
-      <div class="mb-2">
-        <label for="lastName" class="block text-sm font-medium leading-6 text-gray-900">Last Name</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="lastName" id="lastName" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Cooper">
-        </div>
+      <div>
+          <label for="password" class="block text-sm font-medium text-gray-700"> {{ __('Password') }} </label>
+          <div class="mt-1">
+              <input id="password" name="password" type="password" autocomplete="new-password" required
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
       </div>
+      <div>
+          <label for="password_confirmation" class="block text-sm font-medium text-gray-700"> {{ __('Confirm Password') }} </label>
+          <div class="mt-1">
+              <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+      </div>
+      
 
-      <div class="mb-2">
-        <label for="country" class="block text-sm font-medium leading-6 text-gray-900">Country</label>
-        <select id="country" name="country" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-          <option>Nepal</option>
-          <option selected="">USA</option>
-          <option>China</option>
-        </select>
+      <div>
+          <button type="submit"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              {{ __('Register') }}</button>
       </div>
-
-      <div class="mb-2">
-        <label for="address1" class="block text-sm font-medium leading-6 text-gray-900">Address 1</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="address1" id="address1" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Kathmandu, Nepal">
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <label for="city" class="block text-sm font-medium leading-6 text-gray-900">City</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="city" id="city" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Kathmandu">
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <label for="state" class="block text-sm font-medium leading-6 text-gray-900">State</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="state" id="state" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Bagmati">
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <label for="zip" class="block text-sm font-medium leading-6 text-gray-900">Zip</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="zip" id="zip" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. 1234">
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. abc@gmail.com">
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <label for="phone" class="block text-sm font-medium leading-6 text-gray-900">Phone</label>
-        <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="phone" id="phone" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. 1234567890">
-        </div>
-      </div>
-
-      <div class="flex justify-end w-full">
-        <div>
-          <button type="submit" class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
-        </div>
-      </div>
-    </form>
+      
+  </form>
   </div>
 </section>
 @endsection

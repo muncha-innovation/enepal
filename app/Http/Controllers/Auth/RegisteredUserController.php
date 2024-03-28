@@ -51,8 +51,9 @@ class RegisteredUserController extends Controller
             'phone' => $request->phone,
             'country' => $request->country,
         ]);
+        $user->assignRole('user');
         $address = new Address([
-            'country' => 'Nepal'
+            'country_id' => $request->country
         ]);
         $user->address()->save($address);
         event(new Registered($user));

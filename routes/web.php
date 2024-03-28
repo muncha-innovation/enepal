@@ -24,7 +24,7 @@ use App\Http\Controllers\RapidApiController;
 */
 
 
-Route::middleware(['auth', StatusMiddleware::class])->group(function () {
+Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user', 'force.password.update']], function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
@@ -32,7 +32,7 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
     Route::group(['prefix'=>'business', 'as' => 'business.'],function() {
         Route::get('members/{business}', [BusinessController::class, 'members'])->name('members');
-        Route::get('add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
+        Route::match(['get','post'],'add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::get('posts/{business}', [BusinessController::class, 'posts'])->name('posts.list');
     });
@@ -51,6 +51,8 @@ Route::middleware(['auth', StatusMiddleware::class])->group(function () {
 
 });
 
+Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');
+
 Route::get('/home', function () {
     return view('modules.frontend.index');
 });
@@ -65,3 +67,4 @@ Route::get(
 )->name('change-locale');
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/admin.php';

@@ -15,5 +15,19 @@ class Business extends Model
     {
         return $this->morphOne(Address::class, 'addressable');
     }
-    
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot(['role','position']);
+    }
+    public function type() {
+        return $this->belongsTo(BusinessType::class, 'type_id');
+    }
+
+    public function creator() {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    public function contactPerson() {
+        return $this->belongsTo(User::class, 'contact_person_id');
+    }
 }

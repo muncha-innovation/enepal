@@ -20,8 +20,7 @@ class BusinessTypesSeeder extends Seeder
             $types = [
                 'Restaurant',
                 'Shop',
-                'News Agency',
-                'Non-Profit',
+                'Travel Agency',
             ];
             foreach ($types as $type) {
                 BusinessType::firstOrCreate([

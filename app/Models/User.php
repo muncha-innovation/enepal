@@ -46,11 +46,8 @@ class User extends Authenticatable
 
     ];
 
-    const SuperAdmin = 'Super admin';
-    const Supervisor = 'Supervisor';
-    const Inspector = 'Inspector';
-    const User = 'User';
-
+    const SuperAdmin = 'super-admin';
+    const Owner = 'owner';
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -124,4 +121,8 @@ class User extends Authenticatable
         return false;
     }
 
+    public function businesses()
+{
+    return $this->belongsToMany(Business::class);
+}
 }

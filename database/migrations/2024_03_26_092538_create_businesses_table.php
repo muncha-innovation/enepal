@@ -16,7 +16,7 @@ class CreateBusinessesTable extends Migration
         Schema::create('businesses', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->unsignedMediumInteger('type')->nullable();
+            $table->unsignedMediumInteger('type_id')->nullable();
             $table->string('email', 100)->unique()->nullable();      
             $table->string('phone_1', 20)->nullable();
             $table->string('phone_2', 20)->nullable();
@@ -29,8 +29,10 @@ class CreateBusinessesTable extends Migration
             $table->json('social_media')->nullable();
             $table->boolean('active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->foreign('type')->references('id')->on('business_types')->onDelete('set null');
+            $table->unsignedBigInteger('contact_person_id')->nullable();
+            $table->foreign('type_id')->references('id')->on('business_types')->onDelete('set null');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('contact_person_id')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }

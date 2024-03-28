@@ -27,7 +27,7 @@ class StoreBusinessRequest extends FormRequest
             //
             'name' => ['required'],
             'country' => ['required'],
-            'type' => ['required',],
+            'type_id' => ['required',],
             'phone_1' => ['required'],
             'cover_image' => ['required', 'image', 'max:1999'],
             'logo' => ['required', 'image', 'max:1999'],

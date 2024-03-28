@@ -41,60 +41,17 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
+            @foreach($business->users as $member)
             <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Lindsay Walton</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Front-end Developer</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">lindsay.walton@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
+              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{$member->name}}</td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$member->pivot->position}}</td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$member->email}}</td>
+              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ucfirst($member->pivot->role)}}</td>
               <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Lindsay Walton</span></a>
+                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{$member->name}}</span></a>
               </td>
             </tr>
-            <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Courtney Henry</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Designer</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">courtney.henry@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Admin</td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Courtney Henry</span></a>
-              </td>
-            </tr>
-            <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Tom Cook</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Director of Product</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">tom.cook@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Tom Cook</span></a>
-              </td>
-            </tr>
-            <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Whitney Francis</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Copywriter</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">whitney.francis@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Admin</td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Whitney Francis</span></a>
-              </td>
-            </tr>
-            <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Leonard Krasner</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Senior Designer</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">leonard.krasner@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Owner</td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Leonard Krasner</span></a>
-              </td>
-            </tr>
-            <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Floyd Miles</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Principal Designer</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">floyd.miles@example.com</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
-              <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Floyd Miles</span></a>
-              </td>
-            </tr>
+            @endforeach
           </tbody>
         </table>
       </div>

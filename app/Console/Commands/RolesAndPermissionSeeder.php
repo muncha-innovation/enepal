@@ -39,10 +39,10 @@ class RolesAndPermissionSeeder extends Command
      */
     public function handle(): int
     {
-        $roles = ['Super admin', 'Supervisor', 'Inspector', 'User'];
+        $roles = ['super-admin','owner','member'];
         foreach ($roles as $role) {
             if (!Role::where('name', $role)->exists()) {
-                Role::create(['name' => $role]);
+                Role::create(['name' => $role, 'business_id' => null]);
             }
         }
 
@@ -55,7 +55,7 @@ class RolesAndPermissionSeeder extends Command
                 'email' => 'admin@admin.com',
                 'password' => bcrypt('password'),
             ]);
-            $user->assignRole('Super Admin');
+            $user->assignRole('super-admin');
             $this->info('email: admin@admin.com password: password');
         }
 
