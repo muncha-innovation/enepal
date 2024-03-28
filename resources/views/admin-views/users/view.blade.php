@@ -16,12 +16,12 @@
 
                     <fieldset class="col-span-4 mb-2 sm:col-span-2 md:col-span-4 lg:col-span-2">
                         <label for="user_name" class="block text-sm font-medium text-gray-700">
-                            {{ __('User Name') }}
+                            {{ __('Name') }}
                         </label>
                         <div class="mt-1">
                             <input type="text" name="user_name" id="user_name"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                placeholder="" disabled value="{{ $user->user_name }}" />
+                                placeholder="" disabled value="{{ $user->name }}" />
                         </div>
 
                     </fieldset>
@@ -36,27 +36,6 @@
                             placeholder="" disabled value="{{ trans($user->getRoleNames()[0]) }}" />
                     </fieldset>
 
-                    <fieldset class="col-span-4 mb-2 sm:col-span-2 md:col-span-4 lg:col-span-2">
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">
-                            {{ __('Last Name') }}
-                        </label>
-                        <div class="mt-1">
-                            <input type="text" name="last_name" id="last_name"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                placeholder="" disabled value="{{ $user->last_name }}" />
-                        </div>
-                    </fieldset>
-
-                    <fieldset class="col-span-4 mb-2 sm:col-span-2 md:col-span-4 lg:col-span-2">
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">
-                            {{ __('First Name') }}
-                        </label>
-                        <div class="mt-1">
-                            <input type="text" name="first_name" id="first_name"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                placeholder="" disabled value="{{ $user->first_name }}" />
-                        </div>
-                    </fieldset>
 
 
                     {{-- ------------------------ Pronounciation Section ------------------------------- --}}
@@ -215,7 +194,7 @@
 
                     </div>
                     <div class="col-span-4 text-center my-3">
-                        <a href="{{ route('users.index') }}"
+                        <a href="{{ route('admin.users.index') }}"
                             class="inline-flex items-center px-4 py-2 border border-transparent
                              text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700
                              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

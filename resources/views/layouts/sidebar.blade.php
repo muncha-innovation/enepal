@@ -1,9 +1,14 @@
 @php
     $isUserRoute = str_contains(url()->current(), 'user');
-    $isChecklistRoute = str_contains(url()->current(), 'checklist');
+    $isProfileRoute = str_contains(url()->current(), 'profile');
+
+    $isBusinessRoute = str_contains(url()->current(), 'business');
   
-    if (!$isChecklistRoute) {
-        $isChecklistRoute = 0;
+    if (!$isBusinessRoute) {
+        $isBusinessRoute = 0;
+    }
+    if (!$isProfileRoute) {
+        $isProfileRoute = 0;
     }
     if (!$isUserRoute) {
         $isUserRoute = 0;

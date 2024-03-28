@@ -10,14 +10,6 @@
       @endforeach
     </select>
   </fieldset>
-  <template x-if="country=='1'">
-    @include('modules.users.partials.japan_form')
-  </template>
-  <template x-if="country==''">
-    <div>
-    </div>
-  </template>
-  <template x-if="country!='1' && country!=''">
-    @include('modules.users.partials.general_form')
-  </template>
+    @include('admin-views.users.partials.general_form')
+  
 </div>

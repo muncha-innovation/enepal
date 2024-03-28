@@ -12,11 +12,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\Factory;
 use App\Http\Requests\StoreUserRequest;
-use App\Models\Countries;
+use App\Models\Country;
 use App\Models\LogTypes;
 use App\Models\Process;
 use App\Models\Product;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Request;
 
 class UsersController extends Controller
 {
@@ -25,12 +26,10 @@ class UsersController extends Controller
      *
      * @return Application|Factory|View
      */
-    public function index(UsersDataTable $dt)
+    public function index(Request $request)
     {
-
-        abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-
-        return $dt->render('modules.users.index');
+        $users = User::with(['address.country'])->paginate(10);
+        return view('admin-views.users.index', compact(['users']));
     }
 
     /**
@@ -42,9 +41,9 @@ class UsersController extends Controller
     {
 
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        return view('modules.users.createOrEdit', [
+        return view('admin-views.users.createOrEdit', [
             'roles' => Role::get(),
-            'countries' => config('app.countries')
+            'countries' => Country::all(),
         ]);
     }
 
@@ -68,7 +67,7 @@ class UsersController extends Controller
 
         //todo: maybe sending email to the user with the password(this can be dispatched after redirecting check that)
 
-        return redirect()->route('users.index')->with('success', __('User created successfully'));
+        return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
     }
 
     /**
@@ -80,7 +79,7 @@ class UsersController extends Controller
     public function show(User $user)
     {
         
-        return view('modules.users.view', compact(['user']));
+        return view('admin-views.users.view', compact(['user']));
     }
 
     /**

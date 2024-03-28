@@ -29,10 +29,10 @@ class UsersDataTable extends DataTable
             })
             ->addColumn('action', function ($result) {
                 $userId = $result->id;
-                return view('modules.users.partials.actions', [
-                    'viewRoute' => route('users.show', $userId),
-                    'editRoute' => route('users.edit', $userId),
-                    'deleteRoute' => route('users.destroy', $userId),
+                return view('admin-views.users.partials.actions', [
+                    'viewRoute' => route('admin.users.show', $userId),
+                    'editRoute' => route('admin.users.edit', $userId),
+                    'deleteRoute' => route('admin.users.destroy', $userId),
                     // 'logRoute' => route('user.logs', ['userId' => $userId])
                 ]);
             });
@@ -85,7 +85,6 @@ class UsersDataTable extends DataTable
         return [
 
             Column::make('id')->title(__('Id')),
-            Column::make('user_name')->title(__('User Name')),
             Column::make('name')->title(__('Name')),
             Column::make('user_type')->title(__('User Type'))->sortable(false),
             Column::make('created_at')->title(__('Created At')),

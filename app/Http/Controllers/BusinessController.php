@@ -23,9 +23,13 @@ class BusinessController extends Controller
      */
     public function index()
     {
-        
-        $businesses = auth()->user()->businesses()->with(['address.country','type'])->paginate(10);
-        return view('modules.business.index',compact('businesses'));
+        if(auth()->user()->hasRole('super-admin')) {
+            $businesses = Business::with(['address.country','type'])->paginate(10);
+            return view('modules.business.index',compact('businesses'));
+        } else {
+            $businesses = auth()->user()->businesses()->with(['address.country','type'])->paginate(10);
+            return view('modules.business.index',compact('businesses'));
+        }
         
     }
 
@@ -214,4 +218,17 @@ class BusinessController extends Controller
         }
     }
     
+    public function createPost(Request $request, Business $business) {
+        if($request->isMethod('get')) {
+            return view('modules.business.createPost', compact(['business']));
+        } else if($request->isMethod('post')) {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'short_desc' => 'required|string|max:255',
+                'content' => 'required|string',
+                'image' => 'required|image'
+
+            ]);
+        }
+    }
 }

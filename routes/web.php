@@ -24,7 +24,7 @@ use App\Http\Controllers\RapidApiController;
 */
 
 
-Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user', 'force.password.update']], function () {
+Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update']], function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
@@ -35,6 +35,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user', 'fo
         Route::match(['get','post'],'add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::get('posts/{business}', [BusinessController::class, 'posts'])->name('posts.list');
+        Route::get('post/create/{business}', [BusinessController::class, 'createPost'])->name('post.create');
     });
     Route::resource('business',BusinessController::class);
    

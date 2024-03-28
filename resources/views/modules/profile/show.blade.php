@@ -7,12 +7,11 @@
     <section class="mb-4">
         <div class="bg-white p-4 shadow rounded flex gap-3 divide-x">
             <div class="col-span-full flex items-center gap-x-8">
-                <img src="{{ getImage(auth()->user()->profile_picture, 'profile/') }}" alt=""
+                <img id="profile-picture" src="{{ getImage(auth()->user()->profile_picture, 'profile/') }}" alt=""
                     class="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover">
                 <div>
-                    <button type="button"
-                        class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change
-                        avatar</button>
+                    <button type="button" id="file-selector"
+                        class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change avatar</button>
                     <p class="mt-2 text-xs leading-5 text-gray-400">JPG, GIF or PNG. 1MB max.</p>
                 </div>
             </div>
@@ -31,8 +30,9 @@
         <div class="bg-white p-4 shadow rounded">
             <h2 class="font-semibold">{{ __('User Details') }}</h2>
 
-            <form route="{{ route('profile.update') }}" method="POST">
+            <form route="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <input type="file" id="file-input" name="profile_picture" accept="image/*" style="display: none;">
                 @if (auth()->user()->force_update_password)
                     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4">
                         <div class="flex">
@@ -147,4 +147,26 @@
             </form>
         </div>
     </section>
+@endsection
+
+@section('js')
+<script>
+  document.getElementById('file-selector').addEventListener('click', function () {
+        document.getElementById('file-input').click();
+    });
+    document.getElementById('file-input').addEventListener('change', function () {
+        const fileInput = this;
+        const selectedImage = document.getElementById('profile-picture');
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                selectedImage.setAttribute('src', e.target.result);
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    });
+</script>
 @endsection

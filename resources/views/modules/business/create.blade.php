@@ -11,13 +11,13 @@
       <div class="mb-2">
         <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
         <div class="mt-2 rounded-md shadow-sm">
-          <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Nepalese Association of Houston">
+          <input required type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Eg. Nepalese Association of Houston">
         </div>
       </div>
 
       <div class="mb-2">
         <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
-        <select id="type_id" name="type_id" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <select required id="type_id" name="type_id" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
           @foreach ($businessTypes as $type)
             <option value="{{$type->id}}">{{ $type->title }}</option>
             
@@ -98,11 +98,11 @@
       </div>
       <div class="mb-2">
         <label for="logo" class="block text-sm font-medium leading-6 text-gray-900">{{('Logo')}}</label>
-        <input type="file" name="logo" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+        <input type="file" required name="logo" accept="image/*" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
       </div>
       <div class="mb-2">
         <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
-        <input type="file" name="cover_image" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+        <input type="file" required name="cover_image" accept="image/*" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
       </div>
 
       <div class="flex justify-end w-full">
