@@ -10,7 +10,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ __('App Title') }}</title>
+    <title>{{ __('ENepali') }}</title>
 
     <!-- Scripts -->
 
