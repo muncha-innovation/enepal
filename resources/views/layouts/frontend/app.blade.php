@@ -13,7 +13,7 @@
   <div class="flex flex-col flex-1">
     <main class="flex-1 min-h-screen bg-white">
       @include('layouts.frontend.navbar')
-      <div class="px-6 py-4">
+      <div>
         @yield('content')
       </div>
     </main>

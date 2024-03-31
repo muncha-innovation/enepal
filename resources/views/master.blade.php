@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    @if (!auth()->check())
+    @if (auth()->check())
         @include('modules.includes.navbar')
     @endif
     @yield('body')
