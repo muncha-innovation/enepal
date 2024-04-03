@@ -60,11 +60,15 @@ Route::get('/home', function () {
 
 Route::get('/single', function () {
     return view('modules.frontend.show');
-});
+})->name('single');
 
 Route::get('/posts', function () {
     return view('modules.frontend.posts');
 })->name('posts');
+
+Route::get('/location', function () {
+    return view('modules.frontend.location');
+})->name('location');
 
 Route::get(
     'locale/{lang}',

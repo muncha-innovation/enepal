@@ -21,24 +21,7 @@
   </div>
 </section>
 
-<section class="container mx-auto px-6">
-  <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-4">
-    <ul class="flex flex-wrap -mb-px">
-      <li class="me-2">
-        <a href="" class="inline-block p-3 {{ false ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('home') ? 'page' : '' }}">About</a>
-      </li>
-      <li class="me-2">
-        <a href="#" class="inline-block p-3 {{ true ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('posts') ? 'page' : '' }}">Posts</a>
-      </li>
-      <li class="me-2">
-        <a href="#" class="inline-block p-3 {{ false ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.setting') ? 'page' : '' }}">Setting</a>
-      </li>
-      <li class="me-2">
-        <a href="#" class="inline-block p-3 {{ false ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.members') ? 'page' : '' }}">Members</a>
-      </li>
-    </ul>
-  </div>
-</section>
+@include('modules.includes.menu')
 
 <section class="container mx-auto px-6 py-4">
   <div class="grid md:grid-cols-3 2xl:grid-cols-4 gap-8">
