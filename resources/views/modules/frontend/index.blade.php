@@ -2,8 +2,6 @@
 
 @section('content')
 
-{{-- <h1 class="text-2xl font-semibold text-gray-700 mb-2"></h1> --}}
-
 <section class="container mx-auto px-6 py-4">
   <div class="grid md:grid-cols-3 2xl:grid-cols-4 gap-8">
     <div class="max-w-sm bg-white">
