@@ -23,9 +23,6 @@
 </head>
 
 <body>
-    @if (auth()->check())
-        @include('modules.includes.navbar')
-    @endif
     @yield('body')
 
     <script src="{{ asset('js/app.js') }}"></script>

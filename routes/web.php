@@ -30,15 +30,15 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 
     // Route::resource('users', UsersController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
-    Route::group(['prefix'=>'business', 'as' => 'business.'],function() {
+    Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('members/{business}', [BusinessController::class, 'members'])->name('members');
-        Route::match(['get','post'],'add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
+        Route::match(['get', 'post'], 'add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::get('posts/{business}', [BusinessController::class, 'posts'])->name('posts.list');
         Route::get('post/create/{business}', [BusinessController::class, 'createPost'])->name('post.create');
     });
-    Route::resource('business',BusinessController::class);
-   
+    Route::resource('business', BusinessController::class);
+
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -56,8 +56,19 @@ Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->nam
 
 Route::get('/home', function () {
     return view('modules.frontend.index');
-});
+})->name('home');
 
+Route::get('/single', function () {
+    return view('modules.frontend.show');
+})->name('single');
+
+Route::get('/posts', function () {
+    return view('modules.frontend.posts');
+})->name('posts');
+
+Route::get('/location', function () {
+    return view('modules.frontend.location');
+})->name('location');
 
 Route::get(
     'locale/{lang}',

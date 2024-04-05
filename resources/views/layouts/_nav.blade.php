@@ -1,33 +1,31 @@
-<div class="flex items-center flex-shrink-0 px-4">
-    <a href="{{ route('dashboard') }}">
+@php
+$isUserRoute = str_contains(url()->current(), 'user');
+$isProfileRoute = str_contains(url()->current(), 'profile');
 
-        <img class="w-auto" src="{{ asset('logo.png') }}" alt="{{ __('Enepal') }}" />
+$isBusinessRoute = str_contains(url()->current(), 'business');
+
+if (!$isBusinessRoute) {
+$isBusinessRoute = 0;
+}
+if (!$isProfileRoute) {
+$isProfileRoute = 0;
+}
+if (!$isUserRoute) {
+$isUserRoute = 0;
+}
+@endphp
+
+<div class="flex items-center flex-shrink-0 px-4 justify-center py-3">
+    <a href="{{ route('dashboard') }}">
+        <img class="h-20 w-auto" src="{{ asset('logo.png') }}" alt="{{ __('Enepal') }}" />
     </a>
 </div>
 
 <nav class="flex flex-col justify-between flex-1 px-2 mt-5 space-y-4 divide-y-2 divide-gray-300">
-    {{--
-    @role($superAdmin)
     <div class="space-y-1">
-        <a href="{{ route('logs.all') }}" type="button" class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-700 hover:text-white group @if (url()->current() == route('logs.all')) bg-gray-700 @endif">
-            <div class="flex items-center pointer-events-none">
-                <div class="pr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                </div> {{ __('Logs') }}
-            </div>
-            <svg x-bind:class="!open ? '' : 'rotate-90'" class="flex-shrink-0 w-5 h-5 mr-2 text-gray-500 transition-colors duration-150 ease-in-out transform pointer-events-none group-hover:text-gray-400" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
-            </svg>
-        </a>
-    </div>
-    @endrole --}}
-    <div class="pt-5 space-y-1">
-        
         <div x-data="{ open: {{ $isProfileRoute }} }" class="space-y-1">
             <a href="{{ route('profile') }}">
-                <button class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-700 hover:text-white group">
+                <button class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
                     <div class="flex items-center pointer-events-none">
                         <div>
                             <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 w-6 h-6 mr-3 text-gray-500 group-hover:text-gray-500" fill="currentColor" viewBox="0 0 16 16">
@@ -41,7 +39,7 @@
             </a>
         </div>
         <div x-data="{ open: {{ $isBusinessRoute }} }" class="space-y-1">
-            <button type="button" x-on:click="open = !open" class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-700 hover:text-white group">
+            <button type="button" x-on:click="open = !open" class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
                 <div class="flex items-center pointer-events-none">
                     <div>
                         <svg class="mr-3" class="text-gray-500" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -55,13 +53,13 @@
                 </svg>
             </button>
             <div x-show="open" class="space-y-1">
-                <a href="{{ route('business.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('business.index')) bg-gray-700 @endif">List</a>
-                <a href="{{ route('business.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('business.create')) bg-gray-700 @endif">{{ __('Create') }}</a>
+                <a href="{{ route('business.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (url()->current() == route('business.index')) bg-gray-200 @endif">List</a>
+                <a href="{{ route('business.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (url()->current() == route('business.create')) bg-gray-200 @endif">{{ __('Create') }}</a>
             </div>
         </div>
         @role('super-admin')
         <div x-data="{ open: {{ $isUserRoute }} }" class="space-y-1">
-            <button type="button" x-on:click="open = !open" class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-700 hover:text-white group">
+            <button type="button" x-on:click="open = !open" class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
                 <div class="flex items-center pointer-events-none">
                     <div>
                         <svg class="mr-3" class="text-gray-500" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -75,8 +73,8 @@
                 </svg>
             </button>
             <div x-show="open" class="space-y-1">
-                <a href="{{ route('admin.users.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('business.index')) bg-gray-700 @endif">List</a>
-                <a href="{{ route('admin.users.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-700 hover:text-white @if (url()->current() == route('business.create')) bg-gray-700 @endif">{{ __('Create') }}</a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (url()->current() == route('business.index')) bg-gray-200 @endif">List</a>
+                <a href="{{ route('admin.users.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (url()->current() == route('business.create')) bg-gray-200 @endif">{{ __('Create') }}</a>
             </div>
         </div>
         @endrole

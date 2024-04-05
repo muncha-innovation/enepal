@@ -33,9 +33,7 @@
 
         <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             @include('layouts._nav')
-
         </div>
-
     </div>
 
     <div class="flex-shrink-0 w-14">

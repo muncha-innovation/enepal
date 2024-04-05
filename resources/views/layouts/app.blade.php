@@ -24,7 +24,6 @@
             </main>
         </div>
     </div>
-
 @stop
 
 @section('scripts')

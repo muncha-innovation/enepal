@@ -8,7 +8,7 @@
         <div class="bg-white p-4 shadow rounded flex gap-3 divide-x">
             <div class="col-span-full flex items-center gap-x-8">
                 <img id="profile-picture" src="{{ getImage(auth()->user()->profile_picture, 'profile/') }}" alt=""
-                    class="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover">
+                    class="h-24 w-24 flex-none rounded-lg bg-gray-200 object-cover">
                 <div>
                     <button type="button" id="file-selector"
                         class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change avatar</button>
