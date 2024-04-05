@@ -70,7 +70,7 @@
                                     <option value="{{ $country->id }}" @if ($country->id == $user->country) selected @endif>
                                         {{-- country flag and country code --}}
                                         <img class="pointer-events-none h-8 w-8 rounded-full" src="{{ $country->flag }}"
-                                            alt="" style="display: inline">
+                                            alt="">
                                         {{ $country->name }} ({{ $country->dial_code }})
                                     </option>
                                 @endforeach
@@ -163,6 +163,7 @@
 
             reader.onload = function (e) {
                 selectedImage.setAttribute('src', e.target.result);
+                console.log('atr set');
             };
 
             reader.readAsDataURL(fileInput.files[0]);
