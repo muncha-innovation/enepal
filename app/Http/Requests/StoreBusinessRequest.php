@@ -24,15 +24,24 @@ class StoreBusinessRequest extends FormRequest
     public function rules()
     {
         return [
-            //
             'name' => ['required'],
-            'country' => ['required'],
+            'email' => ['required', 'email'],
             'type_id' => ['required',],
             'phone_1' => ['required'],
             'cover_image' => ['required', 'image', 'max:1999'],
             'logo' => ['required', 'image', 'max:1999'],
             'phone_2'  => ['sometimes'],
-            'address.city' => ['sometimes']
+            'address.city' => ['sometimes'],
+            'address.state_id' => ['sometimes'],
+            'address.street' => ['sometimes'],
+            'address.postal_code' => ['sometimes'],
+            'address.address_line_1' => ['sometimes'],
+            'address.address_line_2' => ['sometimes'],
+            'address.country_id' => ['required'],
+            'address.prefecture' => ['sometimes'],
+            'address.town' => ['sometimes'],
+            'address.building' => ['sometimes'],
+
         ];
     }
 }

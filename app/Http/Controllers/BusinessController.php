@@ -44,7 +44,7 @@ class BusinessController extends Controller
         $businessTypes = BusinessType::all();
         $countries = Country::all();
         
-        return view('modules.business.create',compact('businessTypes','countries'));
+        return view('modules.business.createOrEdit',compact('businessTypes','countries'));
     }
 
     /**
@@ -56,16 +56,14 @@ class BusinessController extends Controller
     public function store(StoreBusinessRequest $request)
     {
         //
-        // dd($request->all());
         $data = $request->validated();
         $data['cover_image'] = upload('business/cover_image','png',$data['cover_image']);
         $data['logo'] = upload('business/logo','png',$data['logo']);
-        $address = new Address([
-            'country_id' => $data['country'],
-        ]);
-        unset($data['country']);
-        $business = Business::create($data);
+        
+        $business = Business::create(collect($data)->except(['address'])->toArray());
+        $address = new Address($data['address']);
         $business->address()->save($address);
+
         $business->users()->attach(auth()->user()->id, ['role' => 'owner']);
         return redirect()->route('business.index')->with('success','Business Created Successfully');
 
@@ -94,6 +92,10 @@ class BusinessController extends Controller
     public function edit(Business $business)
     {
         //
+        $businessTypes = BusinessType::all();
+        $countries = Country::all();
+        $business->load('address');
+        return view('modules.business.createOrEdit', compact(['business','businessTypes','countries']));
     }
 
     /**
@@ -120,8 +122,9 @@ class BusinessController extends Controller
     }
     public function setting(Business $business) {
         $businessTypes = BusinessType::all();
-        $business->load('users');
-        return view('modules.business.setting', compact(['business', 'businessTypes']));
+        $countries = Country::all();
+        $business->load('address');
+        return view('modules.business.setting', compact(['business','businessTypes','countries']));
     }
     public function members(Request $request , Business $business) {
         if($request->isMethod('get')) {

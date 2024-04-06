@@ -44,7 +44,7 @@ class LoginController extends Controller
         }
         $user->role = trans($user->getRoleNames()[0], [], $lang);
         if($user->address?->country) {
-            $user->address->country =$user->address->country_name;
+            $user->address->country =$user->address?->country_name;
         }
         $user->image  = $user->full_path;
         return response()->json([

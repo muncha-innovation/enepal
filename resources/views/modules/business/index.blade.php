@@ -63,7 +63,7 @@
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                         {{$business->name}}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->type->title}}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->address->country->name }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->address?->country->name }}</td>
                                     <td
                                         class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"

@@ -22,10 +22,13 @@ class UpdateProfileRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
+{
         return [
-            'country' => 'required',
-            'name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'address.country_id' => ['required', 'exists:countries,id'],
+            'address.state_id' => ['sometimes','nullable', 'exists:states,id'],
+            'address.city' => 'required',
             'email' => 'required|unique:users,email,' . auth()->id(),
             'phone' => 'required',
             'password' => 'nullable|confirmed',

@@ -65,7 +65,10 @@ class Country extends Model
         }
         return asset('images/country/flags/'.$value);
     }
-
+    public function states()
+    {
+        return $this->hasMany(State::class);
+    }
     /**
      * The default file upload path.
      *
@@ -83,7 +86,7 @@ class Country extends Model
      */
     public static function allJSON()
     {
-        $route = dirname(dirname(__FILE__)) . '/Helper/Countries/countries.json';
+        $route = dirname(dirname(__FILE__)) . '/Helper/Countries/countries_states.json';
         return json_decode(file_get_contents($route), true);
     }
 
