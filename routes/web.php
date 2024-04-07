@@ -59,7 +59,7 @@ Route::get('/home', function () {
 })->name('home');
 
 Route::get('/single', function () {
-    return view('modules.frontend.show');
+    return view('modules.frontend.resturant');
 })->name('single');
 
 Route::get('/posts', function () {
