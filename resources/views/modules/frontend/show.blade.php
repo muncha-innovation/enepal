@@ -19,4 +19,10 @@
     We want to give people the power to build community and bring the world closer together. To do that, we ask that you help create a safe and respectful online space. These community values encourage constructive conversations on this page:
   </p>
 </section>
+
+<section class="container mx-auto px-6 py-4">
+  <div class="flex">
+  </div>
+  
+
 @endsection
