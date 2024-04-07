@@ -11,7 +11,7 @@
 
   <div class="flex gap-2">
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-      <a href="{{ route('business.member.add', $business) }}" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Member</a>
+      <a href="{{ route('members.create', $business) }}" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Member</a>
       {{-- <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Member</button> --}}
     </div>
 
@@ -34,7 +34,7 @@
           <thead class="bg-gray-50">
             <tr>
               <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Title</th>
+              {{-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Title</th> --}}
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Role</th>
               
@@ -43,8 +43,8 @@
           <tbody class="divide-y divide-gray-200 bg-white">
             @foreach($business->users as $member)
             <tr>
-              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{$member->name}}</td>
-              <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$member->pivot->position}}</td>
+              <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{$member->first_name.' '.$member->last_name}}</td>
+              {{-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$member->pivot->position}}</td> --}}
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$member->email}}</td>
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ucfirst($member->pivot->role)}}</td>
               <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\MembersController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 
@@ -31,11 +33,25 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     // Route::resource('users', UsersController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
-        Route::get('members/{business}', [BusinessController::class, 'members'])->name('members');
-        Route::match(['get', 'post'], 'add-member/{business}', [BusinessController::class, 'addMember'])->name('member.add');
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
-        Route::get('posts/{business}', [BusinessController::class, 'posts'])->name('posts.list');
-        Route::get('post/create/{business}', [BusinessController::class, 'createPost'])->name('post.create');
+
+    });
+    Route::group(['prefix' => 'members', 'as' => 'members.'], function() {
+        Route::get('/{business}', [MembersController::class, 'index'])->name('index');
+        Route::get('create/{business}', [MembersController::class, 'create'])->name('create');
+        Route::post('store/{business}', [MembersController::class, 'store'])->name('store');
+        Route::get('edit/{business}/{user}', [MembersController::class, 'edit'])->name('edit');
+        Route::put('update/{business}/{user}', [MembersController::class, 'update'])->name('update');
+    });
+
+    Route::group(['prefix' => 'posts', 'as' => 'posts.'], function() {
+        Route::get('/{business}', [PostController::class, 'index'])->name('index');
+        Route::get('create/{business}', [PostController::class, 'create'])->name('create');
+        Route::post('store/{business}', [PostController::class, 'store'])->name('store');
+        Route::get('edit/{post}', [PostController::class, 'edit'])->name('edit');
+        Route::put('update/{post}', [PostController::class, 'update'])->name('update');
+        Route::delete('delete/{post}', [PostController::class, 'destroy'])->name('delete');
+        Route::post('{business}/image/upload', [PostController::class, 'uploadImage'])->name('image.upload');
     });
     Route::resource('business', BusinessController::class);
 

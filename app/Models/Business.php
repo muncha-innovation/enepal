@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Business extends Model
 {
     use HasFactory;
+    static $ROLES = ['owner', 'admin', 'member'];
+    
     protected $guarded = [];
 
     public function address(): MorphOne

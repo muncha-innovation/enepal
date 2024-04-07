@@ -18,23 +18,12 @@
 </style>
 @endsection
 @section('js')
-  <!--
-            The "superbuild" of CKEditor&nbsp;5 served via CDN contains a large set of plugins and multiple editor types.
-            See https://ckeditor.com/docs/ckeditor5/latest/installation/getting-started/quick-start.html#running-a-full-featured-editor-from-cdn
-        -->
-        <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
-        <!--
-            Uncomment to load the Spanish translation
-            <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/translations/es.js"></script>
-        -->
+ <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
+        
         <script>
-            // This sample still does not showcase all CKEditor&nbsp;5 features (!)
-            // Visit https://ckeditor.com/docs/ckeditor5/latest/features/index.html to browse all the features.
             CKEDITOR.ClassicEditor.create(document.getElementById("editor"), {
-                // https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html#extended-toolbar-configuration-format
                 toolbar: {
-                    items: [
-                        
+                    items: [                       
                         'findAndReplace', 'selectAll', '|',
                         'heading', '|',
                         'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
@@ -51,8 +40,13 @@
                     ],
                     shouldNotGroupWhenFull: true
                 },
-                // Changing the language of the interface requires loading the language file using the <script> tag.
-                // language: 'es',
+                simpleUpload: {
+                    uploadUrl: '{{ route('posts.image.upload', $business) }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    }
+                },
+
                 list: {
                     properties: {
                         styles: true,
@@ -60,7 +54,6 @@
                         reversed: true
                     }
                 },
-                // https://ckeditor.com/docs/ckeditor5/latest/features/headings.html#configuration
                 heading: {
                     options: [
                         { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
@@ -72,9 +65,7 @@
                         { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
                     ]
                 },
-                // https://ckeditor.com/docs/ckeditor5/latest/features/editor-placeholder.html#using-the-editor-configuration
                 placeholder: 'Write Here..',
-                // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-family-feature
                 fontFamily: {
                     options: [
                         'default',
@@ -89,13 +80,10 @@
                     ],
                     supportAllValues: true
                 },
-                // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-size-feature
                 fontSize: {
                     options: [ 10, 12, 14, 'default', 18, 20, 22 ],
                     supportAllValues: true
                 },
-                // Be careful with the setting below. It instructs CKEditor to accept ALL HTML markup.
-                // https://ckeditor.com/docs/ckeditor5/latest/features/general-html-support.html#enabling-all-html-features
                 htmlSupport: {
                     allow: [
                         {
@@ -106,12 +94,9 @@
                         }
                     ]
                 },
-                // Be careful with enabling previews
-                // https://ckeditor.com/docs/ckeditor5/latest/features/html-embed.html#content-previews
                 htmlEmbed: {
                     showPreviews: true
                 },
-                // https://ckeditor.com/docs/ckeditor5/latest/features/link.html#custom-link-attributes-decorators
                 link: {
                     decorators: {
                         addTargetToExternalLinks: true,
@@ -125,34 +110,11 @@
                         }
                     }
                 },
-                // https://ckeditor.com/docs/ckeditor5/latest/features/mentions.html#configuration
-                // mention: {
-                //     feeds: [
-                //         {
-                //             marker: '@',
-                //             feed: [
-                //                 '@apple', '@bears', '@brownie', '@cake', '@cake', '@candy', '@canes', '@chocolate', '@cookie', '@cotton', '@cream',
-                //                 '@cupcake', '@danish', '@donut', '@dragée', '@fruitcake', '@gingerbread', '@gummi', '@ice', '@jelly-o',
-                //                 '@liquorice', '@macaroon', '@marzipan', '@oat', '@pie', '@plum', '@pudding', '@sesame', '@snaps', '@soufflé',
-                //                 '@sugar', '@sweet', '@topping', '@wafer'
-                //             ],
-                //             minimumCharacters: 1
-                //         }
-                //     ]
-                // },
-                // The "superbuild" contains more premium features that require additional configuration, disable them below.
-                // Do not turn them on unless you read the documentation and know how to configure them and setup the editor.
                 removePlugins: [
-                    // These two are commercial, but you can try them out without registering to a trial.
-                    // 'ExportPdf',
-                    // 'ExportWord',
                     'AIAssistant',
                     'CKBox',
                     'CKFinder',
                     'EasyImage',
-                    // Replace it on production website with other solutions:
-                    // https://ckeditor.com/docs/ckeditor5/latest/features/images/image-upload/image-upload.html
-                    // 'Base64UploadAdapter',
                     'RealTimeCollaborativeComments',
                     'RealTimeCollaborativeTrackChanges',
                     'RealTimeCollaborativeRevisionHistory',
@@ -180,7 +142,7 @@
 
 <section>
   <div class="bg-white p-4 shadow rounded">
-    <form class="space-y-6" action="{{ route('business.post.create', $business) }}" method="POST">
+    <form class="space-y-6" action="{{ route('posts.create', $business) }}" method="POST">
       @csrf
       <div>
         <label for="title" class="block text-sm font-medium text-gray-700">

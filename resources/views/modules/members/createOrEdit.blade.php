@@ -1,62 +1,39 @@
 @extends('layouts.app')
-
+@php
+    $user = new App\Models\User();
+    if(isset($member)) {
+        $isEdit = true;
+        $title = 'Edit Member';
+        $action = route('members.update', [$business, $member]);
+    } else {
+        $isEdit = false;
+        $title = 'Add Member';
+        $member = new App\Models\User();
+        $action = route('members.store', $business);
+    }
+@endphp
 @section('content')
-{{-- if any errors display errrors --}}
-@if ($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">{{ $errors->first() }}</span>
-    </div>
-@endif
-    {{-- @include('modules.business.header', ['title' => 'Create Business / Organization']) --}}
-    <h1 class="text-2xl font-semibold text-gray-700 mb-2">Profile</h1>
-
-    <section class="mb-4">
-        <div class="bg-white p-4 shadow rounded flex gap-3 divide-x">
-            <div class="col-span-full flex items-center gap-x-8">
-                <img id="profile-picture" src="{{ getImage(auth()->user()->profile_picture, 'profile/') }}" alt=""
-                    class="h-24 w-24 flex-none rounded-lg bg-gray-200 object-cover">
-                <div>
-                    <button type="button" id="file-selector"
-                        class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change avatar</button>
-                    <p class="mt-2 text-xs leading-5 text-gray-400">JPG, GIF or PNG. 1MB max.</p>
-                </div>
-            </div>
-            <div class="px-4">
-                <h3 class="mb-2">Image Requirements</h3>
-                <ul class="list-disc list-inside text-sm text-gray-600">
-                    <li>Minimum 256x256 pixels</li>
-                    <li>Maximum 1MB</li>
-                    <li>Only JPG, GIF or PNG</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+    @include('modules.business.header', ['title' => 'Add Member'])
 
     <section>
         <div class="bg-white p-4 shadow rounded">
-            <h2 class="font-semibold">{{ __('User Details') }}</h2>
-
-            <form route="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+            <form class="space-y-6" action="{{ $action }}" method="POST">
                 @csrf
-                <input type="file" id="file-input" name="profile_picture" accept="image/*" style="display: none;">
-                @if (auth()->user()->force_update_password)
-                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M10 3a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm0 8a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm0 6a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-yellow-700">{{ __('You are required to update your password') }}</p>
-                            </div>
-                        </div>
-                    </div>
+                @if ($isEdit)
+                    @method('PUT')
                 @endif
+                <input type="hidden" name="member_type" value='new_user'>
+                {{-- choose role --}}
                 <div class="mb-2">
+                    <label for="role" class="block text-sm font-medium leading-6 text-gray-900">Role</label>
+                    <div class="mt-2 rounded-md shadow-sm">
+                        <select name="role" id="role"
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option value="admin">Admin</option>
+                            <option value="member">Member</option>
+                        </select>
+                    </div>
+                <div class="mb-2 mt-2">
                     <label for="first_name"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('First Name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
@@ -95,7 +72,7 @@
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                @if(isset($user->address?->state_id))
+                                @if (isset($user->address?->state_id))
                                     <option value="{{ $user->address?->state_id }}" selected>
                                         {{ $user->address?->state->name }}
                                     </option>
@@ -103,7 +80,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                 </div>
 
                 <div class="mb-2">
@@ -125,7 +102,8 @@
                     <label for="phone" class="block text-sm font-medium text-gray-700">
                         {{ __('Phone Number') }}</label>
                     <div class="mt-1">
-                        <input id="phone" name="phone" type="text" value="{{ $user->phone }}" required minLength="6" maxLength="15"
+                        <input id="phone" name="phone" type="text" value="{{ $user->phone }}" required
+                            minLength="6" maxLength="15"
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
@@ -136,7 +114,7 @@
                     <div class="mt-2 rounded-md shadow-sm">
                         <input autocomplete="new-password" type="password" name="password" id="password"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Leave empty for unchanged') }}">
+                            placeholder="{{ __('Enter password') }}">
                     </div>
                 </div>
 
@@ -161,27 +139,6 @@
     </section>
 @endsection
 
-@section('js')
-<script>
-  document.getElementById('file-selector').addEventListener('click', function () {
-        document.getElementById('file-input').click();
-    });
-    document.getElementById('file-input').addEventListener('change', function () {
-        const fileInput = this;
-        const selectedImage = document.getElementById('profile-picture');
-
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                selectedImage.setAttribute('src', e.target.result);
-                console.log('atr set');
-            };
-
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-    });
-
+@push('js')
 @include('modules.shared.state_prefill', ['entity' => $user, 'countries' => $countries])
-</script>
-@endsection
+@endpush
