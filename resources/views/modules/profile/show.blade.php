@@ -183,6 +183,7 @@
         }
     });
 
-@include('modules.shared.state_prefill', ['entity' => $user, 'countries' => $countries])
 </script>
+@include('modules.shared.state_prefill', ['entity' => $user, 'countries' => $countries])
+
 @endsection

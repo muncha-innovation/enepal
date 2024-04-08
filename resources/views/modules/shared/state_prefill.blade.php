@@ -30,4 +30,5 @@ document.getElementById('country').addEventListener('change', function () {
     phoneInput.value = `${countryData.dial_code}`;
 });
 document.getElementById('country').dispatchEvent(new Event('change'));
+
 </script>
