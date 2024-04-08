@@ -38,6 +38,7 @@
 
             <form route="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                @include('modules.shared.success_error')
                 <input type="file" id="file-input" name="profile_picture" accept="image/*" style="display: none;">
                 @if (auth()->user()->force_update_password)
                     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4">

@@ -56,6 +56,7 @@ class BusinessController extends Controller
     {
         //
         $data = $request->validated();
+        
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
 
@@ -106,6 +107,7 @@ class BusinessController extends Controller
     {
 
         $data = $request->validated();
+        
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         }
@@ -114,7 +116,7 @@ class BusinessController extends Controller
         }
         $business->update(collect($data)->except(['address'])->toArray());
         $business->address()->updateOrCreate($data['address']);
-        return redirect()->route('business.index')->with('success', 'Business Updated Successfully');
+        return back()->with('success', 'Business Updated Successfully');
     }
 
     /**
@@ -134,5 +136,11 @@ class BusinessController extends Controller
         $business->load('address');
         $showSettings = true;
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings']));
+    }
+    public function verify(Business $business)
+    {
+        abort_unless(auth()->user()->hasRole('super-admin'), 403);
+        $business->update(['is_verified' => !$business->is_verified]);
+        return back()->with('success', 'Business Verified Successfully');
     }
 }

@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class BusinessType extends Model
 {
     use HasFactory;
+
 }

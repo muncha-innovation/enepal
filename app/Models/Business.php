@@ -32,4 +32,12 @@ class Business extends Model
     public function contactPerson() {
         return $this->belongsTo(User::class, 'contact_person_id');
     }
+
+    public function posts() {
+        return $this->hasMany(Post::class, 'business_id');
+    }
+
+    public function products() {
+        return $this->hasMany(Product::class);
+    }
 }

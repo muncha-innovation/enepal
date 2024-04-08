@@ -1,183 +1,90 @@
 @extends('layouts.app')
 
 @section('css')
-<style>
-    #container {
-        width: 1000px;
-        margin: 20px auto;
-    }
-    .ck-editor__editable[role="textbox"] {
-        /* Editing area */
-        min-height: 200px;
-    }
-    .ck-content .image {
-        /* Block images */
-        max-width: 80%;
-        margin: 20px auto;
-    }
-</style>
+    @include('modules.shared.ckeditor_css')
 @endsection
 @section('js')
- <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
-        
-        <script>
-            CKEDITOR.ClassicEditor.create(document.getElementById("editor"), {
-                toolbar: {
-                    items: [                       
-                        'findAndReplace', 'selectAll', '|',
-                        'heading', '|',
-                        'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
-                        'bulletedList', 'numberedList', 'todoList', '|',
-                        'outdent', 'indent', '|',
-                        'undo', 'redo',
-                        '-',
-                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
-                        'alignment', '|',
-                        'link', 'uploadImage', 'blockQuote', 'insertTable', 'mediaEmbed', '|',
-                        'specialCharacters', 'horizontalLine', 'pageBreak', '|',
-                        'textPartLanguage', '|',
-                        'sourceEditing'
-                    ],
-                    shouldNotGroupWhenFull: true
-                },
-                simpleUpload: {
-                    uploadUrl: '{{ route('posts.image.upload', $business) }}',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    }
-                },
-
-                list: {
-                    properties: {
-                        styles: true,
-                        startIndex: true,
-                        reversed: true
-                    }
-                },
-                heading: {
-                    options: [
-                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                        { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-                        { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-                        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-                    ]
-                },
-                placeholder: 'Write Here..',
-                fontFamily: {
-                    options: [
-                        'default',
-                        'Arial, Helvetica, sans-serif',
-                        'Courier New, Courier, monospace',
-                        'Georgia, serif',
-                        'Lucida Sans Unicode, Lucida Grande, sans-serif',
-                        'Tahoma, Geneva, sans-serif',
-                        'Times New Roman, Times, serif',
-                        'Trebuchet MS, Helvetica, sans-serif',
-                        'Verdana, Geneva, sans-serif'
-                    ],
-                    supportAllValues: true
-                },
-                fontSize: {
-                    options: [ 10, 12, 14, 'default', 18, 20, 22 ],
-                    supportAllValues: true
-                },
-                htmlSupport: {
-                    allow: [
-                        {
-                            name: /.*/,
-                            attributes: true,
-                            classes: true,
-                            styles: true
-                        }
-                    ]
-                },
-                htmlEmbed: {
-                    showPreviews: true
-                },
-                link: {
-                    decorators: {
-                        addTargetToExternalLinks: true,
-                        defaultProtocol: 'https://',
-                        toggleDownloadable: {
-                            mode: 'manual',
-                            label: 'Downloadable',
-                            attributes: {
-                                download: 'file'
-                            }
-                        }
-                    }
-                },
-                removePlugins: [
-                    'AIAssistant',
-                    'CKBox',
-                    'CKFinder',
-                    'EasyImage',
-                    'RealTimeCollaborativeComments',
-                    'RealTimeCollaborativeTrackChanges',
-                    'RealTimeCollaborativeRevisionHistory',
-                    'PresenceList',
-                    'Comments',
-                    'TrackChanges',
-                    'TrackChangesData',
-                    'RevisionHistory',
-                    'Pagination',
-                    'WProofreader',
-                    'MathType',
-                    'SlashCommand',
-                    'Template',
-                    'DocumentOutline',
-                    'FormatPainter',
-                    'TableOfContents',
-                    'PasteFromOfficeEnhanced',
-                    'CaseChange'
-                ]
-            });
-        </script>
+    @include('modules.shared.ckeditor_js')
 @endsection
+@php
+    if (isset($post)) {
+        $isEdit = true;
+        $title = 'Edit Post';
+        $action = route('posts.update', [$business, $post]);
+    } else {
+        $isEdit = false;
+        $title = 'Add Post';
+        $post = new App\Models\Post();
+        $action = route('posts.create', $business);
+    }
+@endphp
 @section('content')
-@include('modules.business.header', ['title' => 'Add Post'])
+    @include('modules.business.header', ['title' => $title])
 
-<section>
-  <div class="bg-white p-4 shadow rounded">
-    <form class="space-y-6" action="{{ route('posts.create', $business) }}" method="POST">
-      @csrf
-      <div>
-        <label for="title" class="block text-sm font-medium text-gray-700">
-            {{ __('Title') }}</label>
-        <div class="mt-1">
-            <input id="title" name="title" type="text" autocomplete="title" required autofocus
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    <section>
+        <div class="bg-white p-4 shadow rounded">
+            <form class="space-y-6" action="{{ $action }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @if ($isEdit)
+                    @method('PUT')
+                @endif
+                @include('modules.shared.success_error')
+                <div>
+                    <input type="hidden" name="business_id" value="{{ $business->id }}">
+                    <label for="title" class="block text-sm font-medium text-gray-700">
+                        {{ __('Title') }}</label>
+                    <div class="mt-1">
+
+                        <input id="title" name="title" type="text" value="{{ $post->title }}" autocomplete="title"
+                            required autofocus
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="short_description" class="block text-sm font-medium text-gray-700">
+                        {{ __('Short Description') }}</label>
+                    <div class="mt-1">
+                        <textarea rows="2" id="short_description" name="short_description" type="text" autocomplete="short_description"
+                            required autofocus
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ $post->short_description }}
+                        </textarea>
+                    </div>
+                </div>
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700">
+                        {{ __('Content') }}</label>
+                    <textarea id="editor" name="content">
+                        {{ $post->content }}
+                    </textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <div class="mt-2 rounded-md shadow-sm">
+                        <select name="active" id="active"
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option value="1" @if ($post->active) selected @endif>Active</option>
+                            <option value="0" @if (!$post->active) selected @endif>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
+                    <input type="file" @if (!$isEdit) required @endif name="image" accept="image/*"
+                        class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                    {{-- show cover image if isset --}}
+                    @if ($post->image)
+                        <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" class="mt-2 rounded-lg w-1/4">
+                    @endif
+                </div>
+                <div>
+                    <button type="submit"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ __('Create') }}</button>
+                </div>
+
+            </form>
         </div>
-    </div>
-    <div>
-        <label for="short_description" class="block text-sm font-medium text-gray-700">
-            {{ __('Short Description') }}</label>
-        <div class="mt-1">
-            <textarea rows="2" id="short_description" name="short_description" type="text" autocomplete="short_description" required autofocus
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-        </div>
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700">
-            {{ __('Content') }}</label>
-        <div id="editor" >
-        </div>
-    </div>
-  
-    <div class="mb-2">
-        <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
-        <input type="file" required name="image" accept="image/*" class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-      </div>
-      <div>
-          <button type="submit"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              {{ __('Create') }}</button>
-      </div>
-      
-  </form>
-  </div>
-</section>
+    </section>
 @endsection

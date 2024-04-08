@@ -22,6 +22,7 @@
                 @if ($isEdit)
                     @method('PUT')
                 @endif
+                @include('modules.shared.success_error')
                 <input type="hidden" name="member_type" value='new_user'>
                 {{-- choose role --}}
                 <div class="mb-2">

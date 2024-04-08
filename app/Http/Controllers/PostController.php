@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use Illuminate\Http\Request;
-
+use App\Http\Requests\StorePostRequest;
+use App\Models\Post;
 class PostController extends Controller
 {
     /**
@@ -15,7 +16,8 @@ class PostController extends Controller
     public function index(Business $business)
     {
         //
-        return view('modules.posts.index', compact('business'));
+        $posts = $business->posts()->paginate(10);
+        return view('modules.posts.index', compact('business', 'posts'));
         
     }
 
@@ -37,16 +39,14 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
         //
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'short_desc' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'required|image'
-
-        ]);
+        $data = $request->validated();
+        $data['image'] = upload('posts/', 'png', $data['image']);
+        $business = Business::find($data['business_id']);
+        $business->posts()->create($data);
+        return redirect()->route('posts.index', $business)->with('success', 'Post created successfully');
     }
 
     /**
@@ -55,9 +55,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request,Business $business,  Post $post)
     {
         //
+        return view('modules.posts.show', compact('post', 'business'));
     }
 
     /**
@@ -66,9 +67,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Business $business, Post $post)
     {
-        //
+        return view('modules.posts.createOrEdit', compact('post','business'));
     }
 
     /**
@@ -78,9 +79,15 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StorePostRequest $request,Business $business, Post $post)
     {
         //
+        $data = $request->validated();
+        if($request->hasFile('image')) {
+            $data['image'] = upload('posts/', 'png', $data['image']);
+        }
+        $post->update($data);
+        return redirect()->route('posts.index', $business)->with('success', 'Post updated successfully');
     }
 
     /**
@@ -92,6 +99,8 @@ class PostController extends Controller
     public function destroy($id)
     {
         //
+        Post::destroy($id);
+        return back()->with('success', 'Post deleted successfully');
     }
 
     public function uploadImage(Request $request, Business $business) {
@@ -99,7 +108,8 @@ class PostController extends Controller
             'upload' => 'required|image'
         ]);
         $path = upload('posts/', 'png', $request->file('upload'));
-        return response()->json(['url' => $path]);
+        
+        return response()->json(['url' => getImage($path, 'posts/')]);
 
     }
 }

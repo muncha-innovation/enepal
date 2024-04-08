@@ -23,13 +23,22 @@ class StoreBusinessRequest extends FormRequest
      */
     public function rules()
     {
+        // cover_image and logo required only during create and not edit
+        if($this->isMethod('post')) {
+            $coverImageValidation = 'required|image|max:1999';
+            $logoValidation = 'required|image|max:1999';
+        } else {
+            $coverImageValidation = 'sometimes|image|max:1999';
+            $logoValidation = 'sometimes|image|max:1999';
+        }
         return [
             'name' => ['required'],
             'email' => ['required', 'email'],
             'type_id' => ['required',],
             'phone_1' => ['required'],
-            'cover_image' => ['required', 'image', 'max:1999'],
-            'logo' => ['required', 'image', 'max:1999'],
+            'active' => ['required'],
+            'cover_image' => $coverImageValidation,
+            'logo' => $logoValidation,
             'phone_2'  => ['sometimes'],
             'address.city' => ['sometimes'],
             'address.state_id' => ['sometimes'],
@@ -42,6 +51,20 @@ class StoreBusinessRequest extends FormRequest
             'address.town' => ['sometimes'],
             'address.building' => ['sometimes'],
 
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Business name is required',
+            'email.required' => 'Business email is required',
+            'type_id.required' => 'Business type is required',
+            'phone_1.required' => 'Business phone number is required',
+            'active.required' => 'Business status is required',
+            'cover_image.required' => 'Business cover image is required',
+            'logo.required' => 'Business logo is required',
+            'address.country_id.required' => 'Country is required',
         ];
     }
 }

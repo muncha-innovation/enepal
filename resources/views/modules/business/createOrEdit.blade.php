@@ -25,10 +25,11 @@
                 @if ($isEdit)
                     @method('PUT')
                 @endif
+                @include('modules.shared.success_error')
                 <div class="mb-2">
                     <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input required type="text" name="name" id="name" value={{ $business->name }}
+                        <input required type="text" name="name" id="name" value="{{ $business->name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="Eg. Nepalese Association of Houston">
                     </div>
@@ -140,9 +141,19 @@
                     <label for="phone_2" class="block text-sm font-medium leading-6 text-gray-900">Contact Person
                         Phone</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="phone_2" id="phone_2" value={{ $business->phone_2 }}
+                        <input type="text" name="phone_2" id="phone_2" value="{{ $business->phone_2 }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="Eg. 9812312323">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <div class="mt-2 rounded-md shadow-sm">
+                        <select name="active" id="active"
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option value="1" @if ($business->active) selected @endif>Active</option>
+                            <option value="0" @if (!$business->active) selected @endif>Inactive</option>
+                        </select>
                     </div>
                 </div>
                 <div class="mb-2">

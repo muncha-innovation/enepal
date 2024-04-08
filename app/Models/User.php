@@ -80,7 +80,9 @@ class User extends Authenticatable
     {
         return $this->morphOne(Address::class, 'addressable');
     }
-    
+    public function getNameAttribute() {
+        return $this->first_name . ' ' . $this->last_name;
+    }
     
     public function isSupervisorOrAdmin() {
         return true;
