@@ -143,4 +143,13 @@ class BusinessController extends Controller
         $business->update(['is_verified' => !$business->is_verified]);
         return back()->with('success', 'Business Verified Successfully');
     }
+    public function uploadImage(Request $request, Business $business) {
+        $request->validate([
+            'upload' => 'required|image'
+        ]);
+        $path = upload('content/', 'png', $request->file('upload'));
+        
+        return response()->json(['url' => getImage($path, 'content/')]);
+
+    }
 }

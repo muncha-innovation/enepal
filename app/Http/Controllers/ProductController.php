@@ -28,6 +28,7 @@ class ProductController extends Controller
      */
     public function create(Business $business)
     {
+        $business->load('address.country');
         return view('modules.products.createOrEdit', compact('business') );
     }
 
@@ -37,8 +38,15 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request, Business $business)
     {
+        $data = $request->validated();
+        if($request->hasFile('image')) {
+            $image = $request->file('image');
+            $data['image'] = upload('products/', 'png', $image);
+        }
+        Product::create($data);
+        return redirect()->route('products.index', $business)->with('success','Product Created successfully');
 
     }
 
@@ -50,6 +58,8 @@ class ProductController extends Controller
      */
     public function show(Business $business, Product $product)
     {
+        return view('modules.products.show', compact('product', 'business'));
+
     }
 
     /**
@@ -61,6 +71,8 @@ class ProductController extends Controller
     public function edit(Business $business, Product $product)
     {
         //
+        return view('modules.products.createOrEdit', compact('product','business'));
+
     }
 
     /**
@@ -72,7 +84,13 @@ class ProductController extends Controller
      */
     public function update(StoreProductRequest $request, Business $business,Product $product)
     {
-        //
+
+        $data = $request->validated();
+        if($request->hasFile('image')) {
+            $data['image'] = upload('products/', 'png', $data['image']);
+        }
+        $product->update($data);
+        return redirect()->route('products.index', $business)->with('success', 'Product updated successfully');
     }
 
     /**
@@ -84,5 +102,7 @@ class ProductController extends Controller
     public function destroy(Business $business, Product $product)
     {
         //
+        Product::destroy($product->id);
+        return response()->json(['message' => 'Product Deleted Successfully']);
     }
 }

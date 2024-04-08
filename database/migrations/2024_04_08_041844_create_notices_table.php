@@ -17,7 +17,6 @@ class CreateNoticesTable extends Migration
             $table->id();
             $table->string('title', 255);
             $table->text('content');
-            $table->string('slug', 255)->unique();
             $table->string('image')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('business_id');

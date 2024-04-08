@@ -32,7 +32,7 @@
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
             <tr>
-              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Image</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created By</th>
@@ -43,18 +43,18 @@
           <tbody class="divide-y divide-gray-200 bg-white">
             @foreach ($products as $product)
             <tr>
-              <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $product->title }}</td>
+              <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $product->name }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $product->active?'Active':'Inactive' }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 @if($product->image)
-                <img src="{{ getImage($product->image, 'posts/') }}" alt="Post Image" class="w-10 h-10 rounded-lg">
+                <img src="{{ getImage($product->image, 'products/') }}" alt="Product Image" class="w-10 h-10 rounded-lg">
                 @endif
               </td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $product->user->name }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $product->created_at }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
-                <a href="{{ route('show', [$business, $product]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
-                <a href="{{ route('edit', [$business, $product]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>
+                <a href="{{ route('products.show', [$business, $product]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
+                <a href="{{ route('products.edit', [$business, $product]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>
 
                 {{-- <a href="{{ route('destroy', [$business, $product]) }}" class="bg-red-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-red-500 hover:bg-red-600 focus:z-10">Delete</a> --}}
               </td>

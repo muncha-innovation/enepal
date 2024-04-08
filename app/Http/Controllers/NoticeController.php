@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Notice;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreNoticeRequest;
+use App\Models\Business;
 
 class NoticeController extends Controller
 {
@@ -12,9 +14,11 @@ class NoticeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Business $business)
     {
         //
+        $notices = $business->notices()->paginate(10);
+        return view('modules.notices.index', compact('notices','business'));
     }
 
     /**
@@ -22,9 +26,10 @@ class NoticeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Business $business)
     {
-        //
+        $business->load('address.country');
+        return view('modules.notices.createOrEdit', compact('business') );
     }
 
     /**
@@ -33,9 +38,16 @@ class NoticeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreNoticeRequest $request, Business $business)
     {
-        //
+        $data = $request->validated();
+        if($request->hasFile('image')) {
+            $image = $request->file('image');
+            $data['image'] = upload('notices/', 'png', $image);
+        }
+        Notice::create($data);
+        return redirect()->route('notices.index',$business)->with('success','Notice Created successfully');
+
     }
 
     /**
@@ -44,9 +56,10 @@ class NoticeController extends Controller
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
      */
-    public function show(Notice $notice)
+    public function show(Business $business, Notice $notice)
     {
-        //
+        return view('modules.notices.show', compact('notice', 'business'));
+
     }
 
     /**
@@ -55,9 +68,11 @@ class NoticeController extends Controller
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
      */
-    public function edit(Notice $notice)
+    public function edit(Business $business, Notice $notice)
     {
         //
+        return view('modules.notices.createOrEdit', compact('notice','business'));
+
     }
 
     /**
@@ -67,9 +82,15 @@ class NoticeController extends Controller
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Notice $notice)
+    public function update(StoreNoticeRequest $request, Business $business,Notice $notice)
     {
-        //
+
+        $data = $request->validated();
+        if($request->hasFile('image')) {
+            $data['image'] = upload('notices/', 'png', $data['image']);
+        }
+        $notice->update($data);
+        return redirect()->route('notices.index', $business)->with('success', 'Notice updated successfully');
     }
 
     /**
@@ -77,9 +98,12 @@ class NoticeController extends Controller
      *
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
-     */
-    public function destroy(Notice $notice)
+     */   
+    public function destroy(Business $business, Notice $notice)
     {
-        //
+        Notice::destroy($notice->id);
+        return response()->json([
+            'success'=> true,
+        ]);
     }
 }

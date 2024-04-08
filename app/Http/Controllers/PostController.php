@@ -39,12 +39,11 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request, Business $business)
     {
         //
         $data = $request->validated();
         $data['image'] = upload('posts/', 'png', $data['image']);
-        $business = Business::find($data['business_id']);
         $business->posts()->create($data);
         return redirect()->route('posts.index', $business)->with('success', 'Post created successfully');
     }
@@ -100,16 +99,8 @@ class PostController extends Controller
     {
         //
         Post::destroy($id);
-        return back()->with('success', 'Post deleted successfully');
-    }
-
-    public function uploadImage(Request $request, Business $business) {
-        $request->validate([
-            'upload' => 'required|image'
+        return response()->json([
+            'success'=> true
         ]);
-        $path = upload('posts/', 'png', $request->file('upload'));
-        
-        return response()->json(['url' => getImage($path, 'posts/')]);
-
     }
 }

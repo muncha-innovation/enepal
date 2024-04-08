@@ -31,13 +31,32 @@
                 @include('modules.shared.success_error')
                 <div>
                     <input type="hidden" name="business_id" value="{{ $business->id }}">
-                    <label for="title" class="block text-sm font-medium text-gray-700">
-                        {{ __('Title') }}</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700">
+                        {{ __('Name') }}</label>
                     <div class="mt-1">
 
-                        <input id="title" name="title" type="text" value="{{ $product->title }}"
-                            autocomplete="title" required autofocus
+                        <input id="name" name="name" type="text" value="{{ $product->name }}"
+                            autocomplete="name" required autofocus
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">
+                        {{ __('Price') }}</label>
+                    <div class="mt-1">
+                        {{-- currency and price fields --}}
+                        <div class="flex gap-2">
+                            <div class="w-1/4">
+                                <select name="currency" id="currency"
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                    <option value="{{$business->address->country->currency_symbol}}">{{$business->address->country->currency_symbol}}</option>
+                                </select>
+                            </div>
+                            <div class="w-3/4">
+                                <input id="price" name="price" type="number" value="{{ $product->price }}"
+                                    autocomplete="price" required
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
                     </div>
                 </div>
                 <div>
@@ -60,12 +79,12 @@
                 </div>
 
                 <div class="mb-2">
-                    <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
+                    <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Product Image</label>
                     <input type="file" @if (!$isEdit) required @endif name="image" accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-                    {{-- show cover image if isset --}}
+                    
                     @if ($product->image)
-                        <img src="{{ getImage($product->image, 'posts/') }}" alt="Post Image" class="mt-2 rounded-lg w-1/4">
+                        <img src="{{ getImage($product->image, 'products/') }}" alt="Product Image" class="mt-2 rounded-lg w-20">
                     @endif
                 </div>
                 <div>

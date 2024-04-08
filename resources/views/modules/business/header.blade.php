@@ -12,11 +12,15 @@
     <li class="me-2">
       <a href="{{ route('products.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('products.index') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('products.index') ? 'page' : '' }}">Products</a>
     </li>
+
+    <li class="me-2">
+      <a href="{{ route('notices.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('notices.index') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('notices.index') ? 'page' : '' }}">Notices</a>
+    </li>
     <li class="me-2">
       <a href="{{ route('business.setting', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.setting') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.setting') ? 'page' : '' }}">Setting</a>
     </li>
     <li class="me-2">
-      <a href="{{ route('members.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.members') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.members') ? 'page' : '' }}">Members</a>
+      <a href="{{ route('members.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.members') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('members.index') ? 'page' : '' }}">Members</a>
     </li>
   </ul>
 </section>

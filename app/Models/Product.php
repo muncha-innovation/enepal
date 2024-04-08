@@ -14,4 +14,15 @@ class Product extends Model
     {
         return $this->belongsTo(Business::class);
     }
+    public function user() {
+        return $this->belongsTo(User::class,'created_by');
+    }
+    protected static function boot() {
+        parent::boot();
+    
+        static::created(function($product){
+            $product->slug = \Str::slug($product->title).'-'.$product->id;
+        $product->save();
+        });
+        }
 }

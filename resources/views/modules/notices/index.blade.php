@@ -5,12 +5,12 @@
 
 <div class="sm:flex sm:items-center">
   <div class="sm:flex-auto">
-    <h1 class="text-base font-semibold leading-6 text-gray-900">Posts</h1>
+    <h1 class="text-base font-semibold leading-6 text-gray-900">Notices</h1>
     </div>
 
   <div class="flex gap-2">
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-      <a href="{{ route('posts.create', $business) }}" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Post</a>
+      <a href="{{ route('notices.create', $business) }}" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Notice</a>
      
     </div>
 
@@ -41,22 +41,25 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
-            @foreach ($posts as $post)
+            @foreach ($notices as $notice)
             <tr>
-              <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $post->title }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->active?'Active':'Inactive' }}</td>
+              <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $notice->title }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $notice->active?'Active':'Inactive' }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
-                @if($post->image)
-                <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" class="w-10 h-10 rounded-lg">
+                @if($notice->image)
+                <img src="{{ getImage($notice->image, 'notices/') }}" alt="Notice Image" class="w-10 h-10 rounded-lg">
+                @else
+                -
                 @endif
-              </td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->user->name }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->created_at }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
-                <a href="{{ route('posts.show', [$business, $post]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
-                <a href="{{ route('posts.edit', [$business, $post]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>
 
-                <a href="{{ route('posts.destroy', [$business, $post]) }}" class="delete bg-red-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-red-500 hover:bg-red-600 focus:z-10">Delete</a>
+              </td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $notice->user->name }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $notice->created_at }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
+                <a href="{{ route('notices.show', [$business, $notice]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
+                <a href="{{ route('notices.edit', [$business, $notice]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>
+
+                <a href="{{ route('notices.destroy', [$business, $notice]) }}" class="delete bg-red-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-red-500 hover:bg-red-600 focus:z-10">Delete</a>
               </td>
             @endforeach
           </tbody>

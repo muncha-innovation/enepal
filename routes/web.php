@@ -10,6 +10,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
@@ -33,6 +34,8 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 
     // Route::resource('users', UsersController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
+    
+    Route::post('{business}/image/upload', [BusinessController::class, 'uploadImage'])->name('image.upload');
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::post('verify/{business}', [BusinessController::class, 'verify'])->name('verify');
@@ -54,7 +57,6 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{post}', [PostController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{post}', [PostController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{post}', [PostController::class, 'destroy'])->name('destroy');
-        Route::post('{business}/image/upload', [PostController::class, 'uploadImage'])->name('image.upload');
     });
     Route::resource('business', BusinessController::class);
     Route::group(['prefix' => 'products', 'as' => 'products.'], function() {
@@ -65,7 +67,15 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{product}', [ProductController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{product}', [ProductController::class, 'destroy'])->name('destroy');
-        Route::post('{business}/image/upload', [ProductController::class, 'uploadImage'])->name('image.upload');
+    });
+    Route::group(['prefix' => 'notices', 'as' => 'notices.'], function() {
+        Route::get('/{business}', [NoticeController::class, 'index'])->name('index');
+        Route::get('create/{business}', [NoticeController::class, 'create'])->name('create');
+        Route::post('create/{business}', [NoticeController::class, 'store'])->name('store');
+        Route::get('show/{business}/{notice}', [NoticeController::class, 'show'])->name('show');
+        Route::get('edit/{business}/{notice}', [NoticeController::class, 'edit'])->name('edit');
+        Route::put('update/{business}/{notice}', [NoticeController::class, 'update'])->name('update');
+        Route::delete('delete/{business}/{notice}', [NoticeController::class, 'destroy'])->name('destroy');
     });
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -40,4 +40,7 @@ class Business extends Model
     public function products() {
         return $this->hasMany(Product::class);
     }
+    public function notices() {
+        return $this->hasMany(Notice::class);
+    }
 }

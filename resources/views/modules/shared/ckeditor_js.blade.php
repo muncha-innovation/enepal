@@ -22,7 +22,7 @@
             shouldNotGroupWhenFull: true
         },
         simpleUpload: {
-            uploadUrl: '{{ route('posts.image.upload', $business) }}',
+            uploadUrl: '{{ route('image.upload', $business) }}',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
             }
