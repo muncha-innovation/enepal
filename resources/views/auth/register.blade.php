@@ -139,6 +139,6 @@
     </div>
 @endsection
 @push('js')
-@include('modules.shared.state_prefill')
+@include('modules.shared.state_prefill', ['countries' => $countries, 'entity' => $user])
     
 @endpush
