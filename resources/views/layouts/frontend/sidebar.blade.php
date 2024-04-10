@@ -28,7 +28,7 @@
       </svg>
     </a>
 
-    <a href="#">
+    <a href="{{ route('profile')}}">
       <img class="object-cover w-8 h-8 rounded-full" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=4&w=880&h=880&q=100" alt="" />
     </a>
   </div>

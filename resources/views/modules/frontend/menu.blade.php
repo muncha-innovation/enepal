@@ -16,23 +16,6 @@
   <div class="grid grid-cols-12 gap-3">
     <main class="col-span-8">
       <section>
-        <h3 class="text-4xl font-semibold text-gray-900 my-6 border-b w-full pb-5">Annapurna Garden Cafe & Lounge</h3>
-
-        <div class="flex mb-5 items-center gap-3">
-          <span class="font-medium">Top Tags:</span>
-          <span class="inline-flex items-center rounded-full bg-gray-50 px-5 py-1.5 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-400">Innovative</span>
-          <span class="inline-flex items-center rounded-full bg-gray-50 px-5 py-1.5 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-400">Romantic</span>
-          <span class="inline-flex items-center rounded-full bg-gray-50 px-5 py-1.5 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-400">Good For Special Occasions</span>
-        </div>
-
-        <p class="text-gray-900 text-justify">
-          The Facebook company is now Meta. Meta builds technologies that help people connect, find communities, and grow businesses. When Facebook launched in 2004, it changed the way people connect. Apps like Messenger, Instagram and WhatsApp further empowered billions around the world. Now, Meta is moving beyond 2D screens toward immersive experiences like augmented and virtual reality to help build the next evolution in social technology.
-
-          We want to give people the power to build community and bring the world closer together. To do that, we ask that you help create a safe and respectful online space. These community values encourage constructive conversations on this page:
-        </p>
-      </section>
-
-      <section>
         <div class="flex justify-between my-4 border-b w-full pb-5">
           <h4 class="text-2xl font-semibold text-gray-900">Menu (Main)</h4>
           <div>
@@ -95,24 +78,6 @@
           </ul>
         </div>
       </section>
-
-      <section>
-
-        <div class="flex justify-between my-4 border-b w-full pb-5">
-          <h4 class="text-2xl font-semibold text-gray-900">8 Photos</h4>
-          <div>
-            <a href="#" class="text-sm font-semibold text-indigo-600 whitespace-nowrap items-center">View all</a>
-          </div>
-        </div>
-
-        <div class="grid-image-gallery">
-          <img src="https://resizer.otstatic.com/v2/photos/xlarge/2/27687576.webp" alt="Annapurna Garden Cafe & Lounge" class="w-full h-full object-cover rounded-md">
-          <img src="https://resizer.otstatic.com/v2/photos/xlarge/2/27687580.webp" alt="Annapurna Garden Cafe & Lounge" class="w-full h-full object-cover rounded-md">
-          <img src="https://resizer.otstatic.com/v2/photos/xlarge/1/61760493.webp" alt="Annapurna Garden Cafe & Lounge" class="w-full h-full object-cover rounded-md">
-          <img src="https://resizer.otstatic.com/v2/photos/xlarge/1/53023140.webp" alt="Annapurna Garden Cafe & Lounge" class="w-full h-full object-cover rounded-md">
-          <img src="https://resizer.otstatic.com/v2/photos/xlarge/2/27687576.webp" alt="Annapurna Garden Cafe & Lounge" class="w-full h-full object-cover rounded-md">
-        </div>
-      </section>
     </main>
 
     <aside class="col-span-4">
@@ -144,5 +109,4 @@
   <div class="flex">
   </div>
 </section>
-
 @endsection

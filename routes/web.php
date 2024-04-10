@@ -62,9 +62,17 @@ Route::get('/single', function () {
     return view('modules.frontend.resturant');
 })->name('single');
 
+Route::get('/menu', function () {
+    return view('modules.frontend.menu');
+})->name('menu');
+
 Route::get('/posts', function () {
     return view('modules.frontend.posts');
 })->name('posts');
+
+Route::get('/chat', function () {
+    return view('modules.frontend.chat');
+})->name('chat');
 
 Route::get('/location', function () {
     return view('modules.frontend.location');
