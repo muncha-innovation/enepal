@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\API\CountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,6 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 
 Route::post('/login', LoginController::class);
 Route::post('/password/reset', ResetPasswordController::class);
-
+Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::middleware(['auth:sanctum'])->group(function () {
 });

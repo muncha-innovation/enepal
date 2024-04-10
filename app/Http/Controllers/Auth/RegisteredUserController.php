@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Address;
 use App\Models\Country;
 use App\Models\User;
@@ -34,27 +35,13 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request)
+    public function store(UpdateProfileRequest $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'country' => ['required', 'exists:countries,id'],
-            'phone' => ['required', 'string', 'min:8','max:20'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        $data = collect($request->validated());
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'country' => $request->country,
-        ]);
+        $user = User::create($data->except('address')->toArray());
         $user->assignRole('user');
-        $address = new Address([
-            'country_id' => $request->country
-        ]);
+        $address = new Address($data->get('address'));
         $user->address()->save($address);
         event(new Registered($user));
 

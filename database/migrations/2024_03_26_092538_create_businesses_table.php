@@ -27,6 +27,7 @@ class CreateBusinessesTable extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->json('social_media')->nullable();
+            $table->boolean('is_verified')->default(false);
             $table->boolean('active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('contact_person_id')->nullable();

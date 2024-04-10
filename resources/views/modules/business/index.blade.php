@@ -53,6 +53,9 @@
                                 </th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                     {{__('Location')}}</th>
+
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    {{__('Verified')}}</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{__('Action')}}
                                 </th>
                             </tr>
@@ -63,14 +66,36 @@
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                         {{$business->name}}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->type->title}}</td>
-                                    {{-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->address->country->name }}</td> --}}
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->address?->country->name }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        @if ($business->is_verified)
+                                            <span>{{__('Yes')}}</span>
+                                        @else
+                                        <span>{{__('No')}}</span>
+                                        @endif
+                                    </td>
                                     <td
-                                        class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        class=" whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"
                                             class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">View</a>
-                                        <a href="#"
+                                        <a href="{{route('business.setting', $business)}}"
                                             class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">Edit<span
                                                 class="sr-only">, {{$business->name}}</span></a>
+                                        @role('super-admin')
+                                        {{-- verify/unverify toggler button --}}
+                                        <form action="{{ route('business.verify', $business) }}" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            <button type="submit"
+                                                class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">
+                                                @if ($business->is_verified)
+                                                    Unverify
+                                                @else
+                                                    Verify
+                                                @endif
+                                            </button>
+                                        </form>
+                                        @endrole
                                     </td>
                                 </tr>
                             @endforeach

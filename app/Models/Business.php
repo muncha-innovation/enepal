@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Business extends Model
 {
     use HasFactory;
+    static $ROLES = ['owner', 'admin', 'member'];
+    
     protected $guarded = [];
 
     public function address(): MorphOne
@@ -17,7 +19,7 @@ class Business extends Model
     }
 
     public function users()
-    {
+    { 
         return $this->belongsToMany(User::class)->withPivot(['role','position']);
     }
     public function type() {
@@ -29,5 +31,16 @@ class Business extends Model
     }
     public function contactPerson() {
         return $this->belongsTo(User::class, 'contact_person_id');
+    }
+
+    public function posts() {
+        return $this->hasMany(Post::class, 'business_id');
+    }
+
+    public function products() {
+        return $this->hasMany(Product::class);
+    }
+    public function notices() {
+        return $this->hasMany(Notice::class);
     }
 }
