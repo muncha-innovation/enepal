@@ -19,7 +19,7 @@ class CreateMessagesTable extends Migration
             // Foreign keys
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('recipient_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
         });
     }
 
