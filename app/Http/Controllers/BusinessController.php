@@ -93,6 +93,7 @@ class BusinessController extends Controller
         $businessTypes = BusinessType::all();
         $countries = Country::all();
         $business->load('address');
+        $facilities = $business->facilities;
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries']));
     }
 

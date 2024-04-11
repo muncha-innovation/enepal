@@ -159,12 +159,14 @@
                 <div class="mb-2">
                     <label for="logo"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ 'Logo' }}</label>
-                    <input type="file" @if(!$isEdit) required @endif name="logo" accept="image/*"
+                    <input type="file" @if (!$isEdit) required @endif name="logo"
+                        accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                 </div>
                 <div class="mb-2">
                     <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
-                    <input type="file" @if(!$isEdit) required @endif name="cover_image" accept="image/*"
+                    <input type="file" @if (!$isEdit) required @endif name="cover_image"
+                        accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                 </div>
 

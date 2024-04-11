@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Department;
-use Illuminate\Http\Response;
-use App\DataTables\UsersDataTable;
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Role;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\Factory;
 use App\Http\Requests\StoreUserRequest;
 use App\Models\Country;
-use App\Models\LogTypes;
+use App\Models\Department;
 use App\Models\Process;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
@@ -57,15 +55,19 @@ class UsersController extends Controller
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
 
-        $validated = collect($request->validated());
-        $user = User::create($validated->except(['address', 'role', 'departmentids'])->toArray());
-        $address = $validated->only('address')->first();
+        $data = $request->validated();
+        if ($request->hasFile('image')) {
+            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            );
+            unset($data['image']);
+        }
+        $validated = collect($data);
+        
+        $user = User::create($validated->except(['address', 'role'])->toArray());
+        $address = $validated->get('address');
 
         $user->address()->create($address);
-        $user->assignRole($validated->only('role')->first());
-        $user->departments()->sync($validated->only('departmentids')->first());
-
-        //todo: maybe sending email to the user with the password(this can be dispatched after redirecting check that)
+        $user->assignRole($validated->get('role'));
 
         return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
     }
@@ -78,7 +80,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        
+
         return view('admin-views.users.view', compact(['user']));
     }
 
@@ -91,18 +93,12 @@ class UsersController extends Controller
     public function edit(User $user): View
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        $departmentIds = $user->departments()->pluck('department_id')->toArray();
-        $departments = Department::where(function ($query) use ($departmentIds) {
-            $query->active();
-            $query->orWhereIn('id', $departmentIds);
-        })->get();
-        return view('modules.users.createOrEdit', [
+        $user->load(['address.country','roles']);
+        return view('admin-views.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),
             'userRole' => collect($user->getRoleNames())->first(),
-            'departments' => $departments,
-            'departmentIds' => $departmentIds,
-            'countries' => config('app.countries')
+            'countries' => Country::all(),
         ]);
     }
 
@@ -117,18 +113,19 @@ class UsersController extends Controller
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
 
-        $validated = collect($request->validated());
-
-        if (!$validated->has('image')) {
-            $validated->put('image', $user->image);
+        $data = $request->validated();
+        if ($request->hasFile('image')) {
+            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            );
+            unset($data['image']);
         }
-        $user->update($validated->except('address', 'role', 'departmentids')->toArray());
-        $user->address()->update($validated->only('address')->first());
-        $user->assignRole($validated->only('role')->first());
-        $user->departments()->sync($validated->only('departmentids')->first());
+        $validated = collect($data);
+        $user->update($validated->except(['address', 'role'])->toArray());
+        $address = $validated->get('address');
+        $user->address()->update($address);
+        $user->syncRoles([$validated->get('role')]);
 
-
-        return redirect()->route('users.index')->with('success', __('User updated successfully'));
+        return redirect()->route('admin.users.index')->with('success', __('User updated successfully'));
     }
 
     /**
@@ -142,21 +139,21 @@ class UsersController extends Controller
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
         if ($user->id == auth()->user()->id) {
             return response()->json([
-                'message' => trans('Sorry, you cannot delete yourself.')
+                'message' => trans('Sorry, you cannot delete yourself.'),
             ], 400);
         }
         $product = Product::where('user_id', $user->id)->first();
         $process = Process::independent()->where('user_id', $user->id)->first();
         if ($product || $process) {
             return response()->json([
-                'message' => trans('Sorry, the user cannot be deleted because product or process exists.')
+                'message' => trans('Sorry, the user cannot be deleted because product or process exists.'),
             ], 400);
         }
         $user->delete();
         $user->address()->delete();
         $user->roles()->detach();
         return response()->json([
-            'message' => trans('User deleted successfully')
+            'message' => trans('User deleted successfully'),
         ]);
     }
 

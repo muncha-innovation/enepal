@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
+use App\Http\Middleware\InactiveUserChecker;
 
 class Kernel extends HttpKernel
 {
@@ -74,6 +75,7 @@ class Kernel extends HttpKernel
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
-        'force.password.update' => ForcePasswordUpdate::class
+        'force.password.update' => ForcePasswordUpdate::class,
+        'user.inactive.check' => InactiveUserChecker::class,
     ];
 }

@@ -28,7 +28,7 @@ use App\Http\Controllers\ProductController;
 */
 
 
-Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update']], function () {
+Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update','user.inactive.check']], function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 

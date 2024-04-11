@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- if any errors display errrors --}}
-@if ($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">{{ $errors->first() }}</span>
-    </div>
-@endif
+    {{-- if any errors display errrors --}}
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ $errors->first() }}</span>
+        </div>
+    @endif
     {{-- @include('modules.business.header', ['title' => 'Create Business / Organization']) --}}
     <h1 class="text-2xl font-semibold text-gray-700 mb-2">Profile</h1>
 
@@ -17,7 +17,8 @@
                     class="h-24 w-24 flex-none rounded-lg bg-gray-200 object-cover">
                 <div>
                     <button type="button" id="file-selector"
-                        class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change avatar</button>
+                        class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">Change
+                        avatar</button>
                     <p class="mt-2 text-xs leading-5 text-gray-400">JPG, GIF or PNG. 1MB max.</p>
                 </div>
             </div>
@@ -53,6 +54,25 @@
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-yellow-700">{{ __('You are required to update your password') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if (!auth()->user()->active)
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 my-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M10 3a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm0 8a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm0 6a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">{{ __('Your account is inactive. Please contact admin') }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -96,7 +116,7 @@
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                @if(isset($user->address?->state_id))
+                                @if (isset($user->address?->state_id))
                                     <option value="{{ $user->address?->state_id }}" selected>
                                         {{ $user->address?->state->name }}
                                     </option>
@@ -104,7 +124,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                 </div>
 
                 <div class="mb-2">
@@ -126,7 +146,8 @@
                     <label for="phone" class="block text-sm font-medium text-gray-700">
                         {{ __('Phone Number') }}</label>
                     <div class="mt-1">
-                        <input id="phone" name="phone" type="text" value="{{ $user->phone }}" required minLength="6" maxLength="15"
+                        <input id="phone" name="phone" type="text" value="{{ $user->phone }}" required
+                            minLength="6" maxLength="15"
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
@@ -163,27 +184,25 @@
 @endsection
 
 @section('js')
-<script>
-  document.getElementById('file-selector').addEventListener('click', function () {
-        document.getElementById('file-input').click();
-    });
-    document.getElementById('file-input').addEventListener('change', function () {
-        const fileInput = this;
-        const selectedImage = document.getElementById('profile-picture');
+    <script>
+        document.getElementById('file-selector').addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+        document.getElementById('file-input').addEventListener('change', function() {
+            const fileInput = this;
+            const selectedImage = document.getElementById('profile-picture');
 
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
 
-            reader.onload = function (e) {
-                selectedImage.setAttribute('src', e.target.result);
-                console.log('atr set');
-            };
+                reader.onload = function(e) {
+                    selectedImage.setAttribute('src', e.target.result);
+                    console.log('atr set');
+                };
 
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-    });
-
-</script>
-@include('modules.shared.state_prefill', ['entity' => $user, 'countries' => $countries])
-
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    </script>
+    @include('modules.shared.state_prefill', ['entity' => $user, 'countries' => $countries])
 @endsection

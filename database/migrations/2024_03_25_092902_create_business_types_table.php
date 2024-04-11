@@ -16,6 +16,8 @@ class CreateBusinessTypesTable extends Migration
         Schema::create('business_types', function (Blueprint $table) {
             $table->mediumIncrements('id');
             $table->string('title',100);
+            $table->string('icon',100)->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

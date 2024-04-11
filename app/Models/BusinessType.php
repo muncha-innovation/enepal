@@ -9,4 +9,10 @@ class BusinessType extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['title', 'description', 'icon'];
+
+    public function facilities() {
+        return $this->belongsToMany(Facility::class,'business_type_facilities');
+    }
+
 }

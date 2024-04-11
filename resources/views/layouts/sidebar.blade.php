@@ -1,19 +1,3 @@
-@php
-    $isUserRoute = str_contains(url()->current(), 'user');
-    $isProfileRoute = str_contains(url()->current(), 'profile');
-
-    $isBusinessRoute = str_contains(url()->current(), 'business');
-  
-    if (!$isBusinessRoute) {
-        $isBusinessRoute = 0;
-    }
-    if (!$isProfileRoute) {
-        $isProfileRoute = 0;
-    }
-    if (!$isUserRoute) {
-        $isUserRoute = 0;
-    }
-@endphp
 <div class="fixed inset-0 flex z-40 md:hidden transition-opacity ease-linear duration-300 side-nav pointer-events-none opacity-0"
     role="dialog" aria-modal="true">
     <div onclick="toggleSidebar()" class="overlay fixed inset-0 bg-gray-700 bg-opacity-75" aria-hidden="true"></div>

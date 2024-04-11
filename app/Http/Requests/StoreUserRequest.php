@@ -36,17 +36,12 @@ class StoreUserRequest extends FormRequest
             $password_validation = 'nullable';
         }
         return [
-            'user_name' => ['required', 'string', 'max:191', $username_validation],
             'email' => ['nullable', 'string', 'email', 'max:191', $email_validation],
             'password' => [$password_validation, 'confirmed', Rules\Password::defaults()],
             'last_name' => ['required', 'string', 'max:191'],
             'first_name' => ['required', 'string', 'max:191'],
-            'p_last_name' => ['nullable', 'string', 'max:191'],
-            'p_first_name' => ['nullable', 'string', 'max:191'],
-            'mobile' => ['nullable', 'string', 'max:191'],
-            'address.country' => 'required',
-            'postalCode1' => ['nullable', 'string', 'max: 20'],
-            'postalCode2' => ['nullable', 'string', 'max: 20'],
+            'phone' => ['nullable', 'string', 'max:191'],
+            'address.country_id' => 'required',
             'address.city' => 'nullable | string| max: 50',
             'address.prefecture' => ['nullable', 'string', 'max:50'],
             'address.town' => ['nullable', 'string', 'max:50'],
@@ -65,18 +60,57 @@ class StoreUserRequest extends FormRequest
         ];
     }
 
+
+    public function messages(): array
+    {
+        return [
+            'role.exists' => 'The selected role is invalid.',
+            'address.country_id.required' => 'The country field is required.',
+            'address.city.string' => 'The city must be a string.',
+            'address.city.max' => 'The city may not be greater than 50 characters.',
+            'address.prefecture.string' => 'The prefecture must be a string.',
+            'address.prefecture.max' => 'The prefecture may not be greater than 50 characters.',
+            'address.town.string' => 'The town must be a string.',
+            'address.town.max' => 'The town may not be greater than 50 characters.',
+            'address.postal_code.string' => 'The postal code must be a string.',
+            'address.postal_code.max' => 'The postal code may not be greater than 50 characters.',
+            'address.state.string' => 'The state must be a string.',
+            'address.state.max' => 'The state may not be greater than 50 characters.',
+            'address.street.string' => 'The street must be a string.',
+            'address.street.max' => 'The street may not be greater than 50 characters.',
+            'address.building.string' => 'The building must be a string.',
+            'address.building.max' => 'The building may not be greater than 50 characters.',
+            'image.image' => 'The image must be an image.',
+            'image.mimes' => 'The image must be a file of type: png, jpg, jpeg, svg, bmp.',
+            'image.max' => 'The image may not be greater than 2048 kilobytes.',
+            'active.required' => 'The active field is required.',
+            'role.required' => 'The role field is required.',
+            'role.exists' => 'The selected role is invalid.',
+            'email.required' => 'The email field is required.',
+            'email.string' => 'The email must be a string.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email may not be greater than 191 characters.',
+            'email.unique' => 'The email has already been taken.',
+            'password.required' => 'The password field is required.',
+            'password.confirmed' => 'The password confirmation does not match.',
+            'password.min' => 'The password must be at least 8 characters.',
+            'last_name.required' => 'The last name field is required.',
+            'last_name.string' => 'The last name must be a string.',
+            'last_name.max' => 'The last name may not be greater than 191 characters.',
+            'first_name.required' => 'The first name field is required.',
+            'first_name.string' => 'The first name must be a string.',
+            'first_name.max' => 'The first name may not be greater than 191 characters.',
+            'phone.required' => 'The phone field is required.',
+            'phone.string' => 'The phone must be a string.',
+            'phone.max' => 'The phone may not be greater than 191 characters.',
+        ];
+    }
+
     protected function passedValidation()
     {
         if ($this->input('password')) {
             $this->merge([
                 'password' => Hash::make($this->password),
-            ]);
-        }
-        if ($this->has('image')) {
-            $documentService = new DocumentService();
-            $url = $documentService->store($this->image, 'users');
-            $this->merge([
-                'image' => $url,
             ]);
         }
         return $this;
@@ -90,16 +124,8 @@ class StoreUserRequest extends FormRequest
         } else {
             unset($final['password']);
         }
-        if ($this->has('image')) {
-            $final = array_merge($final, ['image' => $this->input('image')]);
-        }
-        if ($this->has('postalCode1') && $this->has('postalCode2')) {
-            $final['address']['postal_code'] = $this->input('postalCode1') . '-' . $this->input('postalCode2');
-            unset($final['postalCode1']);
-            unset($final['postalCode2']);
-        }
         if ($this->route()->getName() === 'users.store') {
-            $final['user_id'] = auth()->id();
+            $final['created_by'] = auth()->id();
         }
         return $final;
     }

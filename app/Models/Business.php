@@ -43,4 +43,9 @@ class Business extends Model
     public function notices() {
         return $this->hasMany(Notice::class);
     }
+
+    public function facilities() {
+        return $this->belongsToMany(Facility::class,'business_facilities');
+    }
+
 }
