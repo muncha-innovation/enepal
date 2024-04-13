@@ -13,4 +13,8 @@ class GalleryImage extends Model
     public function gallery() {
         return $this->belongsTo(Gallery::class);
     }
+
+    public function getThumbnailAttribute() {
+        return \Storage::disk('public')->url($this->image);
+    }
 }

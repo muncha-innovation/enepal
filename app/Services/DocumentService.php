@@ -38,17 +38,6 @@ class DocumentService
         return null;
     }
 
-    private static function getStoragePath(string $value): string
-    {
-        return '/storage/' . $value;
-    }
-
-
-    public function copyFilesToPublic($filePath)
-    {
-        $file = Storage::disk('public')->url($filePath);
-        Storage::disk('public')->put($filePath, $file, 'public');
-    }
 
     public function getResizedFile($value, $type = 'medium')
     {
@@ -58,21 +47,6 @@ class DocumentService
         if (Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->url($path);
         }
-    }
-
-    public function copyDocument($path, $folder = 'documents', $disk = 'public')
-    {
-        $uniqueName = \Str::random(40);
-        $pathArr = explode('.', $path);
-        $extension = Arr::last($pathArr);
-        $uniqueName = $uniqueName . '.' . $extension;
-        $fileName = $folder . '/' . $uniqueName;
-
-        Storage::disk('public')->copy($path, $fileName);
-        $name = public_path($this->getStoragePath($fileName));
-
-        $this->resizeAndStore($name, $uniqueName, $disk, $folder);
-        return $fileName;
     }
 
     private function resizeAndStore($file, $uniqueName, $disk = 'public', $folder = 'images')

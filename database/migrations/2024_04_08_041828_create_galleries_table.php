@@ -19,6 +19,8 @@ class CreateGalleriesTable extends Migration
             $table->string('cover_image')->nullable();
             $table->unsignedBigInteger('business_id');
             $table->unsignedBigInteger('user_id');
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_private')->default(false);
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

@@ -48,4 +48,8 @@ class Business extends Model
         return $this->belongsToMany(Facility::class,'business_facilities');
     }
 
+    public function galleries() {
+        return $this->hasMany(Gallery::class);
+    }
+
 }

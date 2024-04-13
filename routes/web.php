@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NoticeController;
@@ -76,6 +77,16 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{notice}', [NoticeController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{notice}', [NoticeController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{notice}', [NoticeController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function() {
+        Route::get('/{business}', [GalleryController::class, 'index'])->name('index');
+        Route::get('create/{business}', [GalleryController::class, 'create'])->name('create');
+        Route::post('create/{business}', [GalleryController::class, 'store'])->name('store');
+        Route::get('show/{business}/{gallery}', [GalleryController::class, 'show'])->name('show');
+        Route::get('edit/{business}/{gallery}', [GalleryController::class, 'edit'])->name('edit');
+        Route::put('update/{business}/{gallery}', [GalleryController::class, 'update'])->name('update');
+        Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');

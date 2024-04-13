@@ -12,8 +12,8 @@
     <div class="md:h-full md:flex-1 flex items-center md:bg-gray-200">
         <div class="py-8 px-8 w-full max-w-3xl">
             <h3 class="text-2xl font-semibold">Log In</h3>
-
             <form class="space-y-6" action="{{ route('login.post') }}" method="POST">
+                @include('modules.shared.success_error')
                 @csrf
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">

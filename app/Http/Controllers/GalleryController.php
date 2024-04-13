@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGalleryRequest;
+use App\Models\Business;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
 
@@ -12,9 +14,10 @@ class GalleryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Business $business)
     {
-        //
+        $galleries = $business->galleries;
+        return view('modules.gallery.index', compact('galleries','business'));
     }
 
     /**
@@ -22,9 +25,9 @@ class GalleryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request, Business $business)
     {
-        //
+        return view('modules.gallery.createOrEdit', compact('business'));
     }
 
     /**
@@ -33,9 +36,10 @@ class GalleryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreGalleryRequest $request, Business $business)
     {
-        //
+        $business->galleries()->create($request->all());
+        return redirect()->route('business.galleries.index', $business);
     }
 
     /**
@@ -44,9 +48,9 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function show(Gallery $gallery)
+    public function show(Business $business, Gallery $gallery)
     {
-        //
+        return view('gallery.show', compact('gallery'));
     }
 
     /**
@@ -55,9 +59,9 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function edit(Gallery $gallery)
+    public function edit(Business $business, Gallery $gallery)
     {
-        //
+        return view('gallery.edit', compact('gallery'));
     }
 
     /**
@@ -67,9 +71,11 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Gallery $gallery)
+    public function update(StoreGalleryRequest $request, Business $business, Gallery $gallery)
     {
-        //
+        $gallery->update($request->all());
+        return redirect()->route('business.galleries.index', $business);
+        
     }
 
     /**
