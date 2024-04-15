@@ -2,22 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\API\Auth\RegistrationController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\API\BusinessController;
+use App\Http\Controllers\API\BusinessTypesController;
 use App\Http\Controllers\API\CountryController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\API\FeedController;
+use App\Http\Controllers\API\PostsController;
 
 Route::post('/login', LoginController::class);
+Route::post('/register', RegistrationController::class);
 Route::post('/password/reset', ResetPasswordController::class);
 Route::get('/countries/{country}/states', [CountryController::class, 'states']);
+Route::get('business/types', [BusinessTypesController::class, 'index']);
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('posts',[PostsController::class, 'index']);
 });

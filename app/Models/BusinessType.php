@@ -15,4 +15,8 @@ class BusinessType extends Model
         return $this->belongsToMany(Facility::class,'business_type_facilities');
     }
 
+    public function businesses() {
+        return $this->hasMany(Business::class,'type_id');
+    }
+
 }

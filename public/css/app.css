@@ -1115,6 +1115,10 @@ body {
   height: 0.5rem;
 }
 
+.h-40 {
+  height: 10rem;
+}
+
 .max-h-40 {
   max-height: 10rem;
 }

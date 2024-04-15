@@ -58,6 +58,8 @@
                                     {{__('Verified')}}</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{__('Action')}}
                                 </th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" >{{__('Featured')}}</th>
+                                
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white" id="set-rows">
@@ -75,7 +77,7 @@
                                         @endif
                                     </td>
                                     <td
-                                        class=" whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        class="whitespace-nowrap py-2 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"
                                             class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">View</a>
                                         <a href="{{route('business.setting', $business)}}"
@@ -96,6 +98,21 @@
                                             </button>
                                         </form>
                                         @endrole
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('business.featured', $business) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">
+                                                @if ($business->is_featured)
+                                                    {{__('Unfeatured')}}
+                                                @else
+                                                    {{__('Featured')}}
+                                                @endif
+                                            </button>
+                                        </form>
+                                        
+                                        
+                                           
                                     </td>
                                 </tr>
                             @endforeach

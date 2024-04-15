@@ -129,6 +129,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'map_key' => env('MAP_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

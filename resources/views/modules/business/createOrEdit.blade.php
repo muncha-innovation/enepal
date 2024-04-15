@@ -169,7 +169,7 @@
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                 </div>
-
+<div id="map" class="w-full h-50"></div>
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"
@@ -183,4 +183,5 @@
 
 @push('js')
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
+    @include('modules.shared.google_maps_js')
 @endpush

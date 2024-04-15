@@ -23,16 +23,14 @@ class LoginController extends Controller
         ]);
         $tokenName = 'enepal';
 
-        $user = User::where('email', $request->email)->orWhere('user_name',$request->email)->with(['address','departments'])->first();
-        $departments = $user->departments->pluck('name')->toArray();
-        unset($user->departments);
-        $user->departments = $departments;
+        $user = User::where('email', $request->email)->with(['address'])->first();
+        
         if (!$user) {
             return response()->json([
                 'message' => trans('User not found', [], $lang)
             ], 400);
         }
-        if (!$user->is_active) {
+        if (!$user->active) {
             return response()->json([
                 'message' => trans('User is not active', [], $lang)
             ], 400);
@@ -43,10 +41,7 @@ class LoginController extends Controller
             ], 400);
         }
         $user->role = trans($user->getRoleNames()[0], [], $lang);
-        if($user->address?->country) {
-            $user->address->country =$user->address?->country_name;
-        }
-        $user->image  = $user->full_path;
+        $user->load('address.country');
         return response()->json([
             'token' => $user->createToken($tokenName)->plainTextToken,
             'user' => collect($user)->except(['email_verified_at', 'created_at', 'updated_at']),

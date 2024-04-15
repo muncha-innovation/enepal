@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('delete/{business}/{post}', [PostController::class, 'destroy'])->name('destroy');
     });
     Route::resource('business', BusinessController::class);
+    Route::post('business/{business}/featured', [BusinessController::class, 'featured'])->name('business.featured');
     Route::group(['prefix' => 'products', 'as' => 'products.'], function() {
         Route::get('/{business}', [ProductController::class, 'index'])->name('index');
         Route::get('create/{business}', [ProductController::class, 'create'])->name('create');
