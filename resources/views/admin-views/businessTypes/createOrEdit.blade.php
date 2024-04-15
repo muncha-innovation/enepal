@@ -24,7 +24,8 @@
                     @method('PUT')
                 @endif
                 @include('modules.shared.success_error')
-                {{-- choose role --}}
+                
+
                 <div class="mb-2">
                     <div class="mb-2">
                         <label for="title"
@@ -36,7 +37,6 @@
                         </div>
                     </div>
 
-                    {{-- select multiple business features --}}
                     <div class="mb-2">
                         <label for="facilities" class="block text-sm font-medium leading-6 text-gray-900">Facilities</label>
                         <div class="mt-2 rounded-md shadow-sm">
