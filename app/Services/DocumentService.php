@@ -23,7 +23,7 @@ class DocumentService
         $isImage = in_array(Arr::last(explode('.', $imageName)), AppSettings::$imageExtensions);
 
         if ($resize && $isImage) {
-            $uniqueName = explode('/', $imageName)[1];
+            $uniqueName = Arr::last(explode('/', $imageName));
             $this->resizeAndStore($file, $uniqueName, $disk, $folder);
         }
 

@@ -23,6 +23,9 @@ document.getElementById('country').addEventListener('change', function () {
 });
 // prefill phone based on country code
 document.getElementById('country').addEventListener('change', function () {
+    if (this.value) {
+        return;
+    }
     const countryId = this.value;
     const country = @json($countries);
     const phoneInput = document.getElementById('phone');

@@ -2,6 +2,9 @@
 
 
 use App\Services\DateFormatter;
+use Illuminate\Http\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 
 if (!function_exists('getLanguageFromCode')) {
     function getLanguageFromCode($code)
@@ -77,4 +80,36 @@ if(!function_exists('getImage')) {
         } else {
             return Storage::disk('public')->url($fileName);
         }}
+}
+
+if (!function_exists('getFormattedDate')) {
+    function getFormattedDate($date, $format = 'Y-m-d H:i')
+    {
+        return \Carbon\Carbon::parse($date)->format($format);
+    }
+}
+
+if (!function_exists('getUploadedFileFromBase64')) {
+    function getUploadedFileFromBase64(string $base64File): UploadedFile
+    {
+        $fileData = base64_decode(Arr::last(explode(',', $base64File)));
+
+        $tempFile = tmpfile();
+        $tempFilePath = stream_get_meta_data($tempFile)['uri'];
+
+        file_put_contents($tempFilePath, $fileData);
+
+        $tempFileObject = new File($tempFilePath);
+        $file = new UploadedFile(
+            $tempFileObject->getPathname(),
+            $tempFileObject->getFilename(),
+            $tempFileObject->getMimeType(),
+            0,
+            true
+        );
+        app()->terminating(function () use ($tempFile) {
+            fclose($tempFile);
+        });
+        return $file;
+    }
 }

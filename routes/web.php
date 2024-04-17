@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NoticeController;
@@ -89,6 +90,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::put('update/{business}/{gallery}', [GalleryController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
+    Route::resource('galleryImage', GalleryImageController::class);
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Logs Route

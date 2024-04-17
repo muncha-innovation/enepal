@@ -43,17 +43,20 @@
             @foreach ($galleries as $gallery)
             <tr>
               <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $gallery->title }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $gallery->is_active?'Active':'Inactive' }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 @if($gallery->cover_image)
-                <img src="{{ getImage($gallery->cover_image, 'gallery/') }}" alt="Gallery Image" class="w-10 h-10 rounded-lg">
+                <img src="{{ getImage($gallery->cover_image, '/') }}" alt="Gallery Image" class="w-10 h-10 rounded-lg">
                 @else
                 -
                 @endif
 
               </td>
+              {{-- images count --}}
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $gallery->images->count() }}</td>
+              
+              
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $gallery->user->name }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $gallery->created_at }}</td>
+              
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 <a href="{{ route('gallery.show', [$business, $gallery]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
                 <a href="{{ route('gallery.edit', [$business, $gallery]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>

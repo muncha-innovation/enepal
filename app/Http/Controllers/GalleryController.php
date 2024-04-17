@@ -38,8 +38,11 @@ class GalleryController extends Controller
      */
     public function store(StoreGalleryRequest $request, Business $business)
     {
-        $business->galleries()->create($request->all());
-        return redirect()->route('business.galleries.index', $business);
+        $data = collect($request->validated());
+        
+        $gallery = $business->galleries()->create($data->except(['images'])->toArray());
+        $gallery->images()->createMany($data->get('images'));
+        return redirect()->route('gallery.index', $business);
     }
 
     /**
@@ -50,7 +53,7 @@ class GalleryController extends Controller
      */
     public function show(Business $business, Gallery $gallery)
     {
-        return view('gallery.show', compact('gallery'));
+        return view('modules.gallery.show', compact(['business', 'gallery']));
     }
 
     /**
@@ -61,7 +64,7 @@ class GalleryController extends Controller
      */
     public function edit(Business $business, Gallery $gallery)
     {
-        return view('gallery.edit', compact('gallery'));
+        return view('modules.gallery.createOrEdit', compact(['business', 'gallery']));
     }
 
     /**
@@ -73,9 +76,12 @@ class GalleryController extends Controller
      */
     public function update(StoreGalleryRequest $request, Business $business, Gallery $gallery)
     {
-        $gallery->update($request->all());
-        return redirect()->route('business.galleries.index', $business);
+
+        $data = collect($request->validated());
         
+        $gallery->update($data->except(['images'])->toArray());
+        $gallery->images()->createMany($data->get('images'));
+        return redirect()->route('gallery.index', $business);
     }
 
     /**
@@ -86,6 +92,5 @@ class GalleryController extends Controller
      */
     public function destroy(Gallery $gallery)
     {
-        //
     }
 }

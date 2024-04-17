@@ -5,7 +5,7 @@
     <div class="bg-white p-8 shadow-md rounded-lg">
         <div class="flex justify-between items-center mb-6">
             <a href="{{ route('products.index',$business) }}" class="text-blue-500 hover:underline">&larr; Back to Products</a>
-            <div class="text-sm text-gray-600">Published by {{ $product->user->name }} on {{ $product->created_at->format('M d, Y') }}</div>
+            <div class="text-sm text-gray-600">Created by {{ $product->user->name }} on {{ getFormattedDate($product->created_at) }}</div>
         </div>
         <h1 class="text-3xl font-bold mb-4">{{ $product->name }}</h1>
         @if($product->image)

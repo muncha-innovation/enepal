@@ -46,9 +46,9 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <label for="is_active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <select name="active" id="active"
+                        <select name="is_active" id="is_active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                             <option value="1" @if ($gallery->active) selected @endif>Active</option>
                             <option value="0" @if (!$gallery->active) selected @endif>Inactive</option>
@@ -71,7 +71,7 @@
                     </div>
                     @if ($isEdit)
                         @if ($gallery->cover_image)
-                            <img src="{{ getImage($gallery->cover_image, 'gallery/') }}" alt="Gallery Image"
+                            <img src="{{ getImage($gallery->cover_image, '/') }}" alt="Gallery Image"
                                 class="w-20 h-20 rounded-lg">
                         @else
                             -

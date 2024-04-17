@@ -48,7 +48,7 @@
                                     @endif
                                 </h1>
                                 <p><strong>{{ __('Performed By') }}</strong>: {{ $log->causer->name }}</p>
-                                <p>{{ formatDateToJp($log->created_at) }}</p>
+                                <p>{{ getFormattedDate($log->created_at) }}</p>
 
                                 {{-- These divs are just to make color available in tailwind when using npm run prod because they are dynamically called --}}
                                 <div class="bg-violet-500"></div>

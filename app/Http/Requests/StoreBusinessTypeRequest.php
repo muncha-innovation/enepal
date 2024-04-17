@@ -25,7 +25,7 @@ class StoreBusinessTypeRequest extends FormRequest
     {
         return [
             'title' => ['required'],
-            'facilities' => ['required', 'array'],
+            'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['exists:facilities,id'],
             'icon' => 'nullable | image | mimes:png,jpg,jpeg,svg,bmp | max:2048',
         ];

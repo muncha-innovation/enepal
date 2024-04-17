@@ -54,7 +54,7 @@
 
               </td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $notice->user->name }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $notice->created_at }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ getFormattedDate($notice->created_at) }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 <a href="{{ route('notices.show', [$business, $notice]) }}" class="bg-blue-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-blue-500 hover:bg-blue-600 focus:z-10">View</a>
                 <a href="{{ route('notices.edit', [$business, $notice]) }}" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">Edit</a>

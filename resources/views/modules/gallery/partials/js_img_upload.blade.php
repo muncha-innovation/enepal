@@ -18,12 +18,11 @@
                         counter++;
                         var html = `
           <div class="group relative">
-            <input type="hidden" name="document_name[${counter}]" value="${name}">
-            <input type="hidden" name="documents[${counter}]" value="${event.target.result}">
+            <input type="hidden" name="images_name[${counter}]" value="${name}">
+            <input type="hidden" name="images[${counter}]" value="${event.target.result}">
             <div class="w-20 h-20 rounded-lg">
               <img src="${extension=='pdf'?@json(asset('pfd_icon.png')):event.target.result}" alt="" class="w-20 h-20 rounded-lg">
             </div>
-            <p class="">${splitName}</p>
             <div class="mt-4 flex flex-col gap-3">
               
               <div class="flex gap-3 justify-between">
@@ -40,13 +39,11 @@
         };
 
         $('#file-upload').on('click', function() {
-            // To overcome the limitation where same file if 
-            // selected twice will not have worked without setting its value null first
-            this.value = null; // clear the input value
+            this.value = null;
         });
         $('#file-upload').on('change', function(e) {
             imagesPreview(this, 'div.gallery');
-            $('#mainImages').val($(this).val())
+            // $('#mainImages').val($(this).val())
         });
 
         $(document).on('click', '.delete-image', function(e) {
@@ -65,6 +62,7 @@
                 confirmButtonText: "{{ trans('Yes, Delete it!') }}"
             }).then((result) => {
                 if (result.value === true) {
+                    $(this).closest('.group').remove();
 
                     if (deleteUrl) {
                         $.ajax({
@@ -89,7 +87,6 @@
                             }
                         })
                     }
-                    $(this).closest('.group').remove();
 
                 }
             });

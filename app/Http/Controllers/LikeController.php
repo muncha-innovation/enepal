@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GalleryImage;
+use App\Models\Like;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
-class GalleryImageController extends Controller
+class LikeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -42,10 +41,10 @@ class GalleryImageController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\GalleryImage  $galleryImage
+     * @param  \App\Models\Like  $like
      * @return \Illuminate\Http\Response
      */
-    public function show(GalleryImage $galleryImage)
+    public function show(Like $like)
     {
         //
     }
@@ -53,10 +52,10 @@ class GalleryImageController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\GalleryImage  $galleryImage
+     * @param  \App\Models\Like  $like
      * @return \Illuminate\Http\Response
      */
-    public function edit(GalleryImage $galleryImage)
+    public function edit(Like $like)
     {
         //
     }
@@ -65,10 +64,10 @@ class GalleryImageController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\GalleryImage  $galleryImage
+     * @param  \App\Models\Like  $like
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, GalleryImage $galleryImage)
+    public function update(Request $request, Like $like)
     {
         //
     }
@@ -76,13 +75,11 @@ class GalleryImageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\GalleryImage  $galleryImage
+     * @param  \App\Models\Like  $like
      * @return \Illuminate\Http\Response
      */
-    public function destroy(GalleryImage $galleryImage)
+    public function destroy(Like $like)
     {
-        Storage::delete($galleryImage->image);
-        $galleryImage->delete();
-        return response()->json(['message' => 'Deleted successfully']);
+        //
     }
 }

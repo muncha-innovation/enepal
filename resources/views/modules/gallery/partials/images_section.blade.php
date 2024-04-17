@@ -10,16 +10,16 @@
             
             <div class="group relative">
                 <div
-                    class="w-full max-h-40 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+                    class="w-20 h-20 rounded-lg">
                     <img src="{{ $image->thumbnail }}" alt=""
-                        class="w-full h-full object-center object-cover lg:w-full lg:h-full">
+                        class="w-20 h-20 rounded-lg">
                 </div>
                 <div class="mt-4 flex flex-col gap-3">
                     
                     <div class="flex gap-3 justify-between">
                         <i type="button"
-                            data-delete-url="{{ route('product.images.destroy', $image->id) }}"
-                            class="delete-image justify-center w-full inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            data-delete-url="{{ route('galleryImage.destroy', $image->id) }}"
+                            class="delete-image justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-small rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Remove') }}
                         </i>
 

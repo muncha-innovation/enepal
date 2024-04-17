@@ -16,10 +16,13 @@ class CreateGalleryImagesTable extends Migration
         Schema::create('gallery_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gallery_id');
+            $table->unsignedBigInteger('business_id');
             $table->string('image');
+            $table->string('original_filename');
             $table->timestamps();
 
             $table->foreign('gallery_id')->references('id')->on('galleries')->onDelete('cascade');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
         });
     }
 
