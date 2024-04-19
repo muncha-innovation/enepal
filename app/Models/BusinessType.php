@@ -12,7 +12,7 @@ class BusinessType extends Model
     protected $fillable = ['title', 'description', 'icon'];
 
     public function facilities() {
-        return $this->belongsToMany(Facility::class,'business_type_facilities');
+        return $this->belongsToMany(Facility::class,'business_tyxpe_facilities');
     }
 
     public function businesses() {
