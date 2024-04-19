@@ -24,19 +24,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'image' => getImage($this->image, 'profile/'),
-            'address' => $this->getAddress()
-        ];
-    }
-
-    private function getAddress()
-    {
-        return [
-            'country' => $this->address->country?->name,
-            'city' => $this->address->city,
-            'state' => $this->address->state?->name,
-            'postal_code' => $this->address->postal_code,
-            'address_line_1' => $this->address->address_line_1,
-            'address_line_2' => $this->address->address_line_2,
+            'address' => AddressResource::make($this->address),
         ];
     }
 }

@@ -14,7 +14,7 @@ class PostsController extends Controller
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
-        return PostResource::collection(Post::with(['user','business'])->offset($offset)->limit($limit)->get());
+        return PostResource::collection(Post::with(['user','user.address','business','business.address'])->offset($offset)->limit($limit)->get());
     }
 
     public function addComment(Request $request)
