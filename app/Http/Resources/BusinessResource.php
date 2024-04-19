@@ -19,7 +19,7 @@ class BusinessResource extends JsonResource
             'title' => $this->name,
             'description' => $this->description,
             'cover_image' => getImage($this->image, 'business/'),
-            'profile_image' => getImage($this->logo, 'business/'),
+            'profile_image' => getImage($this->logo, 'business/logo/'),
             'phone' => $this->phone1,
             'email' => $this->email,
             'website' => $this->website,
