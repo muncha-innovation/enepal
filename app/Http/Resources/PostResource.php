@@ -31,7 +31,6 @@ class PostResource extends JsonResource
             'title' => $this->business->title,
             'description' => $this->business->description,
             'image' => getImage($this->business->image, 'business/'),
-            'address' => $this->getAddress($this->business),
             'phone' => $this->business->phone,
             'email' => $this->business->email,
             'website' => $this->business->website,
