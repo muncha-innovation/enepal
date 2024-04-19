@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Constraint\Count;
@@ -42,9 +43,6 @@ class LoginController extends Controller
         }
         $user->role = trans($user->getRoleNames()[0], [], $lang);
         $user->load('address.country');
-        return response()->json([
-            'token' => $user->createToken($tokenName)->plainTextToken,
-            'user' => collect($user)->except(['email_verified_at', 'created_at', 'updated_at']),
-        ], 200);
+        return UserResource::make($user)->response()->setStatusCode(200);
     }
 }
