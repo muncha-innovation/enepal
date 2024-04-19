@@ -13,4 +13,4 @@ class BusinessTypesController extends Controller
     {
         return BusinessTypesResource::collection(BusinessType::all());
     }
-}
+}    

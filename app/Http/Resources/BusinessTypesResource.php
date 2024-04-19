@@ -30,7 +30,7 @@ class BusinessTypesResource extends JsonResource
                 'title' => $business->title,
                 'description' => $business->description,
                 'image' => getImage($business->image, 'business/'),
-                'address' => $this->getAddress(),
+                'address' => $this->getAddress($business),
                 'phone' => $business->phone,
                 'email' => $business->email,
                 'website' => $business->website,
@@ -45,14 +45,14 @@ class BusinessTypesResource extends JsonResource
         });
     }
 
-    private function getAddress() {
+    private function getAddress($business) {
         return [
-            'country' => $this->address->country?->name,
-            'city' => $this->address->city,
-            'state' => $this->address->state?->name,
-            'postal_code' => $this->address->postal_code,
-            'address_line_1' => $this->address->address_line_1,
-            'address_line_2' => $this->address->address_line_2,
+            'country' => $business->address?->country?->name,
+            'city' => $business->address?->city,
+            'state' => $business->address?->state?->name,
+            'postal_code' => $business->address->postal_code,
+            'address_line_1' => $business->address->address_line_1,
+            'address_line_2' => $business->address->address_line_2,
         ];
     }
 }
