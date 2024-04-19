@@ -11,6 +11,6 @@ class BusinessTypesController extends Controller
 {
     public function index()
     {
-        return BusinessTypesResource::collection(BusinessType::with(['businesses','businesses.address'])->all());
+        return BusinessTypesResource::collection(BusinessType::with(['businesses','businesses.address'])->get());
     }
 }    
