@@ -15,12 +15,9 @@ class BusinessTypesController extends Controller
         return BusinessTypesResource::collection(BusinessType::with(['businesses','businesses.address'])->get());
     }
 
-    public function getById(Request $request)
+    public function getById($id)
     {
-        $request->validate([
-            'id' => 'required|integer'
-        ]);
-        $type = BusinessType::findOrFail($request->id);
+        $type = BusinessType::findOrFail($id);
         return BusinessTypesResource::make($type);
     }
 }    
