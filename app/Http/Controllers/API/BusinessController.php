@@ -10,8 +10,20 @@ use Illuminate\Http\Request;
 class BusinessController extends Controller
 {
 
-    public function getBusinessTypes(Request $request) {
-        
+    public function getBusinesses(Request $request) {
+        $typeId = $request->get('type_id');
+        $featured = $request->get('featured');
+        $limit = $request->get('limit',10);
+        $page = $request->get('page', 1);
+        $offset = ($page - 1) * $limit;
+        $businesses = Business::query();
+        if($typeId) {
+            $businesses->where('type_id', $typeId);
+        }
+        if($featured) {
+            $businesses->where('is_featured', true);
+        }
+        $businesses = $businesses->limit($limit)->offset($offset)->get();
     }
 
     public function getBusinessType(Request $request) {

@@ -17,11 +17,12 @@ Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::get('business/types', [BusinessTypesController::class, 'index']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('posts',[PostsController::class, 'index']);
+    Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::group(['prefix' => 'business'],function() {
+
         Route::get('posts', [BusinessController::class,'posts']);
         Route::get('products', [BusinessController::class, 'products']);
         Route::get('notices', [BusinessController::class,'notices']);
 
     });
-    Route::get('business/featured', [BusinessController::class, 'featured']);
 });
