@@ -17,7 +17,7 @@ class BusinessController extends Controller
         $limit = $request->get('limit',10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
-        $businesses = Business::with(['address'])->query();
+        $businesses = Business::query();
         if($typeId) {
             $businesses->where('type_id', $typeId);
         }
