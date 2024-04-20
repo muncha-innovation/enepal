@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BusinessResource;
 use App\Models\Business;
 use App\Models\BusinessType;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class BusinessController extends Controller
         $limit = $request->get('limit',10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
-        $businesses = Business::query();
+        $businesses = Business::with(['address'])->query();
         if($typeId) {
             $businesses->where('type_id', $typeId);
         }
@@ -24,6 +25,7 @@ class BusinessController extends Controller
             $businesses->where('is_featured', true);
         }
         $businesses = $businesses->limit($limit)->offset($offset)->get();
+        return BusinessResource::collection($businesses);
     }
 
     public function getBusinessType(Request $request) {
