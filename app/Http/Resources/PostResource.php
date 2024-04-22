@@ -22,6 +22,7 @@ class PostResource extends JsonResource
             'image' => getImage($this->image, 'posts/'),
             'business' => BusinessResource::make($this->business),
             'likes' => $this->likes->count(),
+            'totalComments' => $this->comments->count(), 
             'user' => UserResource::make($this->user),
         ];
     }
