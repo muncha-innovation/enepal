@@ -31,4 +31,12 @@ class PostsController extends Controller
             'message' => 'Comment added successfully',
         ]);
     }
+
+    public function getById(Request $request, $id)
+    {
+        $request->validate([
+            'id' => 'required',
+        ]);
+        return new PostResource(Post::with(['user','user.address','business','business.address'])->findOrFail($id));
+    }
 }
