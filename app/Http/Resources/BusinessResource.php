@@ -30,7 +30,10 @@ class BusinessResource extends JsonResource
                     'icon' => getImage($facility->icon)
                 ];
             }),
-            'address' => AddressResource::make($this->address),
+            'address' => new AddressResource($this->whenLoaded('address')),
+            'products' => ProductResource::collection($this->whenLoaded('products')),
+            'type' => BusinessTypesResource::make($this->whenLoaded('type')),
+            
         ];
     }
 }
