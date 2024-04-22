@@ -16,7 +16,7 @@ Route::post('/password/reset', ResetPasswordController::class);
 Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::get('business/types', [BusinessTypesController::class, 'index']);
 Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
-Route::get('posts/{id}', [PostsController::class, 'getPostById']);
+Route::get('posts/{id}', [PostsController::class, 'getById']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('posts',[PostsController::class, 'index']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
