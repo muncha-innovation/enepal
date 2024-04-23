@@ -62,7 +62,7 @@ class Business extends Model
 
     public function getHasFollowedAttribute() {
         $user = $this->users()->where('user_id', auth()->id())->first();
-        return $user && $user->pivot->position === 'member';
+        return $user && $user->pivot->role === 'member';
     }
 
     public function getIsAdminAttribute() {
