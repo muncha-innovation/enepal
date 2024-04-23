@@ -19,6 +19,6 @@ class BusinessTypesResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'icon' => getImage($this->icon),
-            'businesses' => BusinessResource::collection($this->businesses()->latest()->take(10)->get()),
+            'businesses' => BusinessResource::collection($this->businesses),
         ];
     }}

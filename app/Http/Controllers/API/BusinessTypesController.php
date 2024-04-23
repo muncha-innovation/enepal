@@ -12,7 +12,9 @@ class BusinessTypesController extends Controller
 {
     public function index()
     {
-        return BusinessTypesResource::collection(BusinessType::with(['businesses','businesses.address'])->get());
+        return BusinessTypesResource::collection(BusinessType::with(['businesses' => function() {
+            return $this->latest()->take(10);
+        },'businesses.address'])->get());
     }
 
     public function getById($id)
