@@ -97,23 +97,26 @@ class BusinessController extends Controller
     public function followUnfollow($businessId)
     {
         $business = Business::findOrFail($businessId);
-        if ($business->users()->where('user_id', auth()->id())->wherePivot('role', 'member')->exists()) {
-            $business->users()->detach(auth()->id());
-            return response()->json([
-                'message' => 'Business unfollowed successfully'
-            ]);
-        } else if ($business->users()->where('user_id', auth()->id())->exits()) {
-            return response()->json([
-                'message' => 'Business already followed'
-            ]);
-        } else {
+        $user = $business->users()->where('user_id', auth()->id())->first();
+        if (!$user) {
             $business->users()->attach(auth()->id(), [
                 'role' => 'member',
                 'position' => 'follower'
             ]);
+            return response()->json([
+                'message' => 'Business followed successfully'
+            ]);
+        } else {
+            if($user->pivot->role=='member') {
+                $business->users()->detach(auth()->id());
+                return response()->json([
+                    'message' => 'Business unfollowed successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'You are not allowed to unfollow this business'
+                ], 403);
+            }
         }
-        return response()->json([
-            'message' => 'Business followed successfully'
-        ]);
     }
 }
