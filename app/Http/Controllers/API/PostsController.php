@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -45,10 +46,10 @@ class PostsController extends Controller
         $data = $request->all();
         $data['user_id'] = auth()->id();
         $post = Post::find($request->post_id);
-        $post->comments()->create($request->all());
-        return response()->json([
-            'message' => 'Comment added successfully',
-        ]);
+        $comment = $post->comments()->create($request->all());
+        $comment->load('user');
+        return CommentResource::make($comment);
+        
     }
 
     public function getById(Request $request, $id)

@@ -121,10 +121,10 @@ class BusinessController extends Controller
     }
 
     public function following() {
-        
         $businesses = Business::whereHas('users', function($query) {
             $query->where('user_id', auth()->id());
         })->get();
+        
         return BusinessResource::collection($businesses);
     }
 }
