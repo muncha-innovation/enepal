@@ -24,7 +24,7 @@ class BusinessController extends Controller
         if($featured) {
             $businesses->where('is_featured', true);
         }
-        $businesses = $businesses->limit($limit)->offset($offset)->get();
+        $businesses = $businesses->with(['address'])->limit($limit)->offset($offset)->get();
         return BusinessResource::collection($businesses);
     }
 
