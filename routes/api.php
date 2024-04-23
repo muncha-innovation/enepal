@@ -15,21 +15,21 @@ Route::post('/register', RegistrationController::class);
 Route::post('/password/reset', ResetPasswordController::class);
 Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::get('business/types', [BusinessTypesController::class, 'index']);
-Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
-Route::get('posts/{id}', [PostsController::class, 'getById']);
-Route::get('business/{id}', [BusinessController::class, 'getById']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('posts',[PostsController::class, 'index']);
+    Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
+    Route::get('posts/{id}', [PostsController::class, 'getById']);
+    Route::get('business/{id}', [BusinessController::class, 'getById']);
+
+    Route::get('posts', [PostsController::class, 'index']);
 
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
-    Route::group(['prefix' => 'business'],function() {
+    Route::group(['prefix' => 'business'], function () {
 
-        Route::get('posts', [BusinessController::class,'posts']);
+        Route::get('posts', [BusinessController::class, 'posts']);
         Route::get('products', [BusinessController::class, 'products']);
-        Route::get('notices', [BusinessController::class,'notices']);
+        Route::get('notices', [BusinessController::class, 'notices']);
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
-
     });
-
 });
