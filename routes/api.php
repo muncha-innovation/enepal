@@ -20,12 +20,16 @@ Route::get('posts/{id}', [PostsController::class, 'getById']);
 Route::get('business/{id}', [BusinessController::class, 'getById']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('posts',[PostsController::class, 'index']);
+
+    Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::group(['prefix' => 'business'],function() {
 
         Route::get('posts', [BusinessController::class,'posts']);
         Route::get('products', [BusinessController::class, 'products']);
         Route::get('notices', [BusinessController::class,'notices']);
+        Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
 
     });
+
 });

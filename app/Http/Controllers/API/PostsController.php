@@ -17,23 +17,23 @@ class PostsController extends Controller
         $offset = ($page - 1) * $limit;
         $query = Post::query();
 
-if ($request->has('businessTypeId')) {
-    $query->select('posts.*')
-        ->join('businesses', 'posts.business_id', '=', 'businesses.id')
-        ->where('businesses.type_id', $request->businessTypeId);
-}
+        if ($request->has('businessTypeId')) {
+            $query->select('posts.*')
+                ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+                ->where('businesses.type_id', $request->businessTypeId);
+        }
 
-$posts = $query->when($request->has('businessId'), function($query) use ($request) {
-        return $query->where('posts.business_id', $request->businessId);
-    })
-    ->when($request->has('userId'), function($query) use ($request) {
-        return $query->where('posts.user_id', $request->userId);
-    })
+        $posts = $query->when($request->has('businessId'), function ($query) use ($request) {
+            return $query->where('posts.business_id', $request->businessId);
+        })
+            ->when($request->has('userId'), function ($query) use ($request) {
+                return $query->where('posts.user_id', $request->userId);
+            })
 
-    ->latest()
-    ->offset($offset)->limit($limit)->get();
+            ->latest()
+            ->offset($offset)->limit($limit)->get();
 
-return PostResource::collection($posts);
+        return PostResource::collection($posts);
     }
 
     public function addComment(Request $request)
@@ -53,6 +53,14 @@ return PostResource::collection($posts);
 
     public function getById(Request $request, $id)
     {
-        return new PostResource(Post::with(['user','user.address','business','business.address'])->findOrFail($id));
+        return new PostResource(Post::with(['user', 'user.address', 'business', 'business.address'])->findOrFail($id));
     }
+
+    public function likeUnlike($id) {
+        $post = Post::findOrFail($id);
+        $post->likes()->toggle(auth()->id());
+        return response()->json([
+            'message' => 'Success'
+        ]);
+    } 
 }

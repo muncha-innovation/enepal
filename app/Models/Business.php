@@ -10,7 +10,7 @@ class Business extends Model
 {
     use HasFactory;
     static $ROLES = ['owner', 'admin', 'member'];
-    
+
     protected $guarded = [];
 
     public function address(): MorphOne
@@ -19,37 +19,56 @@ class Business extends Model
     }
 
     public function users()
-    { 
-        return $this->belongsToMany(User::class)->withPivot(['role','position']);
+    {
+        return $this->belongsToMany(User::class)->withPivot(['role', 'position']);
     }
-    public function type() {
+    public function type()
+    {
         return $this->belongsTo(BusinessType::class, 'type_id');
     }
 
-    public function creator() {
+    public function creator()
+    {
         return $this->belongsTo(User::class, 'created_by');
     }
-    public function contactPerson() {
+    public function contactPerson()
+    {
         return $this->belongsTo(User::class, 'contact_person_id');
     }
 
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany(Post::class, 'business_id');
     }
 
-    public function products() {
+    public function products()
+    {
         return $this->hasMany(Product::class);
     }
-    public function notices() {
+    public function notices()
+    {
         return $this->hasMany(Notice::class);
     }
 
-    public function facilities() {
-        return $this->belongsToMany(Facility::class,'business_facilities');
+    public function facilities()
+    {
+        return $this->belongsToMany(Facility::class, 'business_facilities');
     }
 
-    public function galleries() {
+    public function galleries()
+    {
         return $this->hasMany(Gallery::class);
     }
 
+    public function getHasFollowedAttribute() {
+        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'member')->exists();
+    }
+
+    public function getIsAdminAttribute() {
+        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'admin')->exists();
+    }
+
+    public function getIsOwnerAttribute() {
+        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'owner')->exists();
+    }
 }

@@ -11,24 +11,26 @@ use Illuminate\Http\Request;
 class BusinessController extends Controller
 {
 
-    public function getBusinesses(Request $request) {
+    public function getBusinesses(Request $request)
+    {
         $typeId = $request->get('type_id');
         $featured = $request->get('featured');
-        $limit = $request->get('limit',10);
+        $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
         $businesses = Business::query();
-        if($typeId) {
+        if ($typeId) {
             $businesses->where('type_id', $typeId);
         }
-        if($featured) {
+        if ($featured) {
             $businesses->where('is_featured', true);
         }
         $businesses = $businesses->with(['address'])->limit($limit)->offset($offset)->get();
         return BusinessResource::collection($businesses);
     }
 
-    public function getBusinessType(Request $request) {
+    public function getBusinessType(Request $request)
+    {
         $request->validate([
             'id' => 'required|integer'
         ]);
@@ -37,14 +39,15 @@ class BusinessController extends Controller
         return response()->json($type);
     }
 
-    public function posts(Request $request) {
+    public function posts(Request $request)
+    {
         $request->validate([
             'business_id' => 'required|integer',
             'limit' => 'sometimes|integer',
             'page' => 'sometimes|integer'
         ]);
 
-        $limit = $request->get('limit',10);
+        $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
 
@@ -52,14 +55,15 @@ class BusinessController extends Controller
         $posts = $business->posts()->limit($limit)->offset($offset)->get();
         return response()->json($posts);
     }
-    public function products(Request $request) {
+    public function products(Request $request)
+    {
         $request->validate([
             'business_id' => 'required|integer',
             'limit' => 'sometimes|integer',
             'page' => 'sometimes|integer'
         ]);
 
-        $limit = $request->get('limit',10);
+        $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
 
@@ -68,14 +72,15 @@ class BusinessController extends Controller
         return response()->json($products);
     }
 
-    public function notices(Request $request) {
+    public function notices(Request $request)
+    {
         $request->validate([
             'business_id' => 'required|integer',
             'limit' => 'sometimes|integer',
             'page' => 'sometimes|integer'
         ]);
 
-        $limit = $request->get('limit',10);
+        $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
 
@@ -83,9 +88,32 @@ class BusinessController extends Controller
         $notices = $business->notices()->limit($limit)->offset($offset)->get();
         return response()->json($notices);
     }
-    
+
     public function getById($id)
     {
-        return new BusinessResource(Business::with(['type','address','posts','products' ,'notices'])->findOrFail($id));
+        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'notices'])->findOrFail($id));
+    }
+
+    public function followUnfollow($businessId)
+    {
+        $business = Business::findOrFail($businessId);
+        if ($business->users()->where('user_id', auth()->id())->wherePivot('role', 'member')->exists()) {
+            $business->users()->detach(auth()->id());
+            return response()->json([
+                'message' => 'Business unfollowed successfully'
+            ]);
+        } else if ($business->users()->where('user_id', auth()->id())->exits()) {
+            return response()->json([
+                'message' => 'Business already followed'
+            ]);
+        } else {
+            $business->users()->attach(auth()->id(), [
+                'role' => 'member',
+                'position' => 'follower'
+            ]);
+        }
+        return response()->json([
+            'message' => 'Business followed successfully'
+        ]);
     }
 }

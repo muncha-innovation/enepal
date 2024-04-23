@@ -23,6 +23,8 @@ class BusinessResource extends JsonResource
             'phone' => $this->phone1,
             'email' => $this->email,
             'website' => $this->website,
+            'has_followed' => $this->has_followed,
+            'is_admin' => $this->is_admin || $this->is_owner,
             'facilities' => $this->facilities->map(function($facility) {
                 return [
                     'id' => $facility->id,

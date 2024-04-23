@@ -21,6 +21,9 @@ class Post extends Model
     public function likes() {
         return $this->hasMany(Like::class);
     }
+    public function getHasLikedAttribute() {
+        return $this->likes->contains('user_id', auth()->id());
+    }
     protected static function boot() {
         parent::boot();
     
