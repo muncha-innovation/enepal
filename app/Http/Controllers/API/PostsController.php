@@ -64,4 +64,14 @@ class PostsController extends Controller
             'message' => 'Success'
         ]);
     } 
+
+    public function getComments(Request $request, $postId) {
+        $post = Post::findOrFail($postId);
+        $limit = $request->get('limit', 10);
+        $page = $request->get('page', 1);
+        $offset = ($page - 1) * $limit;
+        $comments = $post->comments()->latest()->offset($offset)->limit($limit)->get();
+        return CommentResource::collection($comments);
+
+    }
 }

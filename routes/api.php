@@ -26,6 +26,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::post('/comments/add', [PostsController::class, 'addComment']);
+
+    // get comments
+    Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
     Route::group(['prefix' => 'business'], function () {
         Route::get('user/following', [BusinessController::class, 'following']);
         Route::get('posts', [BusinessController::class, 'posts']);
