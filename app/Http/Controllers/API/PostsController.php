@@ -11,10 +11,29 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
+
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
-        return PostResource::collection(Post::with(['user','user.address','business','business.address'])->offset($offset)->limit($limit)->get());
+        $query = Post::query();
+
+if ($request->has('businessTypeId')) {
+    $query->select('posts.*')
+        ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+        ->where('businesses.type_id', $request->businessTypeId);
+}
+
+$posts = $query->when($request->has('businessId'), function($query) use ($request) {
+        return $query->where('posts.business_id', $request->businessId);
+    })
+    ->when($request->has('userId'), function($query) use ($request) {
+        return $query->where('posts.user_id', $request->userId);
+    })
+
+    ->latest()
+    ->offset($offset)->limit($limit)->get();
+
+return PostResource::collection($posts);
     }
 
     public function addComment(Request $request)
