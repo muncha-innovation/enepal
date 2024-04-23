@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::group(['prefix' => 'business'], function () {
-
+        Route::get('user/following', [BusinessController::class, 'following']);
         Route::get('posts', [BusinessController::class, 'posts']);
         Route::get('products', [BusinessController::class, 'products']);
         Route::get('notices', [BusinessController::class, 'notices']);
