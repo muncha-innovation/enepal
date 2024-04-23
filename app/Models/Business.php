@@ -61,14 +61,17 @@ class Business extends Model
     }
 
     public function getHasFollowedAttribute() {
-        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'member')->exists();
+        $user = $this->users()->where('user_id', auth()->id())->first();
+        return $user && $user->pivot->position === 'member';
     }
 
     public function getIsAdminAttribute() {
-        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'admin')->exists();
+        $user = $this->users()->where('user_id', auth()->id())->first();
+        return $user && $user->pivot->role === 'admin';
     }
 
     public function getIsOwnerAttribute() {
-        return $this->users()->where('user_id', auth()->id())->wherePivot('role', 'owner')->exists();
+        $user = $this->users()->where('user_id', auth()->id())->first();
+        return $user && $user->pivot->role === 'owner';
     }
 }
