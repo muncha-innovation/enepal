@@ -46,7 +46,7 @@ class PostsController extends Controller
         $data = $request->all();
         $data['user_id'] = auth()->id();
         $post = Post::find($request->post_id);
-        $comment = $post->comments()->create($request->all());
+        $comment = $post->comments()->create($data);
         $comment->load('user');
         return CommentResource::make($comment);
         
