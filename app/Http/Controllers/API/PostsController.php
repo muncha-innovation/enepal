@@ -66,12 +66,14 @@ class PostsController extends Controller
     } 
 
     public function getComments(Request $request, $postId) {
+        return response()->json([
+            'message' => 'Success'
+        ]);
         $post = Post::findOrFail($postId);
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
         $comments = $post->comments()->latest()->offset($offset)->limit($limit)->get();
         return CommentResource::collection($comments);
-
     }
 }
