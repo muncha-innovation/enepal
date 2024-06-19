@@ -248,7 +248,7 @@
 
 @push('js')
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
-    <script src="https://maps.googleapis.com/maps/api/js?key=@json(config('app.map_key'))&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{config('app.map_key')}}&libraries=places"></script>
     
     <script>
         function initMap() {
