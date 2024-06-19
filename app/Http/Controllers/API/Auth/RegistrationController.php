@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Address;
 use App\Models\User;
@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class RegistrationController extends Controller
 {
 
-    public function __invoke(UpdateProfileRequest $request)
+    public function __invoke(StoreUserRequest $request)
     {
         $data = collect($request->validated());
 

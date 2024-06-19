@@ -16,7 +16,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->isSuperAdmin();
+        return true;
     }
 
     /**
@@ -28,11 +28,12 @@ class StoreUserRequest extends FormRequest
     {
         if (isset($this->user)) {
             $email_validation = 'unique:users,email,' . $this->user->id;
-            $username_validation = 'unique:users,user_name,' . $this->user->id;
+            $password_validation = 'nullable';
+        } else if ($this->route()->getName() === 'profile.update'){
+            $email_validation = 'unique:users,email,' . auth()->user()->id;
             $password_validation = 'nullable';
         } else {
             $email_validation = 'unique:users,email';
-            $username_validation = 'unique:users,user_name';
             $password_validation = 'nullable';
         }
         return [
@@ -55,11 +56,41 @@ class StoreUserRequest extends FormRequest
                 'mimes:png,jpg,jpeg,svg,bmp',
                 'max:2048',
             ],
-            'active' => 'required',
-            'role' => ['required', 'exists:roles,id'],
+            'role' => ['nullable', 'exists:roles,id'],
         ];
     }
 
+
+
+    protected function passedValidation()
+    {
+
+        if ($this->input('password')) {
+            $this->merge([
+                'password' => Hash::make($this->password),
+            ]);
+        } else if ($this->route()->getName() == 'profile.update') {
+        
+        } else {
+            $this->merge([
+                'password' => Hash::make('password'),
+            ]);
+        }
+        return $this;
+    }
+    public function validated(): array
+    {
+        $final = parent::validated();
+        if ($this->input('password')) {
+            $final = array_merge($final, ['password' => $this->input('password')]);
+        } else {
+            unset($final['password']);
+        }
+        if ($this->route()->getName() === 'users.store') {
+            $final['created_by'] = auth()->id();
+        }
+        return $final;
+    }
 
     public function messages(): array
     {
@@ -104,34 +135,5 @@ class StoreUserRequest extends FormRequest
             'phone.string' => 'The phone must be a string.',
             'phone.max' => 'The phone may not be greater than 191 characters.',
         ];
-    }
-
-    protected function passedValidation()
-    {
-        if ($this->input('password')) {
-            $this->merge([
-                'password' => Hash::make($this->password),
-            ]);
-        } else {
-            $this->merge([
-                'password' => Hash::make(\Str::random(8))
-            ]);
-        }
-        return $this;
-    }
-    public function validated(): array
-    {
-        $final = parent::validated();
-        if ($this->input('password')) {
-
-            $final = array_merge($final, ['password' => $this->input('password')]);
-        } else {
-            
-            unset($final['password']);
-        }
-        if ($this->route()->getName() === 'users.store') {
-            $final['created_by'] = auth()->id();
-        }
-        return $final;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\Address;
 use App\Models\Country;
 use App\Models\User;
@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(UpdateProfileRequest $request)
+    public function store(StoreUserRequest $request)
     {
         $data = collect($request->validated());
 

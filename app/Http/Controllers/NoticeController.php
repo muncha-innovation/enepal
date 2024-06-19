@@ -19,7 +19,7 @@ class NoticeController extends Controller
     {
         //
         $notices = $business->notices()->paginate(10);
-        return view('modules.notices.index', compact('notices','business'));
+        return view('modules.notices.index', compact('notices', 'business'));
     }
 
     /**
@@ -30,7 +30,7 @@ class NoticeController extends Controller
     public function create(Business $business)
     {
         $business->load('address.country');
-        return view('modules.notices.createOrEdit', compact('business') );
+        return view('modules.notices.createOrEdit', compact('business'));
     }
 
     /**
@@ -41,15 +41,18 @@ class NoticeController extends Controller
      */
     public function store(StoreNoticeRequest $request, Business $business)
     {
+        if(!$business->canCreateNotice()) {
+            return redirect()->back()->with('error', trans('You are not allowed to create more notices.'));
+        }
         $data = $request->validated();
-        if(!isset($data['title']['en']) && !isset($data['title']['np'])) {
+        if (!isset($data['title']['en']) && !isset($data['title']['np'])) {
             return redirect()->back()->with('error', 'Either English or Nepali title is required');
         }
-        if(!isset($data['content']['en']) && !isset($data['content']['np'])) {
+        if (!isset($data['content']['en']) && !isset($data['content']['np'])) {
             return redirect()->back()->with('error', 'Either English or Nepali content is required');
         }
-        
-        if((isset($data['title']['en']) && !isset($data['content']['en'])) || (!isset($data['title']['en']) && isset($data['content']['en']))) {
+
+        if ((isset($data['title']['en']) && !isset($data['content']['en'])) || (!isset($data['title']['en']) && isset($data['content']['en']))) {
             return redirect()->back()->with('error', 'Both English title and content are required');
         }
         $notice = new Notice();
@@ -60,23 +63,22 @@ class NoticeController extends Controller
         $notice->business_id = $business->id;
         $notice->active = $data['active'];
         $notice->is_private = $data['is_private'];
-        if($notice->is_private) {
+        if ($notice->is_private) {
             $notice->is_verified = true;
         }
         $notice->user_id = auth()->id();
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
             $notice->image = upload('notices/', 'png', $image);
         }
         $notice->save();
-        if($notice->is_private) {
+        if ($notice->is_private) {
             event(new NoticeCreated($business, $notice));
-            $notice->is_sent=true;
+            $notice->is_sent = true;
             $notice->sent_at = now();
             $notice->save();
         }
-        return redirect()->route('notices.index',$business)->with('success','Notice Created successfully');
-
+        return redirect()->route('notices.index', $business)->with('success', trans('Notice Created successfully. It will be published after admin verification.'));
     }
 
     /**
@@ -88,7 +90,6 @@ class NoticeController extends Controller
     public function show(Business $business, Notice $notice)
     {
         return view('modules.notices.show', compact('notice', 'business'));
-
     }
 
     /**
@@ -100,8 +101,7 @@ class NoticeController extends Controller
     public function edit(Business $business, Notice $notice)
     {
         //
-        return view('modules.notices.createOrEdit', compact('notice','business'));
-
+        return view('modules.notices.createOrEdit', compact('notice', 'business'));
     }
 
     /**
@@ -111,18 +111,18 @@ class NoticeController extends Controller
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreNoticeRequest $request, Business $business,Notice $notice)
+    public function update(StoreNoticeRequest $request, Business $business, Notice $notice)
     {
 
         $data = $request->validated();
-        if(!isset($data['title']['en']) && !isset($data['title']['np'])) {
+        if (!isset($data['title']['en']) && !isset($data['title']['np'])) {
             return redirect()->back()->with('error', 'Either English or Nepali title is required');
         }
-        if(!isset($data['content']['en']) && !isset($data['content']['np'])) {
+        if (!isset($data['content']['en']) && !isset($data['content']['np'])) {
             return redirect()->back()->with('error', 'Either English or Nepali content is required');
         }
-        
-        if((isset($data['title']['en']) && !isset($data['content']['en'])) || (!isset($data['title']['en']) && isset($data['content']['en']))) {
+
+        if ((isset($data['title']['en']) && !isset($data['content']['en'])) || (!isset($data['title']['en']) && isset($data['content']['en']))) {
             return redirect()->back()->with('error', 'Both English title and content are required');
         }
         $notice->setTranslation('title', 'en', $data['title']['en'])
@@ -133,17 +133,17 @@ class NoticeController extends Controller
         $notice->active = $data['active'];
         $notice->is_private = $data['is_private'];
         $notice->user_id = auth()->id();
-        if($notice->is_private) {
+        if ($notice->is_private) {
             $notice->is_verified = true;
         }
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
             $notice->image = upload('notices/', 'png', $image);
         }
         $notice->save();
-        if($notice->is_private && !$notice->is_sent) {
+        if ($notice->is_private && !$notice->is_sent) {
             event(new NoticeCreated($business, $notice));
-            $notice->is_sent=true;
+            $notice->is_sent = true;
             $notice->sent_at = now();
             $notice->save();
         }
@@ -155,28 +155,28 @@ class NoticeController extends Controller
      *
      * @param  \App\Models\Notice  $notice
      * @return \Illuminate\Http\Response
-     */   
+     */
     public function destroy(Business $business, Notice $notice)
     {
         Notice::destroy($notice->id);
         return response()->json([
-            'success'=> true,
+            'success' => true,
         ]);
     }
 
-    public function verify() {
+    public function verify()
+    {
         abort_if(!auth()->user()->hasRole('super-admin'), 403);
         $notification = Notice::find(request()->id);
         $notification->is_verified = true;
 
         $business = Business::find($notification->business_id);
-        if(!$notification->is_sent) {
+        if (!$notification->is_sent) {
             event(new NoticeCreated($business, $notification));
-            $notification->is_sent=true;
+            $notification->is_sent = true;
             $notification->sent_at = now();
         }
         $notification->save();
         return back()->with('success', 'Notification verified successfully');
-
     }
 }

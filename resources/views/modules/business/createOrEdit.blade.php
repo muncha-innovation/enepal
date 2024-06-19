@@ -12,23 +12,24 @@
 
 @endphp
 @section('css')
-<style>
-    #map {
-        height: 400px;
-        width: 100%;
-    }
-    .controls {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-        background-color: #fff;
-        padding: 10px;
-        font-size: 15px;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-</style>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #fff;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 @endsection
 @section('content')
     @if (isset($showSettings))
@@ -150,14 +151,17 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="coordinates" class="block text-sm font-medium leading-6 text-gray-900">{{__('Location')}}</label>
+                    <label for="coordinates"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Location') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="coordinates" id="coordinates"
                             value="{{ $business->address?->coordinates }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{__('Please select from map')}}" disabled>
-                        <input type="hidden" name="address[latitude]" id='latitude' value={{$business->address?->latitude}}>
-                        <input type="hidden" name="address[longitude]" id='longitude' value={{$business->address?->longitude}}>
+                            placeholder="{{ __('Please select from map') }}" disabled>
+                        <input type="hidden" name="address[latitude]" id='latitude'
+                            value={{ $business->address?->latitude }}>
+                        <input type="hidden" name="address[longitude]" id='longitude'
+                            value={{ $business->address?->longitude }}>
                     </div>
                     <div id="map"></div>
                     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
@@ -258,19 +262,27 @@
 
 @push('js')
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
-    <script src="https://maps.googleapis.com/maps/api/js?key={{config('app.map_key')}}&libraries=places"></script>
-    
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.map_key') }}&libraries=places"></script>
+
     <script>
         async function initMap() {
             // ask user for location and get the coordinates
-            var center = {lat: -33.8688, lng: 151.2195};
+            
+            var center = {
+                lat: -33.8688,
+                lng: 151.2195
+            };
+            var lat = document.getElementById('latitude').value;
+            var lng = document.getElementById('longitude').value;
+            
             if (navigator.geolocation) {
-                await navigator.geolocation.getCurrentPosition(function(position) {
-                    
+                let position = await navigator.geolocation.getCurrentPosition(function(position) {
+                    if(lat && lng) return;
                     center = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+                    map.setCenter(center);
                 });
             }
             // Initialize the map centered at a default location
@@ -278,26 +290,32 @@
                 center: center,
                 zoom: 13
             });
-    
+
             // Create the search box and link it to the UI element
             var input = document.getElementById('pac-input');
             var searchBox = new google.maps.places.SearchBox(input);
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-    
+
             // Create a marker
             var marker = new google.maps.Marker({
                 map: map,
                 draggable: true,
             });
-    
+            
+            // Set the marker position
+            if (lat && lng) {
+                marker.setPosition(new google.maps.LatLng(lat, lng));
+                map.setCenter(new google.maps.LatLng(lat, lng));
+            }
+
             // Listen for the event fired when the user selects a prediction from the search box
             searchBox.addListener('places_changed', function() {
                 var places = searchBox.getPlaces();
-    
+
                 if (places.length == 0) {
                     return;
                 }
-    
+
                 // For each place, get the icon, name and location
                 var bounds = new google.maps.LatLngBounds();
                 places.forEach(function(place) {
@@ -305,10 +323,11 @@
                         console.log("Returned place contains no geometry");
                         return;
                     }
-    
+
                     // Create a marker for each place
                     marker.setPosition(place.geometry.location);
-                    document.getElementById('coordinates').value = place.geometry.location.lat() + ',' + place.geometry.location.lng();
+                    document.getElementById('coordinates').value = place.geometry.location.lat() + ',' +
+                        place.geometry.location.lng();
                     document.getElementById('latitude').value = place.geometry.location.lat();
                     document.getElementById('longitude').value = place.geometry.location.lng();
                     if (place.geometry.viewport) {
@@ -320,7 +339,7 @@
                 });
                 map.fitBounds(bounds);
             });
-    
+
             // Listen for map clicks to place a marker and get coordinates
             map.addListener('click', function(e) {
                 var latlng = e.latLng;
@@ -329,7 +348,7 @@
                 document.getElementById('latitude').value = latlng.lat();
                 document.getElementById('longitude').value = latlng.lng();
             });
-    
+
             // Update coordinates when dragging the marker
             marker.addListener('dragend', function(e) {
                 var latlng = e.latLng;
@@ -338,8 +357,8 @@
                 document.getElementById('longitude').value = latlng.lng();
             });
         }
-    
+
         // Initialize the map when the window loads
         google.maps.event.addDomListener(window, 'load', initMap);
     </script>
-    @endpush
+@endpush

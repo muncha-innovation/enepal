@@ -44,6 +44,7 @@ class MembersController extends Controller
             }
             $business->users()->detach($user->id);
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
+            
             event(new MemberAddedToBusiness($user, $business, $password, $request->role));
             return redirect()->back()->with('success', 'Member Added Successfully');
         } else if($request->has('member_type')){
@@ -86,7 +87,7 @@ class MembersController extends Controller
     public function destroy(Request $request, $businessId, $memberId)
     {
         // abort if auth user is not super admin or admin of business
-        if(!$request->user()->hasRole('super-admin') && !$request->user()->businesses()->where('business_id', $businessId)->where('role', 'admin')->exists()) {
+        if(!$request->user()->hasRole('super-admin') && !$request->user()->businesses()->where('business_id', $businessId)->where('role', 'admin')->orWhere('role','owner')->exists()) {
             return response()->json(['message'=> trans('You are not authorized to perform this action')], 403);
 
         }
