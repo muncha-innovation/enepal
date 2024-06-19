@@ -60,6 +60,8 @@ class BusinessController extends Controller
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
         $business = Business::create(collect($data)->except(['address','settings'])->toArray());
+        $business->setTranslation('description', 'en', $data['description']['en'])
+            ->setTranslation('description', 'np', $data['description']['np']);    
         $address = new Address($data['address']);
         $business->address()->save($address);
         

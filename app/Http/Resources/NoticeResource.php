@@ -14,6 +14,15 @@ class NoticeResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $lang = $request->query('lang')??'en';
+        return [
+            'id' => $this->id,
+            'title' => $this->getTranslation('title', $lang),
+            'description' => $this->getTranslation('description', $lang),
+            'image' => getImage($this->image, 'notices/'),
+            'business' => new BusinessResource($this->whenLoaded('business')),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

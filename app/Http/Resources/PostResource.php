@@ -14,10 +14,11 @@ class PostResource extends JsonResource
      */
     public function toArray($request)
     {
+        $lang = $request->query('lang');
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'body' => $this->content,
+            'title' => $this->getTranslation('title', $lang),
+            'body' => $this->getTranslation('content', $lang),
             'created_at' => $this->created_at,
             'image' => getImage($this->image, 'posts/'),
             'business' => BusinessResource::make($this->business),

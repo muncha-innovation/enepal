@@ -27,7 +27,8 @@ class CreateAddressesTable extends Migration
             $table->string('town')->nullable();
             $table->string('street')->nullable();
             $table->string('building')->nullable();
-            $table->point('coordinates')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
             $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
             $table->timestamps();

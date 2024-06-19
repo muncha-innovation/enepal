@@ -14,10 +14,11 @@ class BusinessResource extends JsonResource
      */
     public function toArray($request)
     {
+        $lang = $request->query('lang')??'en';
         return [
             'id' => $this->id,
             'title' => $this->name,
-            'description' => $this->description,
+            'description' => $this->getTranslation('description', $lang),
             'cover_image' => getImage($this->cover_image, 'business/cover_image/'),
             'profile_image' => getImage($this->logo, 'business/logo/'),
             'phone' => $this->phone1,

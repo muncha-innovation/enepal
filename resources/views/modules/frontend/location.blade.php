@@ -55,7 +55,6 @@
 @section('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-{{-- <script async src="https://maps.googleapis.com/maps/api/js?key={{env('GOOGLE_MAPS_API_KEY')}}&libraries=places&callback=initAutocomplete"></script> --}}
 <script>
 function buildMap(lat,lon)  {
     document.getElementById('sheltermap').innerHTML = "<div id='map' style='width: 100%; height: 100%;'></div>";

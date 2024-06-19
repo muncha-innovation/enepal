@@ -11,7 +11,25 @@
     }
 
 @endphp
-
+@section('css')
+<style>
+    #map {
+        height: 500px;
+        width: 100%;
+    }
+    .controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background-color: #fff;
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+</style>
+@endsection
 @section('content')
     @if (isset($showSettings))
         @include('modules.business.header', ['title' => 'Settings'])
@@ -34,7 +52,9 @@
                             placeholder="Eg. Nepalese Association of Houston">
                     </div>
                 </div>
-
+                <div id="map"></div>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <input type="hidden" id="coordinates" name="coordinates">
                 <div class="mb-2">
                     <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
                     <select required id="type_id" name="type_id"
@@ -44,6 +64,16 @@
                         @endforeach
                     </select>
                 </div>
+                @foreach (config('app.supported_locales') as $locale)
+                    <div>
+                        <label for="description[{{ $locale }}]" class="block text-sm font-medium text-gray-700">
+                            {{ __('description.' . $locale) }}</label>
+                        <textarea rows="2" id="description[{{ $locale }}]" name="description[{{ $locale }}]" type="text"
+                            autocomplete="description[{{ $locale }}]" autofocus
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ $business->getTranslation('description', $locale) }}
+                            </textarea>
+                    </div>
+                @endforeach
 
                 <p class="text-sm mb-2 mt-4">Business Address</p>
                 <div class="grid grid-cols-2 gap-4">
@@ -162,46 +192,48 @@
                     <input type="file" @if (!$isEdit) required @endif name="logo"
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-                        @if($isEdit)
-                            <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo" class="w-20 h-20 mt-2">
-                            @endif
+                    @if ($isEdit)
+                        <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo"
+                            class="w-20 h-20 mt-2">
+                    @endif
                 </div>
                 <div class="mb-2">
                     <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
                     <input type="file" @if (!$isEdit) required @endif name="cover_image"
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-                        @if($isEdit)
-                            <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="logo" class="w-20 h-20 mt-2">
-                            @endif
+                    @if ($isEdit)
+                        <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="logo"
+                            class="w-20 h-20 mt-2">
+                    @endif
 
                 </div>
                 @role('super-admin')
-                @if(isset($business->settings)) 
-                   @foreach($business->settings as $setting)
-                   <div class="mb-2">
-                    <label for="settings[{{ $setting->key }}]" class="block text
+                    @if (isset($business->settings))
+                        @foreach ($business->settings as $setting)
+                            <div class="mb-2">
+                                <label for="settings[{{ $setting->key }}]"
+                                    class="block text
                     -sm font-medium leading-6 text-gray-900">{{ __($setting->key) }}</label>
-                    <input type="text" name="settings[{{ $setting->key }}]" id="{{ $setting->key }}"
-                        value="{{ $setting->value }}"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="">
-                </div>
-
-                   @endforeach
-                @else
-                @foreach(\App\Models\Business::$SETTINGS as $setting)
-                <div class="mb-2">
-                    <label for="settings[{{ $setting }}]" class="block text
+                                <input type="text" name="settings[{{ $setting->key }}]" id="{{ $setting->key }}"
+                                    value="{{ $setting->value }}"
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="">
+                            </div>
+                        @endforeach
+                    @else
+                        @foreach (\App\Models\Business::$SETTINGS as $setting)
+                            <div class="mb-2">
+                                <label for="settings[{{ $setting }}]"
+                                    class="block text
                     -sm font-medium leading-6 text-gray-900">{{ __($setting) }}</label>
-                    <input type="text" name="settings[{{ $setting }}]" id="{{ $setting }}"
-                        value="{{ isset($business) && isset($business->settings) && $business->settings->isNotEmpty() ? $business?->settings?->$setting:''}}"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="">
-                </div>
-
-            @endforeach
-                @endif
+                                <input type="text" name="settings[{{ $setting }}]" id="{{ $setting }}"
+                                    value="{{ isset($business) && isset($business->settings) && $business->settings->isNotEmpty() ? $business?->settings?->$setting : '' }}"
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="">
+                            </div>
+                        @endforeach
+                    @endif
                 @endrole
                 <div class="flex justify-end w-full">
                     <div>
@@ -216,5 +248,72 @@
 
 @push('js')
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
-    @include('modules.shared.google_maps_js')
-@endpush
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCueHSgyZ3YQWATjjMY6sMjZAAUnDCuDbw&libraries=places"></script>
+    
+    <script>
+        function initMap() {
+            // Initialize the map centered at a default location
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -33.8688, lng: 151.2195},
+                zoom: 13
+            });
+    
+            // Create the search box and link it to the UI element
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+    
+            // Create a marker
+            var marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+            });
+    
+            // Listen for the event fired when the user selects a prediction from the search box
+            searchBox.addListener('places_changed', function() {
+                var places = searchBox.getPlaces();
+    
+                if (places.length == 0) {
+                    return;
+                }
+    
+                // For each place, get the icon, name and location
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place) {
+                    if (!place.geometry) {
+                        console.log("Returned place contains no geometry");
+                        return;
+                    }
+    
+                    // Create a marker for each place
+                    marker.setPosition(place.geometry.location);
+                    document.getElementById('coordinates').value = place.geometry.location.lat() + ',' + place.geometry.location.lng();
+    
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
+    
+            // Listen for map clicks to place a marker and get coordinates
+            map.addListener('click', function(e) {
+                var latlng = e.latLng;
+                marker.setPosition(latlng);
+                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
+            });
+    
+            // Update coordinates when dragging the marker
+            marker.addListener('dragend', function(e) {
+                var latlng = e.latLng;
+                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
+            });
+        }
+    
+        // Initialize the map when the window loads
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+    @endpush

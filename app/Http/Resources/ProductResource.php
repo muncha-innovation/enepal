@@ -14,10 +14,12 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $lang = $request->query('lang')??'en';
+
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => $this->getTranslation('description', $lang),
             'price' => $this->price,
             'image' => getImage($this->image, 'products/'),
             'business' => new BusinessResource($this->whenLoaded('business')),

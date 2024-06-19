@@ -6,10 +6,14 @@ use App\Enums\SettingKeys;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Spatie\Translatable\HasTranslations;
 
 class Business extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    protected $translatable = ['description'];
+
     static $ROLES = ['owner', 'admin', 'member'];
     static $SETTINGS = [SettingKeys::MAX_NOTIFICATION_PER_DAY, SettingKeys::MAX_NOTIFICATION_PER_MONTH];    
 
@@ -54,9 +58,7 @@ class Business extends Model
         return $this->hasMany(Notice::class);
     }
 
-    public function notifications() {
-        return $this->hasMany(Notification::class);
-    }
+    
     public function facilities()
     {
         return $this->belongsToMany(Facility::class, 'business_facilities');
