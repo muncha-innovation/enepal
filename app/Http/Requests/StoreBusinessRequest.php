@@ -24,7 +24,6 @@ class StoreBusinessRequest extends FormRequest
      */
     public function rules()
     {
-        dd($this->all());
         // cover_image and logo required only during create and not edit
         if($this->isMethod('post')) {
             $coverImageValidation = 'required|image|max:1999';
@@ -53,8 +52,9 @@ class StoreBusinessRequest extends FormRequest
             'address.prefecture' => ['sometimes'],
             'address.town' => ['sometimes'],
             'address.building' => ['sometimes'],
+            'address.latitude' => ['sometimes'],
+            'address.longitude' => ['sometimes'],
             'settings' => ['sometimes']
-
         ];
     }
 

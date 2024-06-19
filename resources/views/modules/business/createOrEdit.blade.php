@@ -14,7 +14,7 @@
 @section('css')
 <style>
     #map {
-        height: 500px;
+        height: 400px;
         width: 100%;
     }
     .controls {
@@ -52,9 +52,6 @@
                             placeholder="Eg. Nepalese Association of Houston">
                     </div>
                 </div>
-                <div id="map"></div>
-    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <input type="hidden" id="coordinates" name="coordinates">
                 <div class="mb-2">
                     <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
                     <select required id="type_id" name="type_id"
@@ -151,6 +148,19 @@
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="Eg. 1234">
                     </div>
+                </div>
+                <div class="mb-2">
+                    <label for="coordinates" class="block text-sm font-medium leading-6 text-gray-900">{{__('Location')}}</label>
+                    <div class="mt-2 rounded-md shadow-sm">
+                        <input type="text" name="coordinates" id="coordinates"
+                            value="{{ $business->address?->coordinates }}"
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            placeholder="{{__('Please select from map')}}" disabled>
+                        <input type="hidden" name="address[latitude]" id='latitude' value={{$business->address?->latitude}}>
+                        <input type="hidden" name="address[longitude]" id='longitude' value={{$business->address?->longitude}}>
+                    </div>
+                    <div id="map"></div>
+                    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
                 </div>
                 <div class="mb-2">
                     <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
@@ -251,10 +261,21 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{config('app.map_key')}}&libraries=places"></script>
     
     <script>
-        function initMap() {
+        async function initMap() {
+            // ask user for location and get the coordinates
+            var center = {lat: -33.8688, lng: 151.2195};
+            if (navigator.geolocation) {
+                await navigator.geolocation.getCurrentPosition(function(position) {
+                    
+                    center = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                });
+            }
             // Initialize the map centered at a default location
             var map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -33.8688, lng: 151.2195},
+                center: center,
                 zoom: 13
             });
     
@@ -288,7 +309,8 @@
                     // Create a marker for each place
                     marker.setPosition(place.geometry.location);
                     document.getElementById('coordinates').value = place.geometry.location.lat() + ',' + place.geometry.location.lng();
-    
+                    document.getElementById('latitude').value = place.geometry.location.lat();
+                    document.getElementById('longitude').value = place.geometry.location.lng();
                     if (place.geometry.viewport) {
                         // Only geocodes have viewport
                         bounds.union(place.geometry.viewport);
@@ -304,12 +326,16 @@
                 var latlng = e.latLng;
                 marker.setPosition(latlng);
                 document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
+                document.getElementById('latitude').value = latlng.lat();
+                document.getElementById('longitude').value = latlng.lng();
             });
     
             // Update coordinates when dragging the marker
             marker.addListener('dragend', function(e) {
                 var latlng = e.latLng;
                 document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
+                document.getElementById('latitude').value = latlng.lat();
+                document.getElementById('longitude').value = latlng.lng();
             });
         }
     

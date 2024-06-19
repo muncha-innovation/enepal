@@ -21,4 +21,7 @@ class Address extends Model
     public function state() {
         return $this->belongsTo(State::class, 'state_id');
     }
+    public function getCoordinatesAttribute() {
+        return $this->latitude . ',' . $this->longitude;
+    }
 }
