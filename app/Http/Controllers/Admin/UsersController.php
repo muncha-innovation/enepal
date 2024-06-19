@@ -54,8 +54,9 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request): RedirectResponse
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-
+        
         $data = $request->validated();
+        dd($data);
         if ($request->hasFile('image')) {
             $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
             );
