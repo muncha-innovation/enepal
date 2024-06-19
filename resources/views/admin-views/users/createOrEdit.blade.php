@@ -121,25 +121,7 @@
                     </div>
                 </div>
 
-                <div class="mb-2">
-                    <label for="password"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Password') }}</label>
-                    <div class="mt-2 rounded-md shadow-sm">
-                        <input autocomplete="new-password" type="password" name="password" id="password"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Enter password') }}">
-                    </div>
-                </div>
-
-                <div class="mb-2">
-                    <label for="password_confirmation" class="block text-sm font-medium leading-6 text-gray-900">Confirm
-                        Password</label>
-                    <div class="mt-2 rounded-md shadow-sm">
-                        <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Confirm Password') }}">
-                    </div>
-                </div>
+                
 {{-- active/inactive --}}
                 <div class="mb-2">
                     <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>

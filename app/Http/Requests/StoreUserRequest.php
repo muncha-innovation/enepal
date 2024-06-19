@@ -112,6 +112,10 @@ class StoreUserRequest extends FormRequest
             $this->merge([
                 'password' => Hash::make($this->password),
             ]);
+        } else {
+            $this->merge([
+                'password' => Hash::make(\Str::random(8))
+            ]);
         }
         return $this;
     }
@@ -122,6 +126,7 @@ class StoreUserRequest extends FormRequest
 
             $final = array_merge($final, ['password' => $this->input('password')]);
         } else {
+            
             unset($final['password']);
         }
         if ($this->route()->getName() === 'users.store') {

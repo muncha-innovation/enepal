@@ -56,7 +56,6 @@ class UsersController extends Controller
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
         
         $data = $request->validated();
-        dd($data);
         if ($request->hasFile('image')) {
             $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
             );
@@ -69,7 +68,8 @@ class UsersController extends Controller
 
         $user->address()->create($address);
         $user->assignRole($validated->get('role'));
-
+        // todo: send email to user with their password
+        // todo: make email templates configurable from admin panel
         return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
     }
 
