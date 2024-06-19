@@ -12,7 +12,7 @@ if (!function_exists('getLanguageFromCode')) {
 
         return match ($code) {
             'en' => 'English',
-            'ja' => '日本語',
+            'np' => 'नेपाली',
             default => trans('English'),
         };
     }

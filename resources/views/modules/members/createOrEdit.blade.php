@@ -22,17 +22,25 @@
                     @method('PUT')
                 @endif
                 @include('modules.shared.success_error')
-                <input type="hidden" name="member_type" value='new_user'>
-                {{-- choose role --}}
+                <div class="mb-2">
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+                    <input type="email" name="email" id="email"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="Eg. abc@gmail.com" value="{{session()->has('email')?session()->get('email'): $member->email }}">
+                </div>
                 <div class="mb-2">
                     <label for="role" class="block text-sm font-medium leading-6 text-gray-900">Role</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="role" id="role"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="admin">Admin</option>
-                            <option value="member">Member</option>
+                            <option value="admin" @if(session()->get('role')=='admin') selected @endif>{{__('Admin')}}</option>
+                            <option value="member" @if(session()->get('role')=='member') selected @endif >{{__('Member')}}</option>
                         </select>
                     </div>
+                </div>
+                @if(session()->has('showFullForm'))
+                <input type="hidden" name="member_type" value="new_user">
+                
                 <div class="mb-2 mt-2">
                     <label for="first_name"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('First Name') }}</label>
@@ -91,13 +99,6 @@
                             placeholder="Eg. Kathmandu" value="{{ $member->address?->city }}">
                     </div>
                 </div>
-
-                <div class="mb-2">
-                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
-                    <input type="email" name="email" id="email"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="Eg. abc@gmail.com" value="{{ $member->email }}">
-                </div>
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">
                         {{ __('Phone Number') }}</label>
@@ -108,25 +109,10 @@
                     </div>
                 </div>
 
-                <div class="mb-2">
-                    <label for="password"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Password') }}</label>
-                    <div class="mt-2 rounded-md shadow-sm">
-                        <input autocomplete="new-password" type="password" name="password" id="password"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Enter password') }}">
-                    </div>
-                </div>
+                @endif
+               
 
-                <div class="mb-2">
-                    <label for="password_confirmation" class="block text-sm font-medium leading-6 text-gray-900">Confirm
-                        Password</label>
-                    <div class="mt-2 rounded-md shadow-sm">
-                        <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Confirm Password') }}">
-                    </div>
-                </div>
+            
 
                 <div class="flex justify-end w-full">
                     <div>

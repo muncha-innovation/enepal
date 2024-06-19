@@ -41,11 +41,21 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request, Business $business)
     {
         $data = $request->validated();
+        $product = new Product();
+        $product->setTranslation('name', 'en', $data['name']['en'])
+            ->setTranslation('name', 'np', $data['name']['np']);
+        $product->setTranslation('description', 'en', $data['description']['en'])
+            ->setTranslation('description', 'np', $data['description']['np']);
+        $product->price = $data['price'];
+        $product->currency = $data['currency'];
+        $product->business_id = $business->id;
+        $product->active = $data['active'];
+        $product->created_by = auth()->id();
+        $product->slug = $data['slug'];
         if($request->hasFile('image')) {
-            $image = $request->file('image');
-            $data['image'] = upload('products/', 'png', $image);
+            $product->image = upload('products/', 'png', $request->image);
         }
-        Product::create($data);
+        $product->save();
         return redirect()->route('products.index', $business)->with('success','Product Created successfully');
 
     }
@@ -86,10 +96,19 @@ class ProductController extends Controller
     {
 
         $data = $request->validated();
+        $product->setTranslation('name', 'en', $data['name']['en'])
+            ->setTranslation('name', 'np', $data['name']['np']);
+        $product->setTranslation('description', 'en', $data['description']['en'])
+            ->setTranslation('description', 'np', $data['description']['np']);
+        $product->price = $data['price'];
+        $product->currency = $data['currency'];
+        $product->business_id = $business->id;
+        $product->active = $data['active'];
+        $product->created_by = auth()->id();
         if($request->hasFile('image')) {
-            $data['image'] = upload('products/', 'png', $data['image']);
+            $product->image = upload('products/', 'png', $data['image']);
         }
-        $product->update($data);
+        $product->save();
         return redirect()->route('products.index', $business)->with('success', 'Product updated successfully');
     }
 

@@ -59,10 +59,8 @@ class PostsController extends Controller
 
     public function likeUnlike($id) {
         $post = Post::findOrFail($id);
-        $post->likes()->toggle(auth()->id());
-        return response()->json([
-            'message' => 'Success'
-        ]);
+        $post->toggleLike();
+        return new PostResource($post->refresh());
     } 
 
     public function getComments(Request $request, $postId) {

@@ -8,7 +8,7 @@
     } else {
         $isEdit = false;
         $title = 'Add Product';
-        $product = new App\Models\Post();
+        $product = new App\Models\Product();
         $action = route('products.create', $business);
     }
 @endphp
@@ -29,17 +29,20 @@
                     @method('PUT')
                 @endif
                 @include('modules.shared.success_error')
+                <input type="hidden" name="business_id" value="{{ $business->id }}">
+                @foreach (config('app.supported_locales') as $locale)
                 <div>
-                    <input type="hidden" name="business_id" value="{{ $business->id }}">
-                    <label for="name" class="block text-sm font-medium text-gray-700">
-                        {{ __('Name') }}</label>
+                    <label for="name[{{$locale}}]" class="block text-sm font-medium text-gray-700">
+                        {{ __('name.'.$locale) }}</label>
                     <div class="mt-1">
 
-                        <input id="name" name="name" type="text" value="{{ $product->name }}"
-                            autocomplete="name" required autofocus
+                        <input id="name[{{$locale}}]" name="name[{{$locale}}]" type="text" value="{{ $product->getTranslation('name',$locale) }}"
+                            autocomplete="name[{{$locale}}]" required autofocus
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
+                @endforeach
+                
                 <div>
                     <label for="price" class="block text-sm font-medium text-gray-700">
                         {{ __('Price') }}</label>
@@ -59,13 +62,17 @@
                             </div>
                     </div>
                 </div>
+                @foreach (config('app.supported_locales') as $locale)
+
                 <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700">
-                        {{ __('Description') }}</label>
-                    <textarea id="editor" name="description">
-                        {{ $product->description }}
+                    <label for="description[{{$locale}}]" class="block text-sm font-medium text-gray-700">
+                        {{ __('description.'.$locale) }}</label>
+                    <textarea id="editor[{{$locale}}]" name="description[{{$locale}}]">
+                        {{ $product->getTranslation('description',$locale) }}
                     </textarea>
-                </div>
+                </div> 
+                @endforeach
+                
 
                 <div class="mb-2">
                     <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>

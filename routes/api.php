@@ -9,6 +9,7 @@ use App\Http\Controllers\API\BusinessTypesController;
 use App\Http\Controllers\API\CountryController;
 use App\Http\Controllers\API\FeedController;
 use App\Http\Controllers\API\PostsController;
+use App\Http\Controllers\API\UsersController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
@@ -28,6 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::post('/comments/add', [PostsController::class, 'addComment']);
+    
+    Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);
 
     Route::group(['prefix' => 'business'], function () {
         Route::get('user/following', [BusinessController::class, 'following']);

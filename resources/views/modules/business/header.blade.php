@@ -16,6 +16,7 @@
     <li class="me-2">
       <a href="{{ route('notices.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('notices.index') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('notices.index') ? 'page' : '' }}">Notices</a>
     </li>
+   
     <li class="me-2">
       <a href="{{ route('gallery.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('gallery.index') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('gallery.index') ? 'page' : '' }}">Gallery</a>
     </li>

@@ -143,7 +143,7 @@
                                     class="block text-sm font-medium text-gray-700">{{ __('State') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->state }}" disabled />
+                                    placeholder="" value="{{ $user->address?->state?->name }}" disabled />
                             </fieldset>
                         @endif
                         

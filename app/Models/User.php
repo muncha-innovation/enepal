@@ -47,7 +47,7 @@ class User extends Authenticatable
     ];
 
     const SuperAdmin = 'super-admin';
-    const Owner = 'owner';
+    const User = 'user';
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -76,6 +76,10 @@ class User extends Authenticatable
             $activity->properties = $properties;
         }
     }
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+    }
     public function address(): MorphOne
     {
         return $this->morphOne(Address::class, 'addressable');
@@ -83,38 +87,7 @@ class User extends Authenticatable
     public function getNameAttribute() {
         return $this->first_name . ' ' . $this->last_name;
     }
-    
-    public function isSupervisorOrAdmin() {
-        return true;
-        $roles = $this->roles()->pluck('name');
-        $isSupervisorOrAdmin = in_array($roles->first(), [User::SuperAdmin, User::Supervisor]);
-        return $isSupervisorOrAdmin;
-    }
 
-    public function isSupervisor() {
-        return true;
-        $roles = $this->roles()->pluck('name');
-        $isSupervisor = in_array($roles->first(), [User::Supervisor]);
-        return $isSupervisor;
-    }
-    public function isSuperAdmin()
-    {
-        return true;
-        $roles = $this->roles()->pluck('name');
-        $isSuperAdmin = in_array($roles->first(), [User::SuperAdmin]);
-        return $isSuperAdmin;
-    }
-
-    public function isUser() {
-        $roles = $this->roles()->pluck('name');
-        $isUser = in_array($roles->first(), [User::User]);
-        return $isUser;
-    }
-    public function isInspector() {
-        $roles = $this->roles()->pluck('name');
-        $isUser = in_array($roles->first(), [User::Inspector]);
-        return $isUser;
-    }
     public function hasCreated($model)
     {
         if ($model->user_id == $this->id) {
@@ -126,5 +99,15 @@ class User extends Authenticatable
     public function businesses()
 {
     return $this->belongsToMany(Business::class);
+}
+
+
+public function subscribedBusinesses()
+{
+    return $this->belongsToMany(Business::class)->wherePivot('is_subscribed', true);
+}
+
+public function getNotifications() {
+    
 }
 }

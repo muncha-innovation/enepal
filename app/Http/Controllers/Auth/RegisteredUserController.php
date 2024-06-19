@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
         $data = collect($request->validated());
 
         $user = User::create($data->except('address')->toArray());
-        $user->assignRole('user');
+        $user->assignRole(User::User);
         $address = new Address($data->get('address'));
         $user->address()->save($address);
         event(new Registered($user));

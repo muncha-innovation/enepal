@@ -58,8 +58,9 @@
                                     {{__('Verified')}}</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{__('Action')}}
                                 </th>
+                                @role('super-admin')
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" >{{__('Featured')}}</th>
-                                
+                                @endrole
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white" id="set-rows">
@@ -84,7 +85,6 @@
                                             class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">Edit<span
                                                 class="sr-only">, {{$business->name}}</span></a>
                                         @role('super-admin')
-                                        {{-- verify/unverify toggler button --}}
                                         <form action="{{ route('business.verify', $business) }}" method="POST"
                                             class="inline">
                                             @csrf
@@ -99,6 +99,7 @@
                                         </form>
                                         @endrole
                                     </td>
+                                    @role('super-admin')
                                     <td>
                                         <form action="{{ route('business.featured', $business) }}" method="POST">
                                             @csrf
@@ -114,6 +115,7 @@
                                         
                                            
                                     </td>
+                                    @endrole
                                 </tr>
                             @endforeach
                         </tbody>

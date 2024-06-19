@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MemberAddedToBusiness;
+use App\Models\Address;
 use App\Models\Business;
 use App\Models\Country;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class MembersController extends Controller
@@ -27,11 +31,22 @@ class MembersController extends Controller
     {
 
         $request->validate([
-            'member_type' => 'required|in:new_user,existing_user',
-            'position' => 'sometimes|nullable',
-            'role' => 'required|in:admin,member'
+            'role' => 'required|in:admin,member',
+            'email' => 'required'
         ]);
-        if ($request->member_type == 'new_user') {
+        $user = User::where('email', $request->email)->first();
+        if($user) {
+            $password = '';
+            if($user->force_update_password) {
+                $password = \Str::random(8);
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+            $business->users()->detach($user->id);
+            $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
+            event(new MemberAddedToBusiness($user, $business, $password, $request->role));
+            return redirect()->back()->with('success', 'Member Added Successfully');
+        } else if($request->has('member_type')){
             $request->validate([
                 'first_name' => ['required', 'string', 'max:100'],
                 'last_name' => ['required', 'string', 'max:100'],
@@ -39,30 +54,27 @@ class MembersController extends Controller
                 'address.country_id' => ['required', 'exists:countries,id'],
                 'address.state_id' => ['sometimes', 'nullable'],
                 'address.city' => ['sometimes', 'nullable'],
-                'phone' => ['required', 'string', 'min:6', 'max:20'],
-                'password' => ['required', 'confirmed', Password::defaults()],
+                'phone' => ['required', 'string', 'min:6', 'max:20']
             ]);
+            $password = \Str::random(8);
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($password),
                 'force_update_password' => true
             ]);
+            $user->assignRole(User::User);
+
             $address = new Address($request->address);
             $user->address()->save($address);
-            $business->users()->attach($user->id, ['role' => 'admin', 'position' => $request->position, 'has_joined' => false]);
-
-            return redirect()->route('business.members', $business)->with('success', 'Member Added Successfully');
-        } else if ($request->member_type == 'existing_user') {
-
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'role' => 'required|in:owner,admin,member'
-            ]);
-            $business->users()->attach($request->user_id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
-            return redirect()->back()->with('success', 'Member Added Successfully');
+            $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
+            event(new MemberAddedToBusiness($user, $business, $password, $request->role));
+            return redirect()->route('members.index', $business)->with('success', 'Member Added Successfully');
+        
+        } else {
+            return back()->with(['email' => $request->email, 'role' => $request->role, 'showFullForm' => true]);
         }
     }
     public function show()
@@ -71,7 +83,21 @@ class MembersController extends Controller
     public function update()
     {
     }
-    public function destroy()
+    public function destroy(Request $request, $businessId, $memberId)
     {
+        // abort if auth user is not super admin or admin of business
+        if(!$request->user()->hasRole('super-admin') && !$request->user()->businesses()->where('business_id', $businessId)->where('role', 'admin')->exists()) {
+            return response()->json(['message'=> trans('You are not authorized to perform this action')], 403);
+
+        }
+        // if auth user removes himself, throw error
+        if(auth()->user()->id == $memberId) {
+            return response()->json(['message'=> trans('User cannot be removed')], 403);
+        }
+        $business = Business::find($businessId);
+        $business->users()->detach($memberId);
+        return response()->json(['message' => trans('Member Removed Successfully')]);
     }
+
+    
 }

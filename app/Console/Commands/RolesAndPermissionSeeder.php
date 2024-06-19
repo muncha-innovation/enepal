@@ -42,7 +42,7 @@ class RolesAndPermissionSeeder extends Command
         $roles = ['super-admin','owner','member'];
         foreach ($roles as $role) {
             if (!Role::where('name', $role)->exists()) {
-                Role::create(['name' => $role, 'business_id' => null]);
+                Role::create(['name' => $role,]);
             }
         }
 

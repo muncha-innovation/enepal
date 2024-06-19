@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SettingKeys;
 use App\Http\Requests\StoreBusinessRequest;
 use App\Models\Address;
 use App\Models\Business;
+use App\Models\BusinessSetting;
 use App\Models\BusinessType;
 use App\Models\Country;
 use App\Models\User;
@@ -42,7 +44,6 @@ class BusinessController extends Controller
         //
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-
         return view('modules.business.createOrEdit', compact('businessTypes', 'countries'));
     }
 
@@ -56,14 +57,19 @@ class BusinessController extends Controller
     {
         //
         $data = $request->validated();
-        
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
-
-        $business = Business::create(collect($data)->except(['address'])->toArray());
+        $business = Business::create(collect($data)->except(['address','settings'])->toArray());
         $address = new Address($data['address']);
         $business->address()->save($address);
-
+        
+        foreach($data['settings'] as $key=>$value) {
+            BusinessSetting::create([
+                'business_id' => $business->id,
+                'key' => $key,
+                'value' => $value
+            ]);
+        }
         $business->users()->attach(auth()->user()->id, ['role' => 'owner']);
         return redirect()->route('business.index')->with('success', 'Business Created Successfully');
     }
@@ -92,7 +98,7 @@ class BusinessController extends Controller
         //
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load('address');
+        $business->load(['address','settings']);
         $facilities = $business->facilities;
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries']));
     }
@@ -115,8 +121,17 @@ class BusinessController extends Controller
         if ($request->hasFile('logo')) {
             $data['logo'] = upload('business/logo', 'png', $data['logo']);
         }
-        $business->update(collect($data)->except(['address'])->toArray());
+        $business->update(collect($data)->except(['address','settings'])->toArray());
         $business->address()->updateOrCreate($data['address']);
+        
+        foreach($data['settings'] as $key=>$value) {
+            
+            $business->settings()->updateOrCreate([
+                'key' => $key
+            ], [
+                'value' => $value
+            ]);
+        }
         return back()->with('success', 'Business Updated Successfully');
     }
 
@@ -134,8 +149,10 @@ class BusinessController extends Controller
     {
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load('address');
+        $business->load(['address','settings']);
+
         $showSettings = true;
+        
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings']));
     }
     public function verify(Business $business)
@@ -157,4 +174,5 @@ class BusinessController extends Controller
         return response()->json(['url' => getImage($path, 'content/')]);
 
     }
+
 }

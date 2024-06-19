@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\NotificationCreated;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Middleware\StatusMiddleware;
@@ -13,10 +14,12 @@ use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NoticeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
+use App\Models\Business;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +52,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::post('store/{business}', [MembersController::class, 'store'])->name('store');
         Route::get('edit/{business}/{user}', [MembersController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{user}', [MembersController::class, 'update'])->name('update');
+        Route::delete('delete/{business}/{user}', [MembersController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['prefix' => 'posts', 'as' => 'posts.'], function() {
@@ -90,6 +94,9 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::put('update/{business}/{gallery}', [GalleryController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
+
+
+    
     Route::resource('galleryImage', GalleryImageController::class);
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -136,6 +143,10 @@ Route::get(
         return back();
     }
 )->name('change-locale');
+
+Route::get('send/mail', function() {
+    \Mail::to('cooloozewall@gmail.com')->send(new \App\Mail\TestMail());
+});
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';

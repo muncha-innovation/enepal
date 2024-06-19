@@ -42,8 +42,8 @@ class StoreProductRequest extends FormRequest
     public function validated() {
         $data = parent::validated();
         $data['created_by'] = auth()->id();
-        // temp slug
-        $data['slug'] = \Str::slug($data['name'].uniqid());
+        
+        $data['slug'] = \Str::slug(uniqid());
         return $data;
     }
 

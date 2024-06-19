@@ -4,12 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Notice extends Model
 {
-    use HasFactory;
-    protected $fillable = ['title', 'content', 'image', 'active', 'is_private', 'user_id', 'business_id'];
-
+    use HasFactory, HasTranslations;
+    protected $fillable = ['title', 'content', 'image', 'active', 'is_private', 'user_id', 'business_id', 'is_verified'];
+    protected $casts = [
+        'active' => 'boolean',
+        'is_private' => 'boolean'
+    ];
+    protected $translatable = ['title', 'content'];
     public function user() {
         return $this->belongsTo(User::class);
     }

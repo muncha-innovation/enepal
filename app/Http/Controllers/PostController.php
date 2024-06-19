@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Base\Slug\Slug;
 use App\Models\Business;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePostRequest;
@@ -43,8 +44,22 @@ class PostController extends Controller
     {
         //
         $data = $request->validated();
+        $post = new Post();
+        $post->setTranslation('title', 'en', $data['title']['en'])
+            ->setTranslation('title', 'np', $data['title']['np']);
+        $post->setTranslation('short_description', 'en', $data['short_description']['en'])
+            ->setTranslation('short_description', 'np', $data['short_description']['np']);
+        $post->setTranslation('content', 'en', $data['content']['en'])
+            ->setTranslation('content', 'np', $data['content']['np']);
+        $post->user_id = auth()->id();
+        $post->business_id = $data['business_id'];
+        $post->active = $data['active'];
+
         $data['image'] = upload('posts/', 'png', $data['image']);
-        $business->posts()->create($data);
+        $post->image = $data['image'];
+        $post->slug = $data['slug'];
+        $post->save();
+        
         return redirect()->route('posts.index', $business)->with('success', 'Post created successfully');
     }
 
@@ -82,10 +97,20 @@ class PostController extends Controller
     {
         //
         $data = $request->validated();
+        $post->setTranslation('title', 'en', $data['title']['en'])
+            ->setTranslation('title', 'np', $data['title']['np']);
+        $post->setTranslation('short_description', 'en', $data['short_description']['en'])
+            ->setTranslation('short_description', 'np', $data['short_description']['np']);
+
+        $post->setTranslation('content', 'en', $data['content']['en'])
+            ->setTranslation('content', 'np', $data['content']['np']);
+        
         if($request->hasFile('image')) {
-            $data['image'] = upload('posts/', 'png', $data['image']);
+            $post->image = upload('posts/', 'png', $data['image']);
         }
-        $post->update($data);
+        $post->active = $data['active'];
+        
+        $post->save();
         return redirect()->route('posts.index', $business)->with('success', 'Post updated successfully');
     }
 

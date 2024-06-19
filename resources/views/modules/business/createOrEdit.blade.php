@@ -176,6 +176,33 @@
                             @endif
 
                 </div>
+                @role('super-admin')
+                @if(isset($business->settings)) 
+                   @foreach($business->settings as $setting)
+                   <div class="mb-2">
+                    <label for="settings[{{ $setting->key }}]" class="block text
+                    -sm font-medium leading-6 text-gray-900">{{ __($setting->key) }}</label>
+                    <input type="text" name="settings[{{ $setting->key }}]" id="{{ $setting->key }}"
+                        value="{{ $setting->value }}"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="">
+                </div>
+
+                   @endforeach
+                @else
+                @foreach(\App\Models\Business::$SETTINGS as $setting)
+                <div class="mb-2">
+                    <label for="settings[{{ $setting }}]" class="block text
+                    -sm font-medium leading-6 text-gray-900">{{ __($setting) }}</label>
+                    <input type="text" name="settings[{{ $setting }}]" id="{{ $setting }}"
+                        value="{{ isset($business) && isset($business->settings) && $business->settings->isNotEmpty() ? $business?->settings?->$setting:''}}"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="">
+                </div>
+
+            @endforeach
+                @endif
+                @endrole
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"

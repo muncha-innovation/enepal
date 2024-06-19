@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\MemberAddedToBusiness;
+use App\Events\NoticeCreated;
+use App\Listeners\SendNotificationToSubscribedUsers;
+use App\Listeners\SendRegistrationEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +22,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        MemberAddedToBusiness::class => [
+            SendRegistrationEmail::class,
+        ],
+        NoticeCreated::class => [
+            SendNotificationToSubscribedUsers::class
+        ]
     ];
 
     /**
@@ -28,5 +38,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        parent::boot();
     }
 }

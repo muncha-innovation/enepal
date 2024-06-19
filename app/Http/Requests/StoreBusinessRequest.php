@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\SettingKeys;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBusinessRequest extends FormRequest
@@ -50,6 +51,7 @@ class StoreBusinessRequest extends FormRequest
             'address.prefecture' => ['sometimes'],
             'address.town' => ['sometimes'],
             'address.building' => ['sometimes'],
+            'settings' => ['sometimes']
 
         ];
     }
@@ -66,5 +68,16 @@ class StoreBusinessRequest extends FormRequest
             'logo.required' => 'Business logo is required',
             'address.country_id.required' => 'Country is required',
         ];
+    }
+
+    public function validated()
+    {
+        $data = parent::validated();
+        $default_settings = [
+            SettingKeys::MAX_NOTIFICATION_PER_DAY => 0,
+            SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
+        ];
+        $data['settings'] = isset($data['settings'])? $data['settings'] : $default_settings;
+        return $data;
     }
 }

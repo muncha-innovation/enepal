@@ -25,7 +25,7 @@ class BusinessController extends Controller
         if ($featured) {
             $businesses->where('is_featured', true);
         }
-        $businesses = $businesses->with(['address'])->limit($limit)->offset($offset)->get();
+        $businesses = $businesses->with(['address', 'type'])->limit($limit)->offset($offset)->get();
         return BusinessResource::collection($businesses);
     }
 
@@ -123,7 +123,7 @@ class BusinessController extends Controller
     public function following() {
         $businesses = Business::whereHas('users', function($query) {
             $query->where('user_id', auth()->id());
-        })->get();
+        })->with(['type'])->get();
         
         return BusinessResource::collection($businesses);
     }

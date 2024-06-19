@@ -10,7 +10,7 @@ class ForcePasswordUpdate
     public function handle(Request $request, Closure $next)
     {
         // Check if user is authenticated
-        if ($request->user() && $request->user()->force_update_password) {
+        if ($request->user() && $request->user()->force_update_password && !$request->is('profile')) {
             // Redirect to the password update route
             return redirect()->route('profile.update');
         }

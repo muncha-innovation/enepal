@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
     protected $fillable = ['title','short_description', 'content','image','slug', 'active'];
+    protected $translatable = ['title','short_description', 'content'];
     public function user() {
         return $this->belongsTo(User::class);
     }
@@ -24,6 +26,16 @@ class Post extends Model
     public function getHasLikedAttribute() {
         return $this->likes->contains('user_id', auth()->id());
     }
+
+    public function toggleLike() {
+        if($this->has_liked) {
+            $this->likes()->where('user_id', auth()->id())->delete();
+        } else {
+            $this->likes()->create(['user_id' => auth()->id()]);
+        }
+    }
+
+    
     protected static function boot() {
         parent::boot();
     

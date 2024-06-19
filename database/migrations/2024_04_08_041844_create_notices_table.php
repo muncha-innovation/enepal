@@ -22,8 +22,14 @@ class CreateNoticesTable extends Migration
             $table->unsignedBigInteger('business_id');
             $table->boolean('active')->default(true);
             $table->boolean('is_private')->default(true);
+            $table->boolean('is_verified')->default(false);
+            $table->unsignedBigInteger('verified_by')->nullable();
+            $table->boolean('is_sent')->default(false);
+            $table->timestamp('sent_at')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+            $table->foreign('verified_by')->references('id')->on('users')->onDelete('set null');
+
             $table->timestamps();
         });
     }

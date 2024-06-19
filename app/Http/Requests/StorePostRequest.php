@@ -56,7 +56,14 @@ class StorePostRequest extends FormRequest
     public function validated() {
         $data = parent::validated();
         $data['user_id'] = auth()->id();
-        $data['slug'] = \Str::slug($data['title']).'-'.uniqid();
+        if(isset($data['title']['en']))  {
+            $slug = \Str::slug($data['title']['en']).'-'.uniqid();
+        } else if(isset($data['title']['np'])) {
+            $slug = \Str::slug($data['title']['np'],'-','np').'-'.uniqid();
+        } else {
+            $slug = uniqid();
+        }
+        $data['slug'] = $slug;
         return $data;
     }
 }

@@ -6,6 +6,8 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Country;
 use App\Models\State;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -24,9 +26,10 @@ class ProfileController extends Controller
         if ($request->hasFile('profile_picture')) {
             $userData['profile_picture'] = upload('profile/','png', $request->file('profile_picture'));
         }
-        
+        $userData['force_update_password'] = false;
+        $userData['password'] = Hash::make($userData['password']);
         $user->update($userData);
-
+        
         $address = $user->address;
         if(!$address) { 
             $user->address()->create($data->get('address'));

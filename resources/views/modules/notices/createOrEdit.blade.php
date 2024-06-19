@@ -23,26 +23,33 @@
                     @method('PUT')
                 @endif
                 @include('modules.shared.success_error')
-                <div>
-                    <input type="hidden" name="business_id" value="{{ $business->id }}">
-                    <label for="title" class="block text-sm font-medium text-gray-700">
-                        {{ __('Title') }}</label>
-                    <div class="mt-1">
+                <input type="hidden" name="business_id" value="{{ $business->id }}">
 
-                        <input id="title" name="title" type="text" value="{{ $notice->title }}" autocomplete="title"
-                            required autofocus
-                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                @foreach (config('app.supported_locales') as $locale)
+                    <div>
+                        <label for="title[{{ $locale }}]"
+                            class="block text-sm font-medium leading-6 text-gray-900">{{ __('title.' . $locale) }}</label>
+                        <div class="mt-2 rounded-md shadow-sm">
+                            <input type="text" name="title[{{ $locale }}]" id="title[{{ $locale }}]"
+                                value="{{ $notice->getTranslation('title', $locale) }}"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label for="content" class="block text-sm font-medium text-gray-700">
-                        {{ __('Content') }}</label>
-                    <div class="mt-1">
-                        <textarea rows="2" id="content" name="content" type="text" autocomplete="content"
-                            required autofocus
-                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ $notice->content }}</textarea>
-                    </div>
-                </div>
+                    
+                @endforeach
+                @foreach (config('app.supported_locales') as $locale)
+                        
+                        <div>
+                            <label for="content[{{$locale}}]" class="block text-sm font-medium text-gray-700">
+                                {{ __('content.' . $locale) }}</label>
+                            <textarea rows="2" id="content[{{$locale}}]" name="content[{{$locale}}]" type="text"
+                                autocomplete="content[{{$locale}}]" autofocus
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ $notice->getTranslation('content', $locale) }}
+                            </textarea>
+                        </div>
+                    
+                @endforeach
+               
                 <div class="mb-2">
                     <label for="is_private" class="block text-sm font-medium leading-6 text-gray-900">Visibility</label>
                     <div class="mt-2 rounded-md shadow-sm">
@@ -71,7 +78,7 @@
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                     {{-- show cover image if isset --}}
                     @if ($notice->image)
-                        <img src="{{ getImage($notice->image, 'posts/') }}" alt="Post Image" class="mt-2 rounded-lg w-20">
+                        <img src="{{ getImage($notice->image, 'notices/') }}" alt="Post Image" class="mt-2 rounded-lg w-20">
                     @endif
                 </div>
                 <div>

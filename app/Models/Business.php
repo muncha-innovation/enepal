@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SettingKeys;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -10,6 +11,7 @@ class Business extends Model
 {
     use HasFactory;
     static $ROLES = ['owner', 'admin', 'member'];
+    static $SETTINGS = [SettingKeys::MAX_NOTIFICATION_PER_DAY, SettingKeys::MAX_NOTIFICATION_PER_MONTH];    
 
     protected $guarded = [];
 
@@ -40,7 +42,9 @@ class Business extends Model
     {
         return $this->hasMany(Post::class, 'business_id');
     }
-
+    public function settings() {
+        return $this->hasMany(BusinessSetting::class);
+    }
     public function products()
     {
         return $this->hasMany(Product::class);
@@ -50,6 +54,9 @@ class Business extends Model
         return $this->hasMany(Notice::class);
     }
 
+    public function notifications() {
+        return $this->hasMany(Notification::class);
+    }
     public function facilities()
     {
         return $this->belongsToMany(Facility::class, 'business_facilities');
