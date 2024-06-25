@@ -15,7 +15,7 @@ class CountriesTableSeeder extends Seeder
      */
     public function run()
     {        
-        $this->seedNepal();   
+        $this->seedAll();   
         
     }
 
