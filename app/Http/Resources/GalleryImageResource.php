@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class GalleryResource extends JsonResource
+class GalleryImageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,9 +18,8 @@ class GalleryResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'cover_image' => getImage($this->cover_image, '/'),
-            'images' => GalleryImageResource::collection($this->images),
+            'image' => getImage($this->image, '/'),
+            'thumbnail' => $this->getThumbnailAttribute(),
         ];
     }
 }

@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{notice}', [NoticeController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{notice}', [NoticeController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{notice}', [NoticeController::class, 'destroy'])->name('destroy');
+        Route::get('verify/{business}/{notice}', [NoticeController::class, 'verify'])->name('verify');
     });
 
     Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function() {

@@ -121,6 +121,7 @@ class UsersController extends Controller
             unset($data['image']);
         }
         $validated = collect($data);
+        
         $user->update($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
         $user->address()->update($address);

@@ -141,7 +141,7 @@ class NoticeController extends Controller
             $notice->image = upload('notices/', 'png', $image);
         }
         $notice->save();
-        if ($notice->is_private && !$notice->is_sent) {
+        if ($notice->is_private && !$notice->is_sent && $notice->active) {
             event(new NoticeCreated($business, $notice));
             $notice->is_sent = true;
             $notice->sent_at = now();
@@ -164,19 +164,20 @@ class NoticeController extends Controller
         ]);
     }
 
-    public function verify()
+    public function verify(Business $business, Notice $notice)
     {
         abort_if(!auth()->user()->hasRole('super-admin'), 403);
-        $notification = Notice::find(request()->id);
-        $notification->is_verified = true;
+        
+        $notice->is_verified = true;
 
-        $business = Business::find($notification->business_id);
-        if (!$notification->is_sent) {
-            event(new NoticeCreated($business, $notification));
-            $notification->is_sent = true;
-            $notification->sent_at = now();
+        $business = Business::find($notice->business_id);
+        if (!$notice->is_sent) {
+            event(new NoticeCreated($business, $notice));
+            $notice->is_sent = true;
+            $notice->sent_at = now();
+            $notice->active = true;
         }
-        $notification->save();
+        $notice->save();
         return back()->with('success', 'Notification verified successfully');
     }
 }

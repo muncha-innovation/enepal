@@ -34,19 +34,19 @@ class UserNotification extends Notification
      */
     public function via($notifiable)
     {
-        return [FcmChannel::class,'database'];
+        return [FcmChannel::class, 'database'];
     }
 
     public function toFcm($notifiable)
     {
         $image = '';
-        if($this->notification->image!=null && $this->notification->image!=''){
-            $image = getImage($this->notification->image,'notifications/');
+        if ($this->notification->image != null && $this->notification->image != '') {
+            $image = getImage($this->notification->image, 'notices/');
         }
         $noti = \NotificationChannels\Fcm\Resources\Notification::create()
             ->setTitle($this->notification->title)
             ->setBody($this->notification->content);
-        if($this->notification->image!=null && $this->notification->image!=''){
+        if ($this->notification->image != null && $this->notification->image != '') {
             $noti->setImage($image);
         }
         return (new FcmMessage())
@@ -54,8 +54,8 @@ class UserNotification extends Notification
             ->setData([
                 'title' => $this->notification->title,
                 'message' => $this->notification->content,
-                'type' => 'general', 
-                'business_id' => (string) $this->notification->business_id, 
+                'type' => 'general',
+                'business_id' => (string) $this->notification->business_id,
                 'image' => $image
             ])
 
@@ -82,7 +82,9 @@ class UserNotification extends Notification
             'title' => $this->notification->title,
             'message' => $this->notification->content,
             'business_id' => $this->notification->business_id,
-            'image' => $this->notification->image,
+            'image' => $this->notification->image != null && $this->notification->image != '' ? getImage($this->notification->image, 'notices/') : null,
+            'created_by_id' => $this->notification->business_id,
+            'created_by_type' => 'business',
 
         ];
     }
