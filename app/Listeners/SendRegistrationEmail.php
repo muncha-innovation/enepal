@@ -4,10 +4,12 @@ namespace App\Listeners;
 
 use App\Events\MemberAddedToBusiness;
 use App\Notifications\MemberAddedToBusinessNotification;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
-class SendRegistrationEmail
+class SendRegistrationEmail implements ShouldQueue
 {
     /**
      * Create the event listener.
@@ -27,6 +29,10 @@ class SendRegistrationEmail
      */
     public function handle(MemberAddedToBusiness $event)
     {
+        try{
         $event->user->notify(new MemberAddedToBusinessNotification($event->user, $event->business, $event->password, $event->role));
+        }catch(Exception $e) {
+            dd($event);
+        }
     }
 }

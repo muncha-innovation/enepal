@@ -91,7 +91,7 @@
                     </div>
                     <div>
                         <label for="address[state_id]" class="block text-sm font-medium text-gray-700">
-                            {{ __('State') }}</label>
+                            {{ __('Region/State') }}</label>
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -141,8 +141,7 @@
 
 
                 <div class="mb-2">
-                    <label for="address[postal_code]" class="block text-sm font-medium leading-6 text-gray-900">Postal
-                        Code</label>
+                    <label for="address[postal_code]" class="block text-sm font-medium leading-6 text-gray-900">{{__('Postal/Zip Code')}}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code }}"
                             id="postal_code"
