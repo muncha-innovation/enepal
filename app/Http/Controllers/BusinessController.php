@@ -59,13 +59,13 @@ class BusinessController extends Controller
         $data = $request->validated();
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
-        $business = Business::create(collect($data)->except(['address','settings'])->toArray());
+        $business = Business::create(collect($data)->except(['address', 'settings'])->toArray());
         $business->setTranslation('description', 'en', $data['description']['en'])
-            ->setTranslation('description', 'np', $data['description']['np']);    
+            ->setTranslation('description', 'np', $data['description']['np']);
         $address = new Address($data['address']);
         $business->address()->save($address);
-        
-        foreach($data['settings'] as $key=>$value) {
+
+        foreach ($data['settings'] as $key => $value) {
             BusinessSetting::create([
                 'business_id' => $business->id,
                 'key' => $key,
@@ -100,7 +100,7 @@ class BusinessController extends Controller
         //
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load(['address','settings']);
+        $business->load(['address', 'settings']);
         $facilities = $business->facilities;
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries']));
     }
@@ -116,17 +116,25 @@ class BusinessController extends Controller
     {
 
         $data = $request->validated();
-        
+
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         }
         if ($request->hasFile('logo')) {
             $data['logo'] = upload('business/logo', 'png', $data['logo']);
         }
-        $business->update(collect($data)->except(['address','settings'])->toArray());
-        $business->address()->updateOrCreate($data['address']);
-        
-        foreach($data['settings'] as $key=>$value) {
+        // dd($data);
+        $business->update(collect($data)->except(['address', 'settings'])->toArray());
+        // dd($business);
+        // dd($data['address']);
+        // $business->address()->updateOrCreate($data['address']);
+        $address = $business->address;
+        if ($address) {
+            $address->update($data['address']);
+        } else {
+            $business->address()->save($address);
+        }
+        foreach ($data['settings'] as $key => $value) {
             
             $business->settings()->updateOrCreate([
                 'key' => $key
@@ -151,10 +159,10 @@ class BusinessController extends Controller
     {
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load(['address','settings']);
+        $business->load(['address', 'settings']);
 
         $showSettings = true;
-        
+
         return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings']));
     }
     public function verify(Business $business)
@@ -163,18 +171,18 @@ class BusinessController extends Controller
         $business->update(['is_verified' => !$business->is_verified]);
         return back()->with('success', 'Business Verified Successfully');
     }
-    public function featured(Request $request, Business $business) {
+    public function featured(Request $request, Business $business)
+    {
         $business->update(['is_featured' => !$business->is_featured]);
         return back()->with('success', 'Business Featured Successfully');
     }
-    public function uploadImage(Request $request, Business $business) {
+    public function uploadImage(Request $request, Business $business)
+    {
         $request->validate([
             'upload' => 'required|image'
         ]);
         $path = upload('content/', 'png', $request->file('upload'));
-        
+
         return response()->json(['url' => getImage($path, 'content/')]);
-
     }
-
 }

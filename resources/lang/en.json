@@ -47,5 +47,14 @@
     "max_notification_per_day": "Max Notification Per Day",
     "max_notification_per_month": "Max Notification Per Month",
     "Postal/Zip Code": "Postal/Zip Code",
-    "Region/State": "Region/State"
+    "Region/State": "Region/State",
+    "A list of all the members of the business": "A list of all the members of the business",
+    "title.en": "Title",
+    "title.np": "Title (Nepali)",
+    "short_description.en": "Short Description",
+    "short_description.np": "Short Description (Nepali)",
+    "content.en": "Content",
+    "content.np": "Content (Nepali)",
+    "Cover Image": "Cover Image"
+    
 }

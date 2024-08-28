@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('modules.business.header', ['title' => 'Nepalese Association of Houston'])
+    @include('modules.business.header', ['title' => $business->name])
 
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-            <h1 class="text-base font-semibold leading-6 text-gray-900">Members</h1>
-            <p class="mt-2 text-sm text-gray-700">A list of all the members of the business.</p>
+            <h1 class="text-base font-semibold leading-6 text-gray-900">{{__("Members")}}</h1>
+            <p class="mt-2 text-sm text-gray-700">{{__("A list of all the members of the business")}}</p>
         </div>
 
         <div class="flex gap-2">

@@ -19,3 +19,5 @@ MAIL_ENCRYPTION=ssl
 #MAIL_PASSWORD="d3RZCISw6r8KDat7"
 MAIL_FROM_ADDRESS="info@daishinsyu.muncha.org"
 MAIL_FROM_NAME="${APP_NAME}"
+
+%yD21od8
