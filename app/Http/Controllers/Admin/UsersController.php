@@ -54,15 +54,18 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request): RedirectResponse
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        
+
         $data = $request->validated();
         if ($request->hasFile('image')) {
-            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            $data['profile_picture'] = upload(
+                'profile/',
+                'png',
+                $request->file('image')
             );
             unset($data['image']);
         }
         $validated = collect($data);
-        
+
         $user = User::create($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
 
@@ -94,7 +97,7 @@ class UsersController extends Controller
     public function edit(User $user): View
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        $user->load(['address.country','roles']);
+        $user->load(['address.country', 'roles']);
         return view('admin-views.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),
@@ -116,12 +119,15 @@ class UsersController extends Controller
 
         $data = $request->validated();
         if ($request->hasFile('image')) {
-            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            $data['profile_picture'] = upload(
+                'profile/',
+                'png',
+                $request->file('image')
             );
             unset($data['image']);
         }
         $validated = collect($data);
-        
+
         $user->update($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
         $user->address()->update($address);
@@ -144,19 +150,9 @@ class UsersController extends Controller
                 'message' => trans('Sorry, you cannot delete yourself.'),
             ], 400);
         }
-        $product = Product::where('user_id', $user->id)->first();
-        $process = Process::independent()->where('user_id', $user->id)->first();
-        if ($product || $process) {
-            return response()->json([
-                'message' => trans('Sorry, the user cannot be deleted because product or process exists.'),
-            ], 400);
-        }
         $user->delete();
         $user->address()->delete();
         $user->roles()->detach();
-        return response()->json([
-            'message' => trans('User deleted successfully'),
-        ]);
+        return back()->with('success', __('User deleted successfully'));
     }
-
 }

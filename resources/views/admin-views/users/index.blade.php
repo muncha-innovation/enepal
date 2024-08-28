@@ -71,6 +71,13 @@
                                         <a href="{{route('admin.users.edit', $user) }}"
                                             class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">Edit<span
                                                 class="sr-only">, {{$user->name}}</span></a>
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-red-200 hover:bg-red-200 focus:z-10">Delete<span
+                                                    class="sr-only">, {{$user->name}}</span></button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

@@ -30,7 +30,6 @@ class MemberAddedToBusiness
     public $role;
     public function __construct(User $user, Business $business, $password, $role)
     {
-        Log::info('Member added to business event fired');
 
         $this->user = $user;
         $this->business = $business;
