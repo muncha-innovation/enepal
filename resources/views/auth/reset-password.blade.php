@@ -11,7 +11,7 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="rounded border-b border-gray-200 sm:rounded-lg bg-white py-8 px-4 shadow sm:px-10">
-        @include('shared.errors')
+        @include('modules.shared.success_error')
         <form class="space-y-6" action="{{ route('password.update') }}" method="POST">
           @csrf
           <input type="hidden" name="token" value="{{ $request->route('token') }}">
