@@ -35,12 +35,14 @@ class PreferencesController extends Controller
         $addresses = $request->addresses;
         $user = auth()->user();
         foreach ($addresses as $type => $addressData) {
+            // todo: refactor
+            // make sure array key exists and set default otherwise
             $user->addresses()->updateOrCreate(
                 attributes: ['address_type' => $type],
                 values: [
                     'country_id' => $addressData['country'],
-                    'state_id' => $addressData['state'],
-                    'city' => $addressData['city'],
+                    'state_id' => $addressData['state'] ?? null,
+                    'city' => $addressData['city']?? '',
                 ]
             );
         }
