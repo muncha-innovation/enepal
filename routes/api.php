@@ -24,6 +24,7 @@ Route::get('business/types', [BusinessTypesController::class, 'index']);
 Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/user', [UsersController::class, 'user']);
     Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
     Route::get('posts/{id}', [PostsController::class, 'getById']);
     Route::get('business/{id}', [BusinessController::class, 'getById']);
