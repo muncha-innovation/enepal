@@ -60,7 +60,7 @@
                             <select id="country" name="address[country_id]" required
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 @foreach ($countries as $country)
-                                    <option value="{{ $country->id }}" @if ($country->id == $user->address?->country->id) selected @endif>
+                                    <option value="{{ $country->id }}" @if ($country->id == $user->primaryAddress?->country->id) selected @endif>
                                         {{ $country->name }} ({{ $country->dial_code }})
                                     </option>
                                 @endforeach
@@ -73,9 +73,9 @@
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                @if (isset($user->address?->state_id))
-                                    <option value="{{ $user->address?->state_id }}" selected>
-                                        {{ $user->address?->state->name }}
+                                @if (isset($user->primaryAddress?->state_id))
+                                    <option value="{{ $user->primaryAddress?->state_id }}" selected>
+                                        {{ $user->primaryAddress?->state->name }}
                                     </option>
                                 @endif
                             </select>
@@ -89,7 +89,7 @@
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[city]" id="city" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="Eg. Kathmandu" value="{{ $user->address?->city }}">
+                            placeholder="Eg. Kathmandu" value="{{ $user->primaryAddress?->city }}">
                     </div>
                 </div>
 

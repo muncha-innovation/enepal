@@ -38,6 +38,6 @@ class GalleryController extends Controller
     public function getById(Request $request, $id)
     {
         
-        return new GalleryResource(Gallery::with(['user', 'user.address', 'business', 'business.address'])->findOrFail($id));
+        return new GalleryResource(Gallery::with(['user', 'user.addresses', 'business', 'business.address'])->findOrFail($id));
     }
 }

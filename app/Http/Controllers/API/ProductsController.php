@@ -37,6 +37,6 @@ class ProductsController extends Controller
 
     public function getById(Request $request, $id)
     {
-        return new ProductResource(Product::with(['user', 'user.address', 'business', 'business.address'])->findOrFail($id));
+        return new ProductResource(Product::with(['user', 'user.addresses', 'business', 'business.address'])->findOrFail($id));
     }
 }

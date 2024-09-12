@@ -38,7 +38,7 @@ class NoticeController extends Controller
     public function getById(Request $request, $id)
     {
         
-        return new NoticeResource(Notice::with(['user', 'user.address', 'business', 'business.address'])->findOrFail($id));
+        return new NoticeResource(Notice::with(['user', 'user.addresses', 'business', 'business.address'])->findOrFail($id));
     }
 
 }

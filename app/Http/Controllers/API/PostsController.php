@@ -54,7 +54,7 @@ class PostsController extends Controller
 
     public function getById(Request $request, $id)
     {
-        return new PostResource(Post::with(['user', 'user.address', 'business', 'business.address'])->findOrFail($id));
+        return new PostResource(Post::with(['user', 'user.addresses', 'business', 'business.address'])->findOrFail($id));
     }
 
     public function likeUnlike($id) {
