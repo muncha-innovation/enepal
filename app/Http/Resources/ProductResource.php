@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
             'business' => new BusinessResource($this->whenLoaded('business')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
         ];
     }
 }

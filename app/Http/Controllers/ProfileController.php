@@ -31,11 +31,13 @@ class ProfileController extends Controller
             $userData['force_update_password'] = false;
         }
         $user->update($userData);
-
-        $address = $user->address;
+        
+        $address = $user->primaryAddress;
+        
         if (!$address) {
-            $user->address()->create($data->get('address'));
+            $user->addresses()->create($data->get('address'));
         } else {
+            dd($data->get('address'));
             $address->update($data->get('address'));
         }
         return back()->with('success', 'Profile updated successfully');

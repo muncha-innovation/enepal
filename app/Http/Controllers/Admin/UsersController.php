@@ -26,7 +26,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with(['address.country'])->paginate(10);
+        $users = User::with(['addresses.country'])->paginate(10);
         return view('admin-views.users.index', compact(['users']));
     }
 
@@ -69,7 +69,7 @@ class UsersController extends Controller
         $user = User::create($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
 
-        $user->address()->create($address);
+        $user->addresses()->create($address);
         $user->assignRole($validated->get('role'));
         // todo: send email to user with their password
         // todo: make email templates configurable from admin panel
@@ -130,7 +130,7 @@ class UsersController extends Controller
 
         $user->update($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
-        $user->address()->update($address);
+        $user->addresses()->update($address);
         $user->syncRoles([$validated->get('role')]);
 
         return redirect()->route('admin.users.index')->with('success', __('User updated successfully'));
@@ -151,7 +151,7 @@ class UsersController extends Controller
             ], 400);
         }
         $user->delete();
-        $user->address()->delete();
+        $user->addresses()->delete();
         $user->roles()->detach();
         return back()->with('success', __('User deleted successfully'));
     }

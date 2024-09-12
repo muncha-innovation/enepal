@@ -69,7 +69,7 @@ class MembersController extends Controller
             $user->assignRole(User::User);
 
             $address = new Address($request->address);
-            $user->address()->save($address);
+            $user->addresses()->save($address);
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
             event(new MemberAddedToBusiness($user, $business, $password, $request->role));
             return redirect()->route('members.index', $business)->with('success', 'Member Added Successfully');

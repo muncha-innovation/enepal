@@ -19,7 +19,7 @@ class RegistrationController extends Controller
         $user = User::create($data->except('address')->toArray());
         $user->assignRole('user');
         $address = new Address($data->get('address'));
-        $user->address()->save($address);
+        $user->addresses()->save($address);
         $user->load('address.country');
         return UserResource::make($user)->response()->setStatusCode(200);
     }

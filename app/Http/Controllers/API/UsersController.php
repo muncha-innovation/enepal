@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -18,4 +19,15 @@ class UsersController extends Controller
         $user->save();
         return response()->json(['message' => 'FCM Token updated successfully']);
     }
+
+    public function toggleNewsPreference(Category $category) {
+        
+        $user = auth()->user();
+        $user->toggleNewsPreference($category->id);
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+
 }

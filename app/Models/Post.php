@@ -26,7 +26,9 @@ class Post extends Model
     public function getHasLikedAttribute() {
         return $this->likes->contains('user_id', auth()->id());
     }
-
+    public function categories() {
+        return $this->belongsToMany(Category::class);
+    }
     public function toggleLike() {
         if($this->has_liked) {
             $this->likes()->where('user_id', auth()->id())->delete();

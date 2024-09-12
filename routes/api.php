@@ -11,6 +11,7 @@ use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\NoticeController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PostsController;
+use App\Http\Controllers\API\PreferencesController;
 use App\Http\Controllers\API\ProductsController;
 use App\Http\Controllers\API\UsersController;
 
@@ -34,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/comments/add', [PostsController::class, 'addComment']);
     
     Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);
+    Route::post('/news-preferences/toggle/{category}', [UsersController::class, 'toggleNewsPreference']);
 
     Route::get('products', [ProductsController::class, 'index']);
     Route::get('products/{id}', [ProductsController::class, 'getById']);
@@ -56,4 +58,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
     });
+    Route::group(['prefix' => 'preferences'], function() {
+        Route::get('fetch', [PreferencesController::class, 'fetch']);
+        Route::post('update', [PreferencesController::class, 'update']);
+        Route::post(uri: 'address/update', action: [PreferencesController::class, 'updateAddress']);
+    });
+
 });
+
+Route::get('countries', [CountryController::class, 'index']);
+Route::get('countries/{country}/states', [CountryController::class, 'states']);
