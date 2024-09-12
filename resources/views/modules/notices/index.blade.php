@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('modules.business.header', ['title' => 'Create Business / Organization'])
+    @include('modules.business.header', ['title' => __('Notices')])
 
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-            <h1 class="text-base font-semibold leading-6 text-gray-900">Notices</h1>
+            <h1 class="text-base font-semibold leading-6 text-gray-900">{{__('Notices')}}</h1>
         </div>
 
         <div class="flex gap-2">
             <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                 <a href="{{ route('notices.create', $business) }}"
-                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add
-                    Notice</a>
+                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    {{__('Add Notice')}}</a>
 
             </div>
 

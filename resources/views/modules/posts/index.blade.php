@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-@include('modules.business.header', ['title' => 'Create Business / Organization'])
+@include('modules.business.header', ['title' => __('Posts')])
 
 <div class="sm:flex sm:items-center">
   <div class="sm:flex-auto">
-    <h1 class="text-base font-semibold leading-6 text-gray-900">Posts</h1>
+    <h1 class="text-base font-semibold leading-6 text-gray-900">{{__('Posts')}}</h1>
     </div>
 
   <div class="flex gap-2">
