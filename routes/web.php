@@ -20,6 +20,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
 use App\Models\Business;
+use App\WebSocket\WebsocketHandler;
+use BeyondCode\LaravelWebSockets\Facades\WebSocketsRouter;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +85,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{notice}', [NoticeController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{notice}', [NoticeController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{notice}', [NoticeController::class, 'destroy'])->name('destroy');
+        Route::get('verify/{business}/{notice}', [NoticeController::class, 'verify'])->name('verify');
     });
 
     Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function() {
@@ -150,3 +153,6 @@ Route::get('send/mail', function() {
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
+
+
+WebSocketsRouter::webSocket('/socket', WebsocketHandler::class);

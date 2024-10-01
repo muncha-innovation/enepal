@@ -14,6 +14,13 @@ class GalleryResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $lang = $request->query('lang')??'en';
+
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'cover_image' => getImage($this->cover_image, '/'),
+            'images' => GalleryImageResource::collection($this->images),
+        ];
     }
 }

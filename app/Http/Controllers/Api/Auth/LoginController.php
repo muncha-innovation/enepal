@@ -24,7 +24,7 @@ class LoginController extends Controller
         ]);
         $tokenName = 'enepal';
 
-        $user = User::where('email', $request->email)->with(['address'])->first();
+        $user = User::where('email', $request->email)->with(['addresses'])->first();
         
         if (!$user) {
             return response()->json([
@@ -42,7 +42,7 @@ class LoginController extends Controller
             ], 400);
         }
         $user->role = trans($user->getRoleNames()[0], [], $lang);
-        $user->load('address.country');
+        $user->load('addresses.country');
         return UserResource::make($user)->response()->setStatusCode(200);
     }
 }

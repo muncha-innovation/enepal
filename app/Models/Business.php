@@ -24,6 +24,13 @@ class Business extends Model
         return $this->morphOne(Address::class, 'addressable');
     }
 
+    public function scopeFollowing($query): void
+    {
+         $query->whereHas('users', function ($q) {
+            $q->where('user_id', auth()->id());
+        });
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class)->withPivot(['role', 'position']);

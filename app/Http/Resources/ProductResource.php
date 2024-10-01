@@ -18,13 +18,14 @@ class ProductResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->getTranslation('name', $lang),
             'description' => $this->getTranslation('description', $lang),
-            'price' => $this->price,
+            'price' => $this->currency.' '.$this->price,
             'image' => getImage($this->image, 'products/'),
             'business' => new BusinessResource($this->whenLoaded('business')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
         ];
     }
 }

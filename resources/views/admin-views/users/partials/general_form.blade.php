@@ -27,7 +27,7 @@
     <div class="mt-1">
       <input type="text" name="address[city]" id="city"
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        placeholder="" value="{{ $isEdit ? $user->address?->city : old('address.city') }}" />
+        placeholder="" value="{{ $isEdit ? $user->primaryAddress?->city : old('address.city') }}" />
     </div>
   </fieldset>
 
@@ -38,7 +38,7 @@
     <div class="mt-1">
       <input type="text" name="address[state]" id="state"
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        placeholder="" value="{{ $isEdit ? $user->address?->state : old('address.state') }}" />
+        placeholder="" value="{{ $isEdit ? $user->primaryAddress?->state : old('address.state') }}" />
     </div>
   </fieldset>
   <fieldset class="col-span-2 mb-2">
@@ -48,7 +48,7 @@
     <div class="mt-1">
       <input type="text" name="address[street]" id="streetAddress"
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        placeholder="" value="{{ $isEdit ? $user->address?->street : old('address.street') }}" />
+        placeholder="" value="{{ $isEdit ? $user->primaryAddress?->street : old('address.street') }}" />
     </div>
   </fieldset>
   <fieldset class="col-span-2 mb-2">
@@ -58,7 +58,7 @@
     <div class="mt-1">
       <input type="text" name="address[postal_code]" id="zip"
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        placeholder="" value="{{ $isEdit ? $user->address?->postal_code : old('address.postal_code') }}" />
+        placeholder="" value="{{ $isEdit ? $user->primaryAddress?->postal_code : old('address.postal_code') }}" />
     </div>
   </fieldset>
 </div>

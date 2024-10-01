@@ -54,11 +54,11 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">Type</label>
+                    <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">{{__('Type')}}</label>
                     <select required id="type_id" name="type_id"
                         class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         @foreach ($businessTypes as $type)
-                            <option value="{{ $type->id }}">{{ $type->title }}</option>
+                            <option value="{{ $type->id }}" @if($type->id==$business->type_id) selected @endif>{{ $type->title }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -91,7 +91,7 @@
                     </div>
                     <div>
                         <label for="address[state_id]" class="block text-sm font-medium text-gray-700">
-                            {{ __('State') }}</label>
+                            {{ __('Region/State') }}</label>
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -141,8 +141,7 @@
 
 
                 <div class="mb-2">
-                    <label for="address[postal_code]" class="block text-sm font-medium leading-6 text-gray-900">Postal
-                        Code</label>
+                    <label for="address[postal_code]" class="block text-sm font-medium leading-6 text-gray-900">{{__('Postal/Zip Code')}}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code }}"
                             id="postal_code"

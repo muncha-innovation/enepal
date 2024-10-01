@@ -23,6 +23,7 @@ class AddressResource extends JsonResource
             'address_line_2' => $this->address_line_2,
             'latitude' => $this->lat,
             'longitude' => $this->lng,
+            'type' => $this->address_type
             
         ];
     }

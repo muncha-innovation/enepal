@@ -97,73 +97,73 @@
                                     class="block text-sm font-medium text-gray-700">{{ __('Country') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->country_name }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->country_name }}" disabled />
                             </fieldset>
                         @endif
 
-                        @if ($user->address && $user->address?->postal_code)
+                        @if ($user->primaryAddress && $user->primaryAddress?->postal_code)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[postal_code]"
                                     class="block text-sm font-medium text-gray-700">{{ __('Postal Code') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->postal_code }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->postal_code }}" disabled />
                             </fieldset>
                         @endif
-                        @if ($user->address && $user->address?->prefecture)
+                        @if ($user->primaryAddress && $user->primaryAddress?->prefecture)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[prefecture]"
                                     class="block text-sm font-medium text-gray-700">{{ __('Prefecture') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->prefecture }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->prefecture }}" disabled />
                             </fieldset>
                         @endif
-                        @if ($user->address && $user->address?->city)
+                        @if ($user->primaryAddress && $user->primaryAddress?->city)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[city]"
                                     class="block text-sm font-medium text-gray-700">{{ __('City') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->city }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->city }}" disabled />
                             </fieldset>
                         @endif
-                        @if ($user->address && $user->address?->town)
+                        @if ($user->primaryAddress && $user->primaryAddress?->town)
                         <fieldset class="col-span-2 mb-2">
                             <label for="address[town]"
                                 class="block text-sm font-medium text-gray-700">{{ __('Town') }}</label>
                             <input type="text"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                placeholder="" value="{{ $user->address?->town }}" disabled />
+                                placeholder="" value="{{ $user->primaryAddress?->town }}" disabled />
                         </fieldset>
                     @endif
-                        @if ($user->address && $user->address?->state)
+                        @if ($user->primaryAddress && $user->primaryAddress?->state)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[state]"
                                     class="block text-sm font-medium text-gray-700">{{ __('State') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->state?->name }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->state?->name }}" disabled />
                             </fieldset>
                         @endif
                         
                        
-                        @if ($user->address && $user->address?->street)
+                        @if ($user->primaryAddress && $user->primaryAddress?->street)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[street]"
                                     class="block text-sm font-medium text-gray-700">{{ __('Street') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->street }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->street }}" disabled />
                             </fieldset>
                         @endif
-                        @if ($user->address && $user->address?->building)
+                        @if ($user->primaryAddress && $user->primaryAddress?->building)
                             <fieldset class="col-span-2 mb-2">
                                 <label for="address[building]"
                                     class="block text-sm font-medium text-gray-700">{{ __('Building') }}</label>
                                 <input type="text"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    placeholder="" value="{{ $user->address?->building }}" disabled />
+                                    placeholder="" value="{{ $user->primaryAddress?->building }}" disabled />
                             </fieldset>
                         @endif
 

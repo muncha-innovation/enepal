@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-@include('modules.business.header', ['title' => 'Create Business / Organization', 'business' => $business])
+@include('modules.business.header', ['title' => $business->name, 'business' => $business])
 
 <section>
   <div class="bg-gray-300 h-56 w-full relative">

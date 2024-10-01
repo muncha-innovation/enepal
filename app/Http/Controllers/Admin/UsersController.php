@@ -26,7 +26,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with(['address.country'])->paginate(10);
+        $users = User::with(['addresses.country'])->paginate(10);
         return view('admin-views.users.index', compact(['users']));
     }
 
@@ -54,19 +54,22 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request): RedirectResponse
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        
+
         $data = $request->validated();
         if ($request->hasFile('image')) {
-            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            $data['profile_picture'] = upload(
+                'profile/',
+                'png',
+                $request->file('image')
             );
             unset($data['image']);
         }
         $validated = collect($data);
-        
+
         $user = User::create($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
 
-        $user->address()->create($address);
+        $user->addresses()->create($address);
         $user->assignRole($validated->get('role'));
         // todo: send email to user with their password
         // todo: make email templates configurable from admin panel
@@ -94,7 +97,7 @@ class UsersController extends Controller
     public function edit(User $user): View
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        $user->load(['address.country','roles']);
+        $user->load(['address.country', 'roles']);
         return view('admin-views.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),
@@ -116,14 +119,18 @@ class UsersController extends Controller
 
         $data = $request->validated();
         if ($request->hasFile('image')) {
-            $data['profile_picture'] = upload('profile/', 'png', $request->file('image')
+            $data['profile_picture'] = upload(
+                'profile/',
+                'png',
+                $request->file('image')
             );
             unset($data['image']);
         }
         $validated = collect($data);
+
         $user->update($validated->except(['address', 'role'])->toArray());
         $address = $validated->get('address');
-        $user->address()->update($address);
+        $user->addresses()->update($address);
         $user->syncRoles([$validated->get('role')]);
 
         return redirect()->route('admin.users.index')->with('success', __('User updated successfully'));
@@ -143,19 +150,9 @@ class UsersController extends Controller
                 'message' => trans('Sorry, you cannot delete yourself.'),
             ], 400);
         }
-        $product = Product::where('user_id', $user->id)->first();
-        $process = Process::independent()->where('user_id', $user->id)->first();
-        if ($product || $process) {
-            return response()->json([
-                'message' => trans('Sorry, the user cannot be deleted because product or process exists.'),
-            ], 400);
-        }
         $user->delete();
-        $user->address()->delete();
+        $user->addresses()->delete();
         $user->roles()->detach();
-        return response()->json([
-            'message' => trans('User deleted successfully'),
-        ]);
+        return back()->with('success', __('User deleted successfully'));
     }
-
 }

@@ -7,8 +7,12 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\API\BusinessController;
 use App\Http\Controllers\API\BusinessTypesController;
 use App\Http\Controllers\API\CountryController;
-use App\Http\Controllers\API\FeedController;
+use App\Http\Controllers\API\GalleryController;
+use App\Http\Controllers\API\NoticeController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PostsController;
+use App\Http\Controllers\API\PreferencesController;
+use App\Http\Controllers\API\ProductsController;
 use App\Http\Controllers\API\UsersController;
 
 Route::post('/login', LoginController::class);
@@ -20,6 +24,7 @@ Route::get('business/types', [BusinessTypesController::class, 'index']);
 Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/user', [UsersController::class, 'user']);
     Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
     Route::get('posts/{id}', [PostsController::class, 'getById']);
     Route::get('business/{id}', [BusinessController::class, 'getById']);
@@ -31,12 +36,36 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/comments/add', [PostsController::class, 'addComment']);
     
     Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);
+    Route::post('/news-preferences/toggle/{category}', [UsersController::class, 'toggleNewsPreference']);
 
+    Route::get('products', [ProductsController::class, 'index']);
+    Route::get('products/{id}', [ProductsController::class, 'getById']);
+
+    Route::get('galleries', [GalleryController::class, 'index']);
+    Route::get('galleries/{id}', [GalleryController::class, 'getById']);
+
+    Route::get('notices', [NoticeController::class, 'index']);
+    Route::get('notices/{id}', [NoticeController::class, 'getById']);
+
+    Route::get('notifications/user', [NotificationController::class, 'userNotifications']);
+    Route::get('notifications/business', [NotificationController::class, 'businessNotifications']);
+    // Route::
     Route::group(['prefix' => 'business'], function () {
         Route::get('user/following', [BusinessController::class, 'following']);
         Route::get('posts', [BusinessController::class, 'posts']);
         Route::get('products', [BusinessController::class, 'products']);
         Route::get('notices', [BusinessController::class, 'notices']);
+        Route::get('galleries', [BusinessController::class, 'galeries']);
+
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
     });
+    Route::group(['prefix' => 'preferences'], function() {
+        Route::get('fetch', [PreferencesController::class, 'fetch']);
+        Route::post('update', [PreferencesController::class, 'update']);
+        Route::post(uri: 'address/update', action: [PreferencesController::class, 'updateAddress']);
+    });
+
 });
+
+Route::get('countries', [CountryController::class, 'index']);
+Route::get('countries/{country}/states', [CountryController::class, 'states']);

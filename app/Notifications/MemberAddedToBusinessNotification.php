@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MemberAddedToBusinessNotification extends Notification
+class MemberAddedToBusinessNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -68,7 +68,10 @@ class MemberAddedToBusinessNotification extends Notification
             'user_id' => $this->user->id,
             'business_id' => $this->business->id,
             'role' => $this->role,
-
+            'created_by_id' => $this->business->id,
+            'created_by_type' => 'business',
+            'title' => 'Added to business',
+            'message' => 'You have been added to '.$this->business->name,
         ];
     }
 }

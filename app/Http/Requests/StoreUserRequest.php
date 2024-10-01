@@ -57,6 +57,7 @@ class StoreUserRequest extends FormRequest
                 'max:2048',
             ],
             'role' => ['nullable', 'exists:roles,id'],
+            'active' => ['nullable']
         ];
     }
 

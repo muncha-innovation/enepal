@@ -111,6 +111,11 @@ return [
     */
 
     'faker_locale' => 'en_US',
+    'remote_url' => env('REMOTE_URL', ''),
+    'remote_ws_url' => env('REMOTE_WS_URL', ''),
+    'token_expiration' => env('TOKEN_EXPIRATION', 60 * 24 * 1),
+    'ws_username' => env('WS_USERNAME', ''),
+    'ws_password' => env('WS_PASSWORD', ''),
 
     /*
     |--------------------------------------------------------------------------
