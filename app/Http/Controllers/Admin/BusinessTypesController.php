@@ -29,6 +29,7 @@ class BusinessTypesController extends Controller
     }
     public function store(StoreBusinessTypeRequest $request) {
         $data = collect($request->validated())->except('facilities')->toArray();
+        
         if($request->hasFile('icon')) {
             $data['icon'] = (new DocumentService())->store($request->file('icon'), 'businessTypes');
         }
@@ -42,7 +43,8 @@ class BusinessTypesController extends Controller
             $data['icon'] = (new DocumentService())->store($request->file('icon'), 'businessTypes');
         }
         $businessType->update($data);
-        $businessType->facilities()->sync($request->facilities);
+    $businessType->facilities()->sync($request->facilities);
+        
         return redirect()->route('admin.businessTypes.index')->with('success', 'Business Type updated successfully');
     }
 

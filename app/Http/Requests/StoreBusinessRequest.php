@@ -25,7 +25,7 @@ class StoreBusinessRequest extends FormRequest
     public function rules()
     {
         // cover_image and logo required only during create and not edit
-        if($this->isMethod('post')) {
+        if ($this->isMethod('post')) {
             $coverImageValidation = 'required|image|max:1999';
             $logoValidation = 'required|image|max:1999';
         } else {
@@ -54,7 +54,9 @@ class StoreBusinessRequest extends FormRequest
             'address.building' => ['sometimes'],
             'address.latitude' => ['sometimes'],
             'address.longitude' => ['sometimes'],
-            'settings' => ['sometimes']
+            'settings' => ['sometimes'],
+            'facilities' => ['sometimes', 'array'],
+            'facilities.*' => ['integer', 'exists:facilities,id'],
         ];
     }
 
@@ -79,7 +81,7 @@ class StoreBusinessRequest extends FormRequest
             SettingKeys::MAX_NOTIFICATION_PER_DAY => 0,
             SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
         ];
-        $data['settings'] = isset($data['settings'])? $data['settings'] : $default_settings;
+        $data['settings'] = isset($data['settings']) ? $data['settings'] : $default_settings;
         return $data;
     }
 }

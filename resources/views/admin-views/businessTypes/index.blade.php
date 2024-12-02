@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-2">Business Types</h1>
+    <h1 class="text-2xl font-semibold text-gray-700 mb-2">{{__('Business Types')}}</h1>
 
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             <ul class="flex flex-wrap -mb-px">
                 <li class="me-2">
                     <a href="#" class="inline-block p-3 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active "
-                        aria-current="page">Active</a>
+                        aria-current="page">{{__('Active')}}</a>
                 </li>
                 <li class="me-2">
                     <a href="#"
-                        class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ">Inactive</a>
+                        class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ">{{__('Inactive')}}</a>
                 </li>
             </ul>
         </div>
@@ -21,7 +21,7 @@
             <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                 <a href="{{ route('admin.businessTypes.create') }}">
                     <button type="button"
-                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add</button>
+                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{__('Add')}}</button>
                 </a>
             </div>
         </div>

@@ -68,7 +68,7 @@ class Business extends Model
     
     public function facilities()
     {
-        return $this->belongsToMany(Facility::class, 'business_facilities');
+        return $this->belongsToMany(Facility::class, 'business_facilities')->withPivot('value');
     }
 
     public function galleries()

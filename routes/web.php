@@ -20,8 +20,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
 use App\Models\Business;
-use App\WebSocket\WebsocketHandler;
-use BeyondCode\LaravelWebSockets\Facades\WebSocketsRouter;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +41,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
     
     Route::post('{business}/image/upload', [BusinessController::class, 'uploadImage'])->name('image.upload');
+    Route::get('/businesses/facilities', [BusinessController::class, 'getFacilities']);
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::post('verify/{business}', [BusinessController::class, 'verify'])->name('verify');
@@ -154,5 +153,3 @@ Route::get('send/mail', function() {
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
 
-
-WebSocketsRouter::webSocket('/socket', WebsocketHandler::class);

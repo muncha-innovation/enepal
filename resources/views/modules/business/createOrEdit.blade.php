@@ -42,11 +42,13 @@
             <form action="{{ $action }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @if ($isEdit)
+                    <input type="hidden" id="business_id" name="business_id" value="{{ $business->id }}">
                     @method('PUT')
                 @endif
                 @include('modules.shared.success_error')
                 <div class="mb-2">
-                    <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Business Name</label>
+                    <label for="name"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Business Name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input required type="text" name="name" id="name" value="{{ $business->name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -54,13 +56,25 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900">{{__('Type')}}</label>
+                    <label for="type_id"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Type') }}</label>
                     <select required id="type_id" name="type_id"
                         class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         @foreach ($businessTypes as $type)
-                            <option value="{{ $type->id }}" @if($type->id==$business->type_id) selected @endif>{{ $type->title }}</option>
+                            <option value="{{ $type->id }}" @if ($type->id == $business->type_id) selected @endif>
+                                {{ $type->title }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div id="facilities-section" class="mt-4">
+                    <h2 class="text-lg font-semibold text-gray-700">{{ __('Facilities') }}</h2>
+                    <div id="facilities-container">
+                        @if ($isEdit)
+                            @include('modules.business.components.existing_facilities', [
+                                'business' => $business,
+                            ])
+                        @endif
+                    </div>
                 </div>
                 @foreach (config('app.supported_locales') as $locale)
                     <div>
@@ -73,13 +87,13 @@
                     </div>
                 @endforeach
 
-                <p class="text-sm mb-2 mt-4">Business Address</p>
+                <p class="text-sm mb-2 mt-4">{{ __('Business Address') }}</p>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="address[country_id]" class="block text-sm font-medium text-gray-700">
                             {{ __('Country') }}</label>
                         <div class="mt-1">
-                            <select id="country" name="address[country_id]" required
+                            <select id="country" name="address[country_id]" id="address[country_id]" required
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 @foreach ($countries as $country)
                                     <option value="{{ $country->id }}" @if ($country->id == $business->address?->country->id) selected @endif>
@@ -141,7 +155,8 @@
 
 
                 <div class="mb-2">
-                    <label for="address[postal_code]" class="block text-sm font-medium leading-6 text-gray-900">{{__('Postal/Zip Code')}}</label>
+                    <label for="address[postal_code]"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Postal/Zip Code') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code }}"
                             id="postal_code"
@@ -163,10 +178,11 @@
                             value={{ $business->address?->longitude }}>
                     </div>
                     <div id="map"></div>
-                    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+                    <input id="pac-input" class="controls" type="text" placeholder={{ __('Search Box') }}>
                 </div>
                 <div class="mb-2">
-                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+                    <label for="email"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Email') }}</label>
                     <input required type="email" name="email" id="email" value="{{ $business->email }}"
                         placeholder="Eg. abc@gmail.com"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
@@ -181,28 +197,32 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="phone_2" class="block text-sm font-medium leading-6 text-gray-900">Contact Person
-                        Phone</label>
+                    <label for="phone_2"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Contact Person
+                                                                                                Phone') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="phone_2" id="phone_2" value="{{ $business->phone_2 }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="Eg. 9812312323">
+                            placeholder={{ __('"Eg. 9812312323"') }}>
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <label for="active"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Status') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="active" id="active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="1" @if ($business->active) selected @endif>Active</option>
-                            <option value="0" @if (!$business->active) selected @endif>Inactive</option>
+                            <option value="1" @if ($business->active) selected @endif>{{ __('Active') }}
+                            </option>
+                            <option value="0" @if (!$business->active) selected @endif>{{ __('Inactive') }}
+                            </option>
                         </select>
                     </div>
                 </div>
                 <div class="mb-2">
                     <label for="logo"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ 'Logo' }}</label>
-                    <input type="file" @if (!$isEdit) required @endif name="logo"
+                    <input type="file" @if (!$isEdit) required @endif name="logo" id="logo"
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                     @if ($isEdit)
@@ -211,9 +231,10 @@
                     @endif
                 </div>
                 <div class="mb-2">
-                    <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
+                    <label for="cover_image"
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Cover Image') }}</label>
                     <input type="file" @if (!$isEdit) required @endif name="cover_image"
-                        accept="image/*"
+                        id="cover_image" accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                     @if ($isEdit)
                         <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="logo"
@@ -248,6 +269,7 @@
                         @endforeach
                     @endif
                 @endrole
+
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"
@@ -258,25 +280,26 @@
         </div>
     </section>
 @endsection
-
 @push('js')
+    @include('modules.business._js_load_facilities')
+
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.map_key') }}&libraries=places"></script>
 
     <script>
         async function initMap() {
             // ask user for location and get the coordinates
-            
+
             var center = {
                 lat: -33.8688,
                 lng: 151.2195
             };
             var lat = document.getElementById('latitude').value;
             var lng = document.getElementById('longitude').value;
-            
+
             if (navigator.geolocation) {
                 let position = await navigator.geolocation.getCurrentPosition(function(position) {
-                    if(lat && lng) return;
+                    if (lat && lng) return;
                     center = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
@@ -300,7 +323,7 @@
                 map: map,
                 draggable: true,
             });
-            
+
             // Set the marker position
             if (lat && lng) {
                 marker.setPosition(new google.maps.LatLng(lat, lng));

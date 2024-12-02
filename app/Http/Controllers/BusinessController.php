@@ -42,7 +42,8 @@ class BusinessController extends Controller
     public function create()
     {
         //
-        $businessTypes = BusinessType::all();
+        $businessTypes = BusinessType::with(['facilities'])->get();
+
         $countries = Country::all();
         return view('modules.business.createOrEdit', compact('businessTypes', 'countries'));
     }
@@ -114,20 +115,15 @@ class BusinessController extends Controller
      */
     public function update(StoreBusinessRequest $request, Business $business)
     {
-
+        // dd($request->all());
         $data = $request->validated();
-
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         }
         if ($request->hasFile('logo')) {
             $data['logo'] = upload('business/logo', 'png', $data['logo']);
         }
-        // dd($data);
-        $business->update(collect($data)->except(['address', 'settings'])->toArray());
-        // dd($business);
-        // dd($data['address']);
-        // $business->address()->updateOrCreate($data['address']);
+        $business->update(collect($data)->except(['address', 'settings', 'facilities'])->toArray());
         $address = $business->address;
         if ($address) {
             $address->update($data['address']);
@@ -135,13 +131,23 @@ class BusinessController extends Controller
             $business->address()->save($address);
         }
         foreach ($data['settings'] as $key => $value) {
-            
+
             $business->settings()->updateOrCreate([
                 'key' => $key
             ], [
                 'value' => $value
             ]);
         }
+
+        // Handle facilities
+        if (isset($data['facilities']) && is_array($data['facilities'])) {
+            $facilities = [];
+            foreach ($data['facilities'] as $facilityId => $value) {
+                $facilities[$facilityId] = ['value' => $value];
+            }
+            $business->facilities()->sync($facilities);
+        }
+
         return back()->with('success', 'Business Updated Successfully');
     }
 
@@ -184,5 +190,15 @@ class BusinessController extends Controller
         $path = upload('content/', 'png', $request->file('upload'));
 
         return response()->json(['url' => getImage($path, 'content/')]);
+    }
+    public function getFacilities(Request $request)
+    {
+        $request->validate([
+            'type_id' => 'required|exists:business_types,id'
+        ]);
+        $typeId = $request->input('type_id');
+        $businessType = BusinessType::with('facilities')->findOrFail($typeId);
+
+        return response()->json(['facilities' => $businessType->facilities]);
     }
 }

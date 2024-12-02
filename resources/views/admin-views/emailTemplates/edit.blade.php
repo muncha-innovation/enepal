@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('css')
     <link rel="stylesheet" href="{{ asset('js/summernote/summernote-lite.css') }}">
 @endsection
@@ -6,11 +7,11 @@
 @php
     if (isset($template)) {
         $isEdit = true;
-        $title = 'Edit Email Template';
+        $title = __('Edit Email Template');
         $action = route('admin.templates.update', [$template]);
     } else {
         $isEdit = false;
-        $title = 'Add Email Template';
+        $title = __('Add Email Template');
         $template = new App\Models\EmailTemplate();
         $action = route('admin.templates.store');
     }
@@ -30,7 +31,7 @@
                     <label for="name"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('Name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="name" id="name" placeholder="Eg. Welcome Email"
+                        <input type="text" name="name" id="name" placeholder="{{ __('Eg. Welcome Email') }}"
                             value="{{ old('name', $template->name) }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     </div>
@@ -40,7 +41,8 @@
                     <label for="subject"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('Subject') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="subject" id="subject" placeholder="Eg. Welcome to Our Service"
+                        <input type="text" name="subject" id="subject"
+                            placeholder="{{ __('Eg. Welcome to Our Service') }}"
                             value="{{ old('subject', $template->subject) }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     </div>
@@ -50,7 +52,7 @@
                     <label for="body"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('Body') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <textarea name="body" id="editor" placeholder="Email body content"
+                        <textarea name="body" id="editor" placeholder="{{ __('Email body content') }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">{{ old('body', $template->body) }}</textarea>
                     </div>
                 </div>
