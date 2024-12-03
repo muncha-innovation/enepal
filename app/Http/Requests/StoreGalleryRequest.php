@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\GalleryImage;
 use App\Services\DocumentService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,7 +25,7 @@ class StoreGalleryRequest extends FormRequest
      */
     public function rules()
     {
-        if($this->isMethod('PUT')) {
+        if ($this->isMethod('PUT')) {
             $coverImageValidation = 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
         } else {
             $coverImageValidation = 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
@@ -33,10 +34,12 @@ class StoreGalleryRequest extends FormRequest
             'title' => 'required',
             'images' => 'sometimes|array',
             'images.*' => 'file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'existing_images_titles' => 'sometimes|array',
             'cover_image' => $coverImageValidation,
             'is_active' => 'required|boolean',
             'is_private' => 'required|boolean',
             'business_id' => 'required|exists:businesses,id',
+            'images_title' => 'sometimes|array',
         ];
     }
 
@@ -63,18 +66,26 @@ class StoreGalleryRequest extends FormRequest
             foreach ($this->images as $key => $image) {
                 $url = $imageService->store($image, 'gallery/' . $businessId);
                 $images[$key]['original_filename'] = $this->images_name[$key];
+                $images[$key]['title'] = $this->images_title[$key];
                 $images[$key]['business_id'] = $this->business_id;
                 $images[$key]['image'] = $url;
             }
         }
-        if($this->has('cover_image')) {
+        if ($this->has('cover_image')) {
             $coverImage = $imageService->store($this->cover_image, 'gallery/' . $businessId);
+        }
+        if ($this->has('existing_images_titles')) {
+            foreach ($this->existing_images_titles as $key => $image) {
+                GalleryImage::find($key)->update(['title' => $this->existing_images_titles[$key]]);
+            }
         }
         unset($request['images']);
         unset($request['cover_image']);
+        unset($request['images_title']);
+        unset($request['existing_images_titles']);
         $request['business_id'] = $businessId;
         $request['user_id'] = auth()->id();
-        if(isset($coverImage)) {
+        if (isset($coverImage)) {
             $request['cover_image'] = $coverImage;
         }
         $request['images'] = $images;
@@ -82,7 +93,8 @@ class StoreGalleryRequest extends FormRequest
         return $request;
     }
 
-    public function messages() {
+    public function messages()
+    {
         return [
             'images.*.file' => 'The images must be a file.',
             'images.*.mimes' => 'The images must be a file of type: jpeg, png, jpg, gif, svg.',
@@ -99,5 +111,4 @@ class StoreGalleryRequest extends FormRequest
             'business_id.exists' => 'The selected business id is invalid.',
         ];
     }
-
 }

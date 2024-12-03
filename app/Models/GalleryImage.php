@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class GalleryImage extends Model
 {
-    protected $fillable = ['gallery_id', 'image','business_id','original_filename'];
+    protected $fillable = ['gallery_id', 'image','business_id','original_filename', 'title'];
     use HasFactory;
 
     public function gallery() {

@@ -21,3 +21,13 @@ MAIL_FROM_ADDRESS="info@daishinsyu.muncha.org"
 MAIL_FROM_NAME="${APP_NAME}"
 
 %yD21od8
+
+# Todos:
+    1. Implement image compression for images
+    2. Add title to images
+    3. Implement uuid instead of id
+    4. Business members permissions need to be refined
+    5. Business archiving and auto delete after 30 days 
+    6. Implement email templates features with segmentation as per businesses, meaning that businesses can add something to the email templates, mainly  welcome email for now but should be able to add more in the future
+    7. Verification system for businesses. Admin should be able to dynamically add verification documents for each business 
+

@@ -17,22 +17,24 @@
                     reader.onload = function(event) {
                         counter++;
                         var html = `
-          <div class="group relative">
-            <input type="hidden" name="images_name[${counter}]" value="${name}">
-            <input type="hidden" name="images[${counter}]" value="${event.target.result}">
-            <div class="w-20 h-20 rounded-lg">
-              <img src="${extension=='pdf'?@json(asset('pfd_icon.png')):event.target.result}" alt="" class="w-20 h-20 rounded-lg">
-            </div>
-            <div class="mt-4 flex flex-col gap-3">
-              
-              <div class="flex gap-3 justify-between">
-                <i class="delete-image justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-small rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">${removeText}</i>
-              </div>
-            </div>
-          </div>
-        `;
+      <div class="group flex flex-col items-center gap-2 mb-4">
+        <input type="hidden" name="images_name[${counter}]" value="${name}">
+        <input type="hidden" name="images[${counter}]" value="${event.target.result}">
+        
+        <div class="w-24 h-24 rounded-lg">
+          <img src="${extension=='pdf'?@json(asset('pfd_icon.png')):event.target.result}" alt="" class="w-full h-full rounded-lg object-cover">
+        </div>
+
+        <input type="text" name="images_title[${counter}]" class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center" placeholder=@json(trans('Image title'))>
+        
+        <button type="button" class="delete-image w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          ${removeText}
+        </button>
+      </div>
+    `;
                         $(html).appendTo(placeToInsertImagePreview);
-                    }
+                    };
+
                     reader.readAsDataURL(input.files[i]);
                 }
             }

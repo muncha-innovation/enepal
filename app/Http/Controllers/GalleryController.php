@@ -39,7 +39,6 @@ class GalleryController extends Controller
     public function store(StoreGalleryRequest $request, Business $business)
     {
         $data = collect($request->validated());
-        
         $gallery = $business->galleries()->create($data->except(['images'])->toArray());
         $gallery->images()->createMany($data->get('images'));
         return redirect()->route('gallery.index', $business);

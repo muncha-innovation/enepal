@@ -26,7 +26,7 @@
                 <div>
                     <input type="hidden" name="business_id" value="{{ $business->id }}">
                     <label for="title" class="block text-sm font-medium text-gray-700">
-                        {{ __('Title') }}</label>
+                        {{ __('Title') }}<span class="text-red-500">*</span></label>
                     <div class="mt-1">
 
                         <input id="title" name="title" type="text" value="{{ $gallery->title }}" autocomplete="title"
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="is_private" class="block text-sm font-medium leading-6 text-gray-900">Visibility</label>
+                    <label for="is_private" class="block text-sm font-medium leading-6 text-gray-900">{{__('Visibility')}} <span class="text-red-500">*</span></label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="is_private" id="is_private"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
@@ -46,12 +46,12 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="is_active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <label for="is_active" class="block text-sm font-medium leading-6 text-gray-900">{{__('Status')}}<span class="text-red-500">*</span></label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="is_active" id="is_active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="1" @if ($gallery->active) selected @endif>Active</option>
-                            <option value="0" @if (!$gallery->active) selected @endif>Inactive</option>
+                            <option value="1" @if ($gallery->active) selected @endif>{{__('Active')}}</option>
+                            <option value="0" @if (!$gallery->active) selected @endif>{{__('Inactive')}}</option>
                         </select>
                     </div>
                 </div>
@@ -64,9 +64,9 @@
 
                 <div>
                     <label for="cover_image" class="block text-sm font-medium text-gray-700">
-                        {{ __('Cover Image') }}</label>
+                        {{ __('Cover Image') }} <span class="text-red-500">*</span></label>
                     <div class="mt-1">
-                        <input id="cover_image" name="cover_image" type="file" autocomplete="cover_image"
+                        <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp,image/svg" autocomplete="cover_image"
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                     @if ($isEdit)

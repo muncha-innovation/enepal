@@ -1,6 +1,6 @@
 <fieldset class="mt-4">
     <label class="block text-sm font-medium text-gray-700">
-      {{ __('Images upload') }}</label>
+      {{ __('Images upload') }}<span class="text-red-500">*</span></label>
     <div
       class="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
       <div class="space-y-1 text-center">
