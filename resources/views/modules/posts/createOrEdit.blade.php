@@ -51,9 +51,8 @@
                             {{ __('short_description.'.$locale) }}</label>
                         <div class="mt-1">
                             <textarea rows="2" id="short_description[{{$locale}}]" name="short_description[{{$locale}}]" type="text"
-                                autocomplete="short_description[{{$locale}}]" autofocus
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ $post->short_description }}
-                            </textarea>
+                                autocomplete="short_description[{{$locale}}]"
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ trim($post->short_description) }}</textarea>
                         </div>
                     </div>
                     

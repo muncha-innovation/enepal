@@ -33,7 +33,7 @@
             <div class="flex items-center">
 
                 <label for="facility_{{ $facility->id }}"
-                    class="px-2 block text-sm leading-5 text-gray-900">{{ $facility->name }}</label>
+                    class="px-2 block text-sm font-bold leading-5 text-gray-900">{{ $facility->name }}</label>
                 <input type="text" id="facility_{{ $facility->id }}" name="facilities[{{ $facility->id }}]"
                     value="{{ $value }}"
                     class="form-input text-indigo-600 transition duration-150 ease-in-out"
@@ -42,7 +42,7 @@
         @elseif ($type == 'number')
             <div class="flex items-center">
                 <label for="facility_{{ $facility->id }}"
-                    class="px-2 block text-sm leading-5 text-gray-900">{{ $facility->name }}</label>
+                    class="px-2 block text-sm font-bold leading-5 text-gray-900">{{ $facility->name }}</label>
                 <input type="number" id="facility_{{ $facility->id }}" name="facilities[{{ $facility->id }}]"
                     value="{{ $value }}"
                     class="form-input text-indigo-600 transition duration-150 ease-in-out"

@@ -56,7 +56,7 @@
         } else if (facility.input_type == 'text') {
             result = `
         <div class="flex items center">
-            <label for="facilities[${facility.id}]" class="px-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <label for="facilities[${facility.id}]" class="px-2 block text-sm font-bold leading-5 text-gray-900">${facility.name}</label>
             <input type="text" id="facilities[${facility.id}]" name="facilities[${facility.id}]" class="form-input text-indigo-600 transition duration-150 ease-in-out" />
             
         </div>
@@ -64,7 +64,7 @@
         } else if (facility.input_type == 'number') {
             result = `
         <div class="flex items center">
-            <label for="facilities[${facility.id}]" class="px-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <label for="facilities[${facility.id}]" class="px-2 block text-sm font-bold leading-5 text-gray-900">${facility.name}</label>
             <input type="number" id="facilities[${facility.id}]" name="facilities[${facility.id}]" class="form-input text-indigo-600 transition duration-150 ease-in-out" />
             
         </div>
