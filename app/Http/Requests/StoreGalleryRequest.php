@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Jobs\OptimizeImage;
 use App\Models\GalleryImage;
 use App\Services\DocumentService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -69,10 +70,13 @@ class StoreGalleryRequest extends FormRequest
                 $images[$key]['title'] = $this->images_title[$key];
                 $images[$key]['business_id'] = $this->business_id;
                 $images[$key]['image'] = $url;
+                OptimizeImage::dispatch(storage_path('app/public/' . $url));
             }
         }
         if ($this->has('cover_image')) {
             $coverImage = $imageService->store($this->cover_image, 'gallery/' . $businessId);
+
+            OptimizeImage::dispatch(storage_path('app/public/' . $coverImage));
         }
         if ($this->has('existing_images_titles')) {
             foreach ($this->existing_images_titles as $key => $image) {

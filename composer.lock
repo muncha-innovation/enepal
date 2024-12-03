@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad3ac9c55a985c885fce6263a21735ab",
+    "content-hash": "ce92fcdde31f07d1fcd87b1ba14cb65d",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -272,89 +272,6 @@
             "time": "2024-08-16T22:44:02+00:00"
         },
         {
-            "name": "beyondcode/laravel-websockets",
-            "version": "1.14.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/beyondcode/laravel-websockets.git",
-                "reference": "fee9a81e42a096d2aaca216ce91acf6e25d8c06d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/beyondcode/laravel-websockets/zipball/fee9a81e42a096d2aaca216ce91acf6e25d8c06d",
-                "reference": "fee9a81e42a096d2aaca216ce91acf6e25d8c06d",
-                "shasum": ""
-            },
-            "require": {
-                "cboden/ratchet": "^0.4.1",
-                "ext-json": "*",
-                "facade/ignition-contracts": "^1.0",
-                "guzzlehttp/psr7": "^1.7|^2.0",
-                "illuminate/broadcasting": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/console": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "php": "^7.2|^8.0",
-                "pusher/pusher-php-server": "^3.0|^4.0|^5.0|^6.0|^7.0",
-                "react/dns": "^1.1",
-                "react/http": "^1.1",
-                "symfony/http-kernel": "^4.0|^5.0|^6.0",
-                "symfony/psr-http-message-bridge": "^1.1|^2.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.3.3",
-                "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0|^8.0",
-                "phpunit/phpunit": "^8.0|^9.0|^10.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider"
-                    ],
-                    "aliases": {
-                        "WebSocketRouter": "BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "BeyondCode\\LaravelWebSockets\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marcel Pociot",
-                    "email": "marcel@beyondco.de",
-                    "homepage": "https://beyondcode.de",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "An easy to use WebSocket server",
-            "homepage": "https://github.com/beyondcode/laravel-websockets",
-            "keywords": [
-                "beyondcode",
-                "laravel-websockets"
-            ],
-            "support": {
-                "issues": "https://github.com/beyondcode/laravel-websockets/issues",
-                "source": "https://github.com/beyondcode/laravel-websockets/tree/1.14.1"
-            },
-            "abandoned": true,
-            "time": "2023-08-30T07:23:12+00:00"
-        },
-        {
             "name": "brick/math",
             "version": "0.12.1",
             "source": {
@@ -482,69 +399,6 @@
                 }
             ],
             "time": "2023-12-11T17:09:12+00:00"
-        },
-        {
-            "name": "cboden/ratchet",
-            "version": "v0.4.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ratchetphp/Ratchet.git",
-                "reference": "5012dc954541b40c5599d286fd40653f5716a38f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ratchetphp/Ratchet/zipball/5012dc954541b40c5599d286fd40653f5716a38f",
-                "reference": "5012dc954541b40c5599d286fd40653f5716a38f",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/psr7": "^1.7|^2.0",
-                "php": ">=5.4.2",
-                "ratchet/rfc6455": "^0.3.1",
-                "react/event-loop": ">=0.4",
-                "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5",
-                "symfony/http-foundation": "^2.6|^3.0|^4.0|^5.0|^6.0",
-                "symfony/routing": "^2.6|^3.0|^4.0|^5.0|^6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Ratchet\\": "src/Ratchet"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Boden",
-                    "email": "cboden@gmail.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Matt Bonneau",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP WebSocket library",
-            "homepage": "http://socketo.me",
-            "keywords": [
-                "Ratchet",
-                "WebSockets",
-                "server",
-                "sockets",
-                "websocket"
-            ],
-            "support": {
-                "chat": "https://gitter.im/reactphp/reactphp",
-                "issues": "https://github.com/ratchetphp/Ratchet/issues",
-                "source": "https://github.com/ratchetphp/Ratchet/tree/v0.4.4"
-            },
-            "time": "2021-12-14T00:20:41+00:00"
         },
         {
             "name": "composer/semver",
@@ -1449,59 +1303,6 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.17.0"
             },
             "time": "2023-11-17T15:01:25+00:00"
-        },
-        {
-            "name": "facade/ignition-contracts",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/facade/ignition-contracts.git",
-                "reference": "3c921a1cdba35b68a7f0ccffc6dffc1995b18267"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition-contracts/zipball/3c921a1cdba35b68a7f0ccffc6dffc1995b18267",
-                "reference": "3c921a1cdba35b68a7f0ccffc6dffc1995b18267",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.3|^8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^v2.15.8",
-                "phpunit/phpunit": "^9.3.11",
-                "vimeo/psalm": "^3.17.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Facade\\IgnitionContracts\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://flareapp.io",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Solution contracts for Ignition",
-            "homepage": "https://github.com/facade/ignition-contracts",
-            "keywords": [
-                "contracts",
-                "flare",
-                "ignition"
-            ],
-            "support": {
-                "issues": "https://github.com/facade/ignition-contracts/issues",
-                "source": "https://github.com/facade/ignition-contracts/tree/1.0.2"
-            },
-            "time": "2020-10-16T08:27:54+00:00"
         },
         {
             "name": "fig/http-message-util",
@@ -4814,142 +4615,6 @@
             "time": "2022-01-27T09:35:39+00:00"
         },
         {
-            "name": "paragonie/random_compat",
-            "version": "v9.99.100",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "996434e5492cb4c3edcb9168db6fbb1359ef965a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/996434e5492cb4c3edcb9168db6fbb1359ef965a",
-                "reference": "996434e5492cb4c3edcb9168db6fbb1359ef965a",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 7"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*|5.*",
-                "vimeo/psalm": "^1"
-            },
-            "suggest": {
-                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Paragon Initiative Enterprises",
-                    "email": "security@paragonie.com",
-                    "homepage": "https://paragonie.com"
-                }
-            ],
-            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
-            "keywords": [
-                "csprng",
-                "polyfill",
-                "pseudorandom",
-                "random"
-            ],
-            "support": {
-                "email": "info@paragonie.com",
-                "issues": "https://github.com/paragonie/random_compat/issues",
-                "source": "https://github.com/paragonie/random_compat"
-            },
-            "time": "2020-10-15T08:29:30+00:00"
-        },
-        {
-            "name": "paragonie/sodium_compat",
-            "version": "v1.21.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/paragonie/sodium_compat.git",
-                "reference": "bb312875dcdd20680419564fe42ba1d9564b9e37"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/bb312875dcdd20680419564fe42ba1d9564b9e37",
-                "reference": "bb312875dcdd20680419564fe42ba1d9564b9e37",
-                "shasum": ""
-            },
-            "require": {
-                "paragonie/random_compat": ">=1",
-                "php": "^5.2.4|^5.3|^5.4|^5.5|^5.6|^7|^8"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^3|^4|^5|^6|^7|^8|^9"
-            },
-            "suggest": {
-                "ext-libsodium": "PHP < 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security.",
-                "ext-sodium": "PHP >= 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "autoload.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "ISC"
-            ],
-            "authors": [
-                {
-                    "name": "Paragon Initiative Enterprises",
-                    "email": "security@paragonie.com"
-                },
-                {
-                    "name": "Frank Denis",
-                    "email": "jedisct1@pureftpd.org"
-                }
-            ],
-            "description": "Pure PHP implementation of libsodium; uses the PHP extension if it exists",
-            "keywords": [
-                "Authentication",
-                "BLAKE2b",
-                "ChaCha20",
-                "ChaCha20-Poly1305",
-                "Chapoly",
-                "Curve25519",
-                "Ed25519",
-                "EdDSA",
-                "Edwards-curve Digital Signature Algorithm",
-                "Elliptic Curve Diffie-Hellman",
-                "Poly1305",
-                "Pure-PHP cryptography",
-                "RFC 7748",
-                "RFC 8032",
-                "Salpoly",
-                "Salsa20",
-                "X25519",
-                "XChaCha20-Poly1305",
-                "XSalsa20-Poly1305",
-                "Xchacha20",
-                "Xsalsa20",
-                "aead",
-                "cryptography",
-                "ecdh",
-                "elliptic curve",
-                "elliptic curve cryptography",
-                "encryption",
-                "libsodium",
-                "php",
-                "public-key cryptography",
-                "secret-key cryptography",
-                "side-channel resistant"
-            ],
-            "support": {
-                "issues": "https://github.com/paragonie/sodium_compat/issues",
-                "source": "https://github.com/paragonie/sodium_compat/tree/v1.21.1"
-            },
-            "time": "2024-04-22T22:05:04+00:00"
-        },
-        {
             "name": "phpoffice/phpspreadsheet",
             "version": "1.29.2",
             "source": {
@@ -5665,67 +5330,6 @@
             "time": "2024-06-10T01:18:23+00:00"
         },
         {
-            "name": "pusher/pusher-php-server",
-            "version": "7.2.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pusher/pusher-http-php.git",
-                "reference": "de2f72296808f9cafa6a4462b15a768ff130cddb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/de2f72296808f9cafa6a4462b15a768ff130cddb",
-                "reference": "de2f72296808f9cafa6a4462b15a768ff130cddb",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.2",
-                "paragonie/sodium_compat": "^1.6",
-                "php": "^7.3|^8.0",
-                "psr/log": "^1.0|^2.0|^3.0"
-            },
-            "require-dev": {
-                "overtrue/phplint": "^2.3",
-                "phpunit/phpunit": "^9.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Pusher\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Library for interacting with the Pusher REST API",
-            "keywords": [
-                "events",
-                "messaging",
-                "php-pusher-server",
-                "publish",
-                "push",
-                "pusher",
-                "real time",
-                "real-time",
-                "realtime",
-                "rest",
-                "trigger"
-            ],
-            "support": {
-                "issues": "https://github.com/pusher/pusher-http-php/issues",
-                "source": "https://github.com/pusher/pusher-http-php/tree/7.2.4"
-            },
-            "time": "2023-12-15T10:58:53+00:00"
-        },
-        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -6282,97 +5886,6 @@
             "time": "2023-11-13T13:48:05+00:00"
         },
         {
-            "name": "react/http",
-            "version": "v1.10.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/http.git",
-                "reference": "8111281ee57f22b7194f5dba225e609ba7ce4d20"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http/zipball/8111281ee57f22b7194f5dba225e609ba7ce4d20",
-                "reference": "8111281ee57f22b7194f5dba225e609ba7ce4d20",
-                "shasum": ""
-            },
-            "require": {
-                "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
-                "fig/http-message-util": "^1.1",
-                "php": ">=5.3.0",
-                "psr/http-message": "^1.0",
-                "react/event-loop": "^1.2",
-                "react/promise": "^3 || ^2.3 || ^1.2.1",
-                "react/socket": "^1.12",
-                "react/stream": "^1.2"
-            },
-            "require-dev": {
-                "clue/http-proxy-react": "^1.8",
-                "clue/reactphp-ssh-proxy": "^1.4",
-                "clue/socks-react": "^1.4",
-                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36",
-                "react/async": "^4 || ^3 || ^2",
-                "react/promise-stream": "^1.4",
-                "react/promise-timer": "^1.9"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\Http\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Lück",
-                    "email": "christian@clue.engineering",
-                    "homepage": "https://clue.engineering/"
-                },
-                {
-                    "name": "Cees-Jan Kiewiet",
-                    "email": "reactphp@ceesjankiewiet.nl",
-                    "homepage": "https://wyrihaximus.net/"
-                },
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com",
-                    "homepage": "https://sorgalla.com/"
-                },
-                {
-                    "name": "Chris Boden",
-                    "email": "cboden@gmail.com",
-                    "homepage": "https://cboden.dev/"
-                }
-            ],
-            "description": "Event-driven, streaming HTTP client and server implementation for ReactPHP",
-            "keywords": [
-                "async",
-                "client",
-                "event-driven",
-                "http",
-                "http client",
-                "http server",
-                "https",
-                "psr-7",
-                "reactphp",
-                "server",
-                "streaming"
-            ],
-            "support": {
-                "issues": "https://github.com/reactphp/http/issues",
-                "source": "https://github.com/reactphp/http/tree/v1.10.0"
-            },
-            "funding": [
-                {
-                    "url": "https://opencollective.com/reactphp",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2024-03-27T17:20:46+00:00"
-        },
-        {
             "name": "react/promise",
             "version": "v3.2.0",
             "source": {
@@ -6798,6 +6311,61 @@
             "time": "2022-04-22T08:51:55+00:00"
         },
         {
+            "name": "spatie/image-optimizer",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/image-optimizer.git",
+                "reference": "4fd22035e81d98fffced65a8c20d9ec4daa9671c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/4fd22035e81d98fffced65a8c20d9ec4daa9671c",
+                "reference": "4fd22035e81d98fffced65a8c20d9ec4daa9671c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "php": "^7.3|^8.0",
+                "psr/log": "^1.0 | ^2.0 | ^3.0",
+                "symfony/process": "^4.2|^5.0|^6.0|^7.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^1.21",
+                "phpunit/phpunit": "^8.5.21|^9.4.4",
+                "symfony/var-dumper": "^4.2|^5.0|^6.0|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\ImageOptimizer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easily optimize images using PHP",
+            "homepage": "https://github.com/spatie/image-optimizer",
+            "keywords": [
+                "image-optimizer",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/image-optimizer/issues",
+                "source": "https://github.com/spatie/image-optimizer/tree/1.8.0"
+            },
+            "time": "2024-11-04T08:24:54+00:00"
+        },
+        {
             "name": "spatie/laravel-activitylog",
             "version": "4.8.0",
             "source": {
@@ -6887,6 +6455,74 @@
                 }
             ],
             "time": "2024-03-08T22:28:17+00:00"
+        },
+        {
+            "name": "spatie/laravel-image-optimizer",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-image-optimizer.git",
+                "reference": "024752cba691fee3cd1800000b6aa3da3b8b2474"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-image-optimizer/zipball/024752cba691fee3cd1800000b6aa3da3b8b2474",
+                "reference": "024752cba691fee3cd1800000b6aa3da3b8b2474",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^8.0|^9.0|^10.0|^11.0",
+                "php": "^8.0",
+                "spatie/image-optimizer": "^1.2.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
+                "phpunit/phpunit": "^9.4|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\LaravelImageOptimizer\\ImageOptimizerServiceProvider"
+                    ],
+                    "aliases": {
+                        "ImageOptimizer": "Spatie\\LaravelImageOptimizer\\Facades\\ImageOptimizer"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\LaravelImageOptimizer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Optimize images in your Laravel app",
+            "homepage": "https://github.com/spatie/laravel-image-optimizer",
+            "keywords": [
+                "laravel-image-optimizer",
+                "spatie"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/laravel-image-optimizer/tree/1.8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2024-02-29T10:55:08+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
@@ -8978,95 +8614,6 @@
             "time": "2024-09-17T12:46:43+00:00"
         },
         {
-            "name": "symfony/psr-http-message-bridge",
-            "version": "v2.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/psr-http-message-bridge.git",
-                "reference": "581ca6067eb62640de5ff08ee1ba6850a0ee472e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/psr-http-message-bridge/zipball/581ca6067eb62640de5ff08ee1ba6850a0ee472e",
-                "reference": "581ca6067eb62640de5ff08ee1ba6850a0ee472e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.5",
-                "psr/http-message": "^1.0 || ^2.0",
-                "symfony/deprecation-contracts": "^2.5 || ^3.0",
-                "symfony/http-foundation": "^5.4 || ^6.0"
-            },
-            "require-dev": {
-                "nyholm/psr7": "^1.1",
-                "psr/log": "^1.1 || ^2 || ^3",
-                "symfony/browser-kit": "^5.4 || ^6.0",
-                "symfony/config": "^5.4 || ^6.0",
-                "symfony/event-dispatcher": "^5.4 || ^6.0",
-                "symfony/framework-bundle": "^5.4 || ^6.0",
-                "symfony/http-kernel": "^5.4 || ^6.0",
-                "symfony/phpunit-bridge": "^6.2"
-            },
-            "suggest": {
-                "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
-            },
-            "type": "symfony-bridge",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "2.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Bridge\\PsrHttpMessage\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "PSR HTTP message bridge",
-            "homepage": "http://symfony.com",
-            "keywords": [
-                "http",
-                "http-message",
-                "psr-17",
-                "psr-7"
-            ],
-            "support": {
-                "issues": "https://github.com/symfony/psr-http-message-bridge/issues",
-                "source": "https://github.com/symfony/psr-http-message-bridge/tree/v2.3.1"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2023-07-26T11:53:26+00:00"
-        },
-        {
             "name": "symfony/routing",
             "version": "v5.4.43",
             "source": {
@@ -10384,6 +9931,59 @@
                 "source": "https://github.com/facade/ignition"
             },
             "time": "2023-01-26T12:34:59+00:00"
+        },
+        {
+            "name": "facade/ignition-contracts",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/facade/ignition-contracts.git",
+                "reference": "3c921a1cdba35b68a7f0ccffc6dffc1995b18267"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/facade/ignition-contracts/zipball/3c921a1cdba35b68a7f0ccffc6dffc1995b18267",
+                "reference": "3c921a1cdba35b68a7f0ccffc6dffc1995b18267",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^v2.15.8",
+                "phpunit/phpunit": "^9.3.11",
+                "vimeo/psalm": "^3.17.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Facade\\IgnitionContracts\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://flareapp.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Solution contracts for Ignition",
+            "homepage": "https://github.com/facade/ignition-contracts",
+            "keywords": [
+                "contracts",
+                "flare",
+                "ignition"
+            ],
+            "support": {
+                "issues": "https://github.com/facade/ignition-contracts/issues",
+                "source": "https://github.com/facade/ignition-contracts/tree/1.0.2"
+            },
+            "time": "2020-10-16T08:27:54+00:00"
         },
         {
             "name": "fakerphp/faker",

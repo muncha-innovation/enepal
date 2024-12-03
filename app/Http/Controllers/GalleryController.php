@@ -40,6 +40,7 @@ class GalleryController extends Controller
     {
         $data = collect($request->validated());
         $gallery = $business->galleries()->create($data->except(['images'])->toArray());
+        
         $gallery->images()->createMany($data->get('images'));
         return redirect()->route('gallery.index', $business);
     }

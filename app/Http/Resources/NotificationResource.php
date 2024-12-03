@@ -18,7 +18,6 @@ class NotificationResource extends JsonResource
     public function toArray($request)
     {
         $data = collect($this->data);
-        // dd($data->get('created_by_type'));
         $creatorDetails = $this->creatorDetails();
         return [
             'id' => $this->id,

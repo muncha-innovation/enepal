@@ -115,7 +115,6 @@ class BusinessController extends Controller
      */
     public function update(StoreBusinessRequest $request, Business $business)
     {
-        // dd($request->all());
         $data = $request->validated();
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);

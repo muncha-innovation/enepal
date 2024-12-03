@@ -37,7 +37,6 @@ class ProfileController extends Controller
         if (!$address) {
             $user->addresses()->create($data->get('address'));
         } else {
-            dd($data->get('address'));
             $address->update($data->get('address'));
         }
         return back()->with('success', 'Profile updated successfully');
