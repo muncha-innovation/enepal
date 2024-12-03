@@ -56,7 +56,7 @@ class StoreBusinessRequest extends FormRequest
             'address.longitude' => ['sometimes'],
             'settings' => ['sometimes'],
             'facilities' => ['sometimes', 'array'],
-            'facilities.*' => ['integer', 'exists:facilities,id'],
+            'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
         ];
     }
 

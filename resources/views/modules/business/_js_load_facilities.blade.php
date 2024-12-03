@@ -42,36 +42,31 @@
         if (facility.input_type == 'radio') {
             result = `
             <div class="flex items center">
-                <label class="block text-sm font-bold leading-5 text-gray-900">${facility.name}</label>
-                <div class="ml-2 flex items-center">
+                <label class="px-2 block text-sm font-bold leading-5 text-gray-900">${facility.name}</label>
+                <div class=" flex items-center">
                     <input type="radio" id="facilities[${facility.id}][yes]" name="facilities[${facility.id}]" value="1" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-                    <label for="facilities[${facility.id}][yes]" class="ml-2 block text-sm leading-5 text-gray-900">{{ __('Yes') }}</label>
+                    <label for="facilities[${facility.id}][yes]" class="px-2 block text-sm leading-5 text-gray-900">{{ __('Yes') }}</label>
                 </div>
-                <div class="ml-2 flex items-center">
+                <div class=" flex items-center">
                     <input type="radio" id="facilities[${facility.id}][no]" name="facilities[${facility.id}]" value="0" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-                    <label for="facilities[${facility.id}]no" class="ml-2 block text-sm leading-5 text-gray-900">{{ __('No') }}</label>
+                    <label for="facilities[${facility.id}]no" class="px-2 block text-sm leading-5 text-gray-900">{{ __('No') }}</label>
                 </div>
-            </div>
-        `;
-        } else if (facility.input_type == 'checkbox') {
-            result = `
-            <div class="flex items center">
-                <input type="checkbox" id="facility_${facility.id}" name="facility_${facility.id}" value="1" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-                <label for="facility_${facility.id}" class="ml-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
             </div>
         `;
         } else if (facility.input_type == 'text') {
             result = `
         <div class="flex items center">
-            <input type="text" id="facility_${facility.id}" name="facility_${facility.id}" class="form-input h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-            <label for="facility_${facility.id}" class="ml-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <label for="facilities[${facility.id}]" class="px-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <input type="text" id="facilities[${facility.id}]" name="facilities[${facility.id}]" class="form-input text-indigo-600 transition duration-150 ease-in-out" />
+            
         </div>
     `;
         } else if (facility.input_type == 'number') {
             result = `
         <div class="flex items center">
-            <input type="number" id="facility_${facility.id}" name="facility_${facility.id}" class="form-input h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-            <label for="facility_${facility.id}" class="ml-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <label for="facilities[${facility.id}]" class="px-2 block text-sm leading-5 text-gray-900">${facility.name}</label>
+            <input type="number" id="facilities[${facility.id}]" name="facilities[${facility.id}]" class="form-input text-indigo-600 transition duration-150 ease-in-out" />
+            
         </div>
         `;
         }
