@@ -15,6 +15,7 @@ class FacilitiesController extends Controller
         $facilities = Facility::paginate(10);
         return view('admin-views.facilities.index', compact('facilities'));
     }
+    
 
     public function create() {
         $businessTypes = BusinessType::all();

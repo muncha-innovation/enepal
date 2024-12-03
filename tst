@@ -23,7 +23,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 %yD21od8
 
 # Todos:
-    1. Implement image compression for images
+    1. Implement image compression for images :
     2. Add title to images
     3. Implement uuid instead of id
     4. Business members permissions need to be refined
