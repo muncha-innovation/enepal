@@ -5,6 +5,7 @@
 @endpush
 
 @section('content')
+    @include('modules.shared.success_error')
     <div class="container mx-auto px-4 sm:px-8">
         <div class="py-8">
             <div>

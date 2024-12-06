@@ -31,7 +31,7 @@ class StoreNotificationTemplateRequest extends FormRequest
 
         return array_merge($rules, [
             'email_sent_from_name' => 'required|string',
-            'email_sent_from_email' => 'required|email',
+            'email_sent_from_email' => 'required',
             'allow_business_section' => 'required|in:0,1',
         ]);
     }
