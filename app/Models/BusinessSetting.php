@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BusinessSetting extends Model
 {
     use HasFactory;
-    protected $fillable = ['key', 'value'];
+    
+    protected $fillable = ['type', 'key', 'value', 'business_id'];
     
 }

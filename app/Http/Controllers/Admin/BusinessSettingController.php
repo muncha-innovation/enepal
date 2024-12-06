@@ -18,7 +18,6 @@ class BusinessSettingController extends Controller
     public function index()
     {
         $settings = BusinessSetting::all()->groupBy('type');
-        
         return view('admin.settings.index', compact('settings'));
     }
 

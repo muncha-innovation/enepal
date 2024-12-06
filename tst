@@ -26,7 +26,7 @@ MAIL_FROM_NAME="${APP_NAME}"
     //1. Implement image compression for images :
     //2. Add title to images
     3. Replace generalsettings table with business settings as we already have this.
-    
+    4. Vendor can create categories for their users and segment them.
     3. Implement uuid instead of id
     4. Business members permissions need to be refined
     5. Business archiving and auto delete after 30 days 
