@@ -6,18 +6,30 @@ use App\Enums\SettingKeys;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 class Business extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $translatable = ['description'];
+    protected $dates = ['deleted_at'];
 
     static $ROLES = ['owner', 'admin', 'member'];
     static $SETTINGS = [SettingKeys::MAX_NOTIFICATION_PER_DAY, SettingKeys::MAX_NOTIFICATION_PER_MONTH];    
 
     protected $guarded = [];
+
+    public function scopeActive($query)
+    {
+        return $query->whereNull('deleted_at');
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->whereNotNull('deleted_at');
+    }
 
     public function address(): MorphOne
     {

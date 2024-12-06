@@ -7,7 +7,21 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-
+if(!function_exists('upload')) {
+    function upload($dir, $format, $image)
+    {
+        if ($image) {
+            $imageName = time() . "." . $format;
+            if (!Storage::disk('public')->exists($dir)) {
+                Storage::disk('public')->makeDirectory($dir);
+            }
+            Storage::disk('public')->put($dir . '/' . $imageName, file_get_contents($image));
+            return $dir . '/' . $imageName;
+        } else {
+            return 'def.png';
+        }
+    }
+}
 if (!function_exists('getLanguageFromCode')) {
     function getLanguageFromCode($code)
     {

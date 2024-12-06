@@ -23,15 +23,24 @@ class BusinessController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (auth()->user()->hasRole('super-admin')) {
-            $businesses = Business::with(['address.country', 'type'])->paginate(10);
-            return view('modules.business.index', compact('businesses'));
-        } else {
-            $businesses = auth()->user()->businesses()->with(['address.country', 'type'])->paginate(10);
-            return view('modules.business.index', compact('businesses'));
+        $tab = $request->get('tab', 'active');
+        $query = Business::with(['address.country', 'type']);
+        
+        if (!auth()->user()->hasRole('super-admin')) {
+            $query->whereHas('users', function ($q) {
+                $q->where('user_id', auth()->id());
+            });
         }
+
+        if ($tab === 'inactive') {
+            $businesses = $query->inactive()->paginate(10);
+        } else {
+            $businesses = $query->active()->paginate(10);
+        }
+
+        return view('modules.business.index', compact('businesses', 'tab'));
     }
 
     /**
@@ -158,8 +167,20 @@ class BusinessController extends Controller
      */
     public function destroy(Business $business)
     {
-        //
+        abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to delete this business');
+        $business->delete();
+        return back()->with('success', 'Business has been moved to inactive. It will be permanently deleted after one month.');
     }
+
+    public function restore(Business $business)
+    {
+        abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to restore this business');
+        
+        $business->restore();
+        
+        return back()->with('success', 'Business has been restored successfully.');
+    }
+
     public function setting(Business $business)
     {
         $businessTypes = BusinessType::all();
