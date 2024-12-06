@@ -4,22 +4,19 @@ use App\Events\NotificationCreated;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Middleware\StatusMiddleware;
-use App\Models\Process;
+
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\UsersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GalleryImageController;
-use App\Http\Controllers\LogsController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NoticeController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
-use App\Models\Business;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +37,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     // Route::resource('users', UsersController::class);
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
     
-    Route::post('{business}/image/upload', [BusinessController::class, 'uploadImage'])->name('image.upload');
+    Route::post('image/upload', [BusinessController::class, 'uploadImage'])->name('image.upload');
     Route::get('/businesses/facilities', [BusinessController::class, 'getFacilities']);
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
@@ -147,7 +144,7 @@ Route::get(
 )->name('change-locale');
 
 Route::get('send/mail', function() {
-    \Mail::to('cooloozewall@gmail.com')->send(new \App\Mail\TestMail());
+    Mail::to('cooloozewall@gmail.com')->send(new \App\Mail\TestMail());
 });
 
 require __DIR__ . '/auth.php';

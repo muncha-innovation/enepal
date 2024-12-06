@@ -181,7 +181,7 @@ class BusinessController extends Controller
         $business->update(['is_featured' => !$business->is_featured]);
         return back()->with('success', 'Business Featured Successfully');
     }
-    public function uploadImage(Request $request, Business $business)
+    public function uploadImage(Request $request)
     {
         $request->validate([
             'upload' => 'required|image'

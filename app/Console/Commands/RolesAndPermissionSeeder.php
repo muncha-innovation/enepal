@@ -49,7 +49,6 @@ class RolesAndPermissionSeeder extends Command
         if (!User::where('email', 'admin@admin.com')->exists()) {
             $this->info('Creating User with Super Admin Role');
             $user = User::create([
-                'user_name' => 'admin',
                 'first_name' => 'admin',
                 'last_name' => 'admin',
                 'email' => 'admin@admin.com',

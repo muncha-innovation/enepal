@@ -13,19 +13,19 @@ class BusinessTypesController extends Controller
 {
     public function index() {
         $businessTypes = BusinessType::paginate(10);
-        return view('admin-views.businessTypes.index', compact('businessTypes'));
+        return view('admin.businessTypes.index', compact('businessTypes'));
     }
 
     public function create() {
         $facilities = Facility::all();
-        return view('admin-views.businessTypes.createOrEdit', compact('facilities'));
+        return view('admin.businessTypes.createOrEdit', compact('facilities'));
     }
     public function edit(Request $request, BusinessType $businessType) {
         $facilities = Facility::all();
-        return view('admin-views.businessTypes.createOrEdit', compact('facilities','businessType'));
+        return view('admin.businessTypes.createOrEdit', compact('facilities','businessType'));
     }
     public function show(BusinessType $businessType) {
-        return view('admin-views.businessTypes.show', compact('businessType'));
+        return view('admin.businessTypes.show', compact('businessType'));
     }
     public function store(StoreBusinessTypeRequest $request) {
         $data = collect($request->validated())->except('facilities')->toArray();

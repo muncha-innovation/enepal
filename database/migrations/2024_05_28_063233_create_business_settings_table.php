@@ -16,7 +16,7 @@ class CreateBusinessSettingsTable extends Migration
         Schema::create('business_settings', function (Blueprint $table) {
             $table->id();
             $table->string('key');
-            $table->string('value')->nullable();
+            $table->text('value')->nullable();
             $table->string('type')->default('general');
             $table->unsignedBigInteger('business_id')->nullable();
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');

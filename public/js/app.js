@@ -4987,8 +4987,7 @@ window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"];
 window.$ = window.Jquery = window.jQuery = (jquery__WEBPACK_IMPORTED_MODULE_1___default());
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].start();
 
-__webpack_require__(/*! gasparesganga-jquery-loading-overlay */ "./node_modules/gasparesganga-jquery-loading-overlay/dist/loadingoverlay.min.js"); // The workerSrc property shall be specified.
-
+__webpack_require__(/*! gasparesganga-jquery-loading-overlay */ "./node_modules/gasparesganga-jquery-loading-overlay/dist/loadingoverlay.min.js");
 
 window.pdfjsLib = pdfjs_dist__WEBPACK_IMPORTED_MODULE_2__;
 

@@ -176,7 +176,7 @@
         @endrole
         @role('super-admin')
             <div x-data="{ open: {{ $isTemplatesRoute }} }" class="space-y-1">
-                <a href="{{ route('admin.templates.index') }}"
+                <button type="button" x-on:click="open = !open"
                     class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
                     <div class="flex items-center pointer-events-none">
                         <div>
@@ -185,20 +185,21 @@
                                 <path
                                     d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v12h16V6H4Zm3 3h4a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2Zm0 4h10a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2Z" />
                             </svg>
-
                         </div>
-                        {{ __('Templates') }}
+                        {{ __('Notification Templates') }}
                     </div>
                     <svg x-bind:class="!open ? '' : 'rotate-90'"
                         class="flex-shrink-0 w-5 h-5 mr-2 text-gray-500 transition-colors duration-150 ease-in-out transform pointer-events-none group-hover:text-gray-400"
                         viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
                     </svg>
-                </a>
-
+                </button>
+                <div x-show="open" class="space-y-1">
+                    <a href="{{ route('admin.templates.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (url()->current() == route('admin.templates.index')) bg-gray-200 @endif">{{ __('Email Templates') }}</a>
+                </div>
             </div>
         @endrole
-
         @role('super-admin')
             <div x-data="{ open: {{ $isSettingsRoute }} }" class="space-y-1">
                 <a href="{{ route('admin.settings.index') }}"

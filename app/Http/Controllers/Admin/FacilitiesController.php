@@ -13,17 +13,17 @@ class FacilitiesController extends Controller
     //
     public function index() {
         $facilities = Facility::paginate(10);
-        return view('admin-views.facilities.index', compact('facilities'));
+        return view('admin.facilities.index', compact('facilities'));
     }
     
 
     public function create() {
         $businessTypes = BusinessType::all();
-        return view('admin-views.facilities.createOrEdit', compact('businessTypes'));
+        return view('admin.facilities.createOrEdit', compact('businessTypes'));
     }
     public function edit(Request $request, Facility $facility) {
         $businessTypes = BusinessType::all();
-        return view('admin-views.facilities.createOrEdit', compact('businessTypes','facility'));
+        return view('admin.facilities.createOrEdit', compact('businessTypes','facility'));
 
     }
     public function store(StoreFacilityRequest $request) {

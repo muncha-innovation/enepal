@@ -40,15 +40,13 @@ class LogsController extends Controller
     public function getLogsBySubject(Request $request, $subjectId, $subjectType)
     {
         $type = $subjectType;
-        $typeClass = $subjectType == 'process' ? get_class(new Process()) : get_class(new Product());
         $startDate = request()->get('start_date') ? Carbon::parse(request()->get('start_date'))->format('m/d/Y') : Carbon::now()->subDays(30)->format('m/d/Y');
         $endDate = request()->get('end_date') ? Carbon::parse(request()->get('end_date'))->format('m/d/y') : Carbon::now()->format('m/d/Y');
         $modelId = $subjectId;
         $logs = Activity::where('subject_id', $subjectId)
             ->when(request('start_date') && request('end_date'), function ($query) {
                 return $query->whereBetween('created_at', [request('start_date'), request('end_date')]);
-            })
-            ->where('subject_type', $typeClass)->latest()->paginate(10);
+            })->latest()->paginate(10);
 
         return view('modules.logs.logs_by_model', compact('logs', 'startDate', 'endDate', 'modelId', 'type'));
     }

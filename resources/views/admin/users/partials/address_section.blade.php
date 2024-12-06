@@ -10,6 +10,6 @@
       @endforeach
     </select>
   </fieldset>
-    @include('admin-views.users.partials.general_form')
+    @include('admin.users.partials.general_form')
   
 </div>

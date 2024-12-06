@@ -29,7 +29,7 @@ class UsersDataTable extends DataTable
             })
             ->addColumn('action', function ($result) {
                 $userId = $result->id;
-                return view('admin-views.users.partials.actions', [
+                return view('admin.users.partials.actions', [
                     'viewRoute' => route('admin.users.show', $userId),
                     'editRoute' => route('admin.users.edit', $userId),
                     'deleteRoute' => route('admin.users.destroy', $userId),

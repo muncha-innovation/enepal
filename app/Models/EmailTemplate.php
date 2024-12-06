@@ -9,6 +9,8 @@ use Spatie\Translatable\HasTranslations;
 class EmailTemplate extends Model
 {
     use HasFactory, HasTranslations;
+    protected $fillable = ['name', 'subject', 'body', 'slug', 'placeholders'];
 
-    protected $fillable = ['name', 'subject', 'body', 'slug'];
+    
+
 }

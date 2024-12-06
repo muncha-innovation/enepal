@@ -5,9 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Models\Country;
-use App\Models\Department;
-use App\Models\Process;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -27,7 +24,7 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $users = User::with(['addresses.country'])->paginate(10);
-        return view('admin-views.users.index', compact(['users']));
+        return view('admin.users.index', compact(['users']));
     }
 
     /**
@@ -39,7 +36,7 @@ class UsersController extends Controller
     {
 
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        return view('admin-views.users.createOrEdit', [
+        return view('admin.users.createOrEdit', [
             'roles' => Role::get(),
             'countries' => Country::all(),
         ]);
@@ -85,7 +82,7 @@ class UsersController extends Controller
     public function show(User $user)
     {
 
-        return view('admin-views.users.view', compact(['user']));
+        return view('admin.users.view', compact(['user']));
     }
 
     /**
@@ -98,7 +95,7 @@ class UsersController extends Controller
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
         $user->load(['address.country', 'roles']);
-        return view('admin-views.users.createOrEdit', [
+        return view('admin.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),
             'userRole' => collect($user->getRoleNames())->first(),

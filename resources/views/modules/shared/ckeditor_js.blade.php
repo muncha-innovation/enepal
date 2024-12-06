@@ -25,7 +25,7 @@
                 shouldNotGroupWhenFull: true
             },
             simpleUpload: {
-                uploadUrl: '{{ route('image.upload', $business) }}',
+                uploadUrl: '{{ route('image.upload') }}',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 }
@@ -180,7 +180,7 @@
                 shouldNotGroupWhenFull: true
             },
             simpleUpload: {
-                uploadUrl: '{{ route('image.upload', $business) }}',
+                uploadUrl: '{{ route('image.upload') }}',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 }
@@ -335,7 +335,7 @@
                 shouldNotGroupWhenFull: true
             },
             simpleUpload: {
-                uploadUrl: '{{ route('image.upload', $business) }}',
+                uploadUrl: '{{ route('image.upload') }}',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 }

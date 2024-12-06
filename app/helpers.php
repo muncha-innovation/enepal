@@ -1,10 +1,12 @@
 <?php
 
-
+use App\Models\GeneralSetting;
 use App\Services\DateFormatter;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 if (!function_exists('getLanguageFromCode')) {
     function getLanguageFromCode($code)
@@ -32,13 +34,6 @@ if (!function_exists('getColorClassForLog')) {
     }
 }
 
-if (!function_exists('formatDateToJp')) {
-    function formatDateToJp($date)
-    {
-        return DateFormatter::utcToJp($date);
-    }
-}
-
 if (!function_exists('file_path')) {
     /**
      * Get the full file path given the folder path and file name.
@@ -53,33 +48,19 @@ if (!function_exists('file_path')) {
         return rtrim($path, '/') . ($folder ? "/{$folder}/" : '/') . $filename;
     }
 }
-if(!function_exists('upload')) {
-    function upload(string $dir, string $format, $image = null)
-    {
-        if ($image != null) {
-            $imageName = \Carbon\Carbon::now()->toDateString() . "-" . uniqid() . "." . $format;
-            if (!Storage::disk('public')->exists($dir)) {
-                Storage::disk('public')->makeDirectory($dir);
-            }
-            Storage::disk('public')->putFileAs($dir, $image, $imageName);
-        } else {
-            $imageName = 'def.png';
-        }
-    
-        return $imageName;
-    }
-}
-if(!function_exists('getImage')) {
+
+if (!function_exists('getImage')) {
     function getImage(string $fileName = null, string $dir = null)
     {
-        if($fileName==null) {
+        if ($fileName == null) {
             return asset('images/profile/default.png');
         }
-        if($dir!=null) {
-            return Storage::disk('public')->url($dir.$fileName);
+        if ($dir != null) {
+            return Storage::disk('public')->url($dir . $fileName);
         } else {
             return Storage::disk('public')->url($fileName);
-        }}
+        }
+    }
 }
 
 if (!function_exists('getFormattedDate')) {
@@ -112,4 +93,48 @@ if (!function_exists('getUploadedFileFromBase64')) {
         });
         return $file;
     }
+}
+
+
+if (!function_exists('menuActive')) {
+
+    function menuActive($routeName, $type = null, $param = null)
+    {
+        if ($type == 3) $class = 'side-menu--open';
+        elseif ($type == 2) $class = 'sidebar-submenu__open';
+        else $class = 'active';
+
+        if (is_array($routeName)) {
+            foreach ($routeName as $key => $value) {
+                if (request()->routeIs($value)) return $class;
+            }
+        } elseif (request()->routeIs($routeName)) {
+            if ($param) {
+                $routeParam = array_values(@request()->route()->parameters ?? []);
+                if (strtolower(@$routeParam[0]) == strtolower($param)) return $class;
+                else return;
+            }
+            return $class;
+        }
+    }
+}
+
+function gs($key = null)
+{
+    $general = Cache::get('GeneralSetting');
+    if (!$general) {
+        $general = GeneralSetting::first();
+        Cache::put('GeneralSetting', $general);
+    }
+    if (Arr::has([
+        'mail_config',
+        'sms_config',
+        'global_placeholders' => 'object',
+        'socialite_credentials',
+        'firebase_config',
+    ], $key)) {
+        return (object) @$general->$key;
+    }
+    if ($key) return @$general->$key;
+    return $general;
 }
