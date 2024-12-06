@@ -13,7 +13,7 @@ class NotificationTemplateController extends Controller
     //
     public function index() {
         $templates = EmailTemplate::all();
-        dd($templates);
+        // dd($templates);
         return view('admin.notification.template.index', compact(['templates']));
     }
     public function global(Request $request) {
