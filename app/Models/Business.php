@@ -11,8 +11,9 @@ use Spatie\Translatable\HasTranslations;
 
 class Business extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
-
+    use SoftDeletes;
+    use HasFactory, HasTranslations;
+    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id'];
     protected $translatable = ['description'];
     protected $dates = ['deleted_at'];
 

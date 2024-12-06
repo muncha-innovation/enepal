@@ -52,7 +52,6 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{user}', [MembersController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{user}', [MembersController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{user}', [MembersController::class, 'destroy'])->name('destroy');
-        Route::post('{business}/restore', [BusinessController::class, 'restore'])->name('business.restore');
     });
 
     Route::group(['prefix' => 'posts', 'as' => 'posts.'], function() {
@@ -65,6 +64,8 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('delete/{business}/{post}', [PostController::class, 'destroy'])->name('destroy');
     });
     Route::resource('business', BusinessController::class);
+
+    Route::post('{business}/restore', [BusinessController::class, 'restore'])->name('business.restore');
     Route::post('business/{business}/featured', [BusinessController::class, 'featured'])->name('business.featured');
     Route::group(['prefix' => 'products', 'as' => 'products.'], function() {
         Route::get('/{business}', [ProductController::class, 'index'])->name('index');

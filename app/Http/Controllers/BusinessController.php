@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
-
 class BusinessController extends Controller
 {
     /**
@@ -27,7 +26,7 @@ class BusinessController extends Controller
     {
         $tab = $request->get('tab', 'active');
         $query = Business::with(['address.country', 'type']);
-        
+
         if (!auth()->user()->hasRole('super-admin')) {
             $query->whereHas('users', function ($q) {
                 $q->where('user_id', auth()->id());
@@ -35,7 +34,7 @@ class BusinessController extends Controller
         }
 
         if ($tab === 'inactive') {
-            $businesses = $query->inactive()->paginate(10);
+            $businesses = $query->withTrashed()->paginate(10);
         } else {
             $businesses = $query->active()->paginate(10);
         }
@@ -69,9 +68,12 @@ class BusinessController extends Controller
         $data = $request->validated();
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
-        $business = Business::create(collect($data)->except(['address', 'settings'])->toArray());
-        $business->setTranslation('description', 'en', $data['description']['en'])
-            ->setTranslation('description', 'np', $data['description']['np']);
+        $business = Business::create(
+            collect($data)
+                ->except(['address', 'settings', 'facilities'])
+                ->toArray(),
+        );
+        $business->setTranslation('description', 'en', $data['description']['en'])->setTranslation('description', 'np', $data['description']['np']);
         $address = new Address($data['address']);
         $business->address()->save($address);
 
@@ -79,10 +81,18 @@ class BusinessController extends Controller
             BusinessSetting::create([
                 'business_id' => $business->id,
                 'key' => $key,
-                'value' => $value
+                'value' => $value,
             ]);
         }
         $business->users()->attach(auth()->user()->id, ['role' => 'owner']);
+        // Handle facilities
+        if (isset($data['facilities']) && is_array($data['facilities'])) {
+            $facilities = [];
+            foreach ($data['facilities'] as $facilityId => $value) {
+                $facilities[$facilityId] = ['value' => $value];
+            }
+            $business->facilities()->sync($facilities);
+        }
         return redirect()->route('business.index')->with('success', 'Business Created Successfully');
     }
 
@@ -131,7 +141,11 @@ class BusinessController extends Controller
         if ($request->hasFile('logo')) {
             $data['logo'] = upload('business/logo', 'png', $data['logo']);
         }
-        $business->update(collect($data)->except(['address', 'settings', 'facilities'])->toArray());
+        $business->update(
+            collect($data)
+                ->except(['address', 'settings', 'facilities'])
+                ->toArray(),
+        );
         $address = $business->address;
         if ($address) {
             $address->update($data['address']);
@@ -139,12 +153,14 @@ class BusinessController extends Controller
             $business->address()->save($address);
         }
         foreach ($data['settings'] as $key => $value) {
-
-            $business->settings()->updateOrCreate([
-                'key' => $key
-            ], [
-                'value' => $value
-            ]);
+            $business->settings()->updateOrCreate(
+                [
+                    'key' => $key,
+                ],
+                [
+                    'value' => $value,
+                ],
+            );
         }
 
         // Handle facilities
@@ -165,19 +181,26 @@ class BusinessController extends Controller
      * @param  \App\Models\Business  $business
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Business $business)
+    public function destroy($businessId)
     {
+        $business = Business::withTrashed()->findOrFail($businessId);
         abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to delete this business');
-        $business->delete();
-        return back()->with('success', 'Business has been moved to inactive. It will be permanently deleted after one month.');
+        if ($business->trashed()) {
+            $location = route('business.index', ['tab' => 'inactive']);
+            $business->forceDelete();
+        } else {
+            $location = route('business.index');
+            $business->delete();
+        }
+        return response()->json(['location' => $location]);
     }
 
     public function restore(Business $business)
     {
         abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to restore this business');
-        
+
         $business->restore();
-        
+
         return back()->with('success', 'Business has been restored successfully.');
     }
 
@@ -205,7 +228,7 @@ class BusinessController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'upload' => 'required|image'
+            'upload' => 'required|image',
         ]);
         $path = upload('content/', 'png', $request->file('upload'));
 
@@ -214,7 +237,7 @@ class BusinessController extends Controller
     public function getFacilities(Request $request)
     {
         $request->validate([
-            'type_id' => 'required|exists:business_types,id'
+            'type_id' => 'required|exists:business_types,id',
         ]);
         $typeId = $request->input('type_id');
         $businessType = BusinessType::with('facilities')->findOrFail($typeId);

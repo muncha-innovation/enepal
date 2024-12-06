@@ -81,7 +81,11 @@ class StoreBusinessRequest extends FormRequest
             SettingKeys::MAX_NOTIFICATION_PER_DAY => 0,
             SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
         ];
-        $data['settings'] = isset($data['settings']) ? $data['settings'] : $default_settings;
+        $data['settings'] = isset($data['settings']) ? $data['settings'] : 
+        $default_settings;
+        if($this->isMethod('post')){
+            $data['created_by'] = auth()->id();
+        }
         return $data;
     }
 }

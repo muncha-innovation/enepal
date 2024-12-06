@@ -6,12 +6,12 @@
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             <div class="mb-4">
-                <a href="{{ route('business.index', ['tab' => 'active']) }}" 
-                   class="@if($tab === 'active') bg-blue-500 text-white @endif px-4 py-2 rounded">
-                    Active
+                <a href="{{ route('business.index', ['tab' => 'active']) }}"
+                    class="@if ($tab === 'active') bg-blue-500 text-white @endif px-4 py-2 rounded">
+                    {{ __('Active') }}
                 </a>
-                <a href="{{ route('business.index', ['tab' => 'inactive']) }}" 
-                   class="@if($tab === 'inactive') bg-blue-500 text-white @endif px-4 py-2 rounded">
+                <a href="{{ route('business.index', ['tab' => 'inactive']) }}"
+                    class="@if ($tab === 'inactive') bg-blue-500 text-white @endif px-4 py-2 rounded">
                     Inactive
                 </a>
             </div>
@@ -48,18 +48,24 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col"
-                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{{__('Name')}}</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{__('Type')}}
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                    {{ __('Name') }}</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    {{ __('Type') }}
                                 </th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    {{__('Location')}}</th>
+                                    {{ __('Location') }}</th>
 
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                    {{__('Verified')}}</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{{__('Action')}}
+                                    {{ __('Verified') }}</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    {{ __('Action') }}
                                 </th>
                                 @role('super-admin')
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" >{{__('Featured')}}</th>
+                                    @if ($tab == 'active')
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                            {{ __('Featured') }}</th>
+                                    @endif
                                 @endrole
                             </tr>
                         </thead>
@@ -67,67 +73,91 @@
                             @foreach ($businesses as $business)
                                 <tr>
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                        {{$business->name}}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->type->title}}</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$business->address?->country->name }}</td>
+                                        {{ $business->name }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ $business->type->title }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ $business->address?->country->name }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         @if ($business->is_verified)
-                                            <span>{{__('Yes')}}</span>
+                                            <span>{{ __('Yes') }}</span>
                                         @else
-                                        <span>{{__('No')}}</span>
+                                            <span>{{ __('No') }}</span>
                                         @endif
                                     </td>
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
+                                    <td class="whitespace-nowrap py-2 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"
                                             class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">View</a>
-                                        <a href="{{route('business.setting', $business)}}"
-                                            class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">Edit<span
-                                                class="sr-only">, {{$business->name}}</span></a>
+                                        @if (!$business->trashed())
+                                            <a href="{{ route('business.setting', $business) }}"
+                                                class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Edit') }}<span
+                                                    class="sr-only">, {{ $business->name }}</span></a>
+                                        @endif
+                                        @if ($business->trashed())
+                                            <form action="{{ route('business.restore', $business) }}" method="POST"
+                                                class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Restore') }}</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('business.destroy', $business) }}"
+                                                class="delete relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Delete') }}</a>
+                                        @endif
+                                        @if ($business->trashed())
+                                            <a href="{{ route('business.destroy', $business) }}"
+                                                class="delete relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Delete') }}</a>
+                                        @endif
                                         @role('super-admin')
-                                        <form action="{{ route('business.verify', $business) }}" method="POST"
-                                            class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">
-                                                @if ($business->is_verified)
-                                                    Unverify
-                                                @else
-                                                    Verify
-                                                @endif
-                                            </button>
-                                        </form>
+                                            @if (!$business->trashed())
+                                                <form action="{{ route('business.verify', $business) }}" method="POST"
+                                                    class="inline">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">
+                                                        @if ($business->is_verified)
+                                                            Unverify
+                                                        @else
+                                                            Verify
+                                                        @endif
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endrole
                                     </td>
                                     @role('super-admin')
-                                    <td>
-                                        <form action="{{ route('business.featured', $business) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">
-                                                @if ($business->is_featured)
-                                                    {{__('Unfeatured')}}
-                                                @else
-                                                    {{__('Featured')}}
-                                                @endif
-                                            </button>
-                                        </form>
-                                        
-                                        
-                                           
-                                    </td>
+                                        @if (!$business->trashed())
+                                            <td>
+                                                <form action="{{ route('business.featured', $business) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">
+                                                        @if ($business->is_featured)
+                                                            {{ __('Unfeatured') }}
+                                                        @else
+                                                            {{ __('Featured') }}
+                                                        @endif
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        @endif
                                     @endrole
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    @if(count($businesses) !== 0)
-            <hr>
-            @endif
-            <div class="page-area">
-                {!! $businesses->links() !!}
-            </div>
+                    @if (count($businesses) !== 0)
+                        <hr>
+                    @endif
+                    <div class="page-area">
+                        {!! $businesses->links() !!}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('js')
+    @include('modules.shared.delete')
+@endpush
