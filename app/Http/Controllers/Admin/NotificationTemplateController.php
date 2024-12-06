@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreNotificationTemplateRequest;
+use App\Models\EmailTemplate;
 use App\Models\NotificationTemplate;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,8 @@ class NotificationTemplateController extends Controller
 {
     //
     public function index() {
-        $templates = NotificationTemplate::all();
+        $templates = EmailTemplate::all();
+        dd($templates);
         return view('admin.notification.template.index', compact(['templates']));
     }
     public function global(Request $request) {
