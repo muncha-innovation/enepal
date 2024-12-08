@@ -78,7 +78,16 @@ class MembersController extends Controller
             $address = new Address($request->address);
             $user->addresses()->save($address);
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
-            event(new MemberAddedToBusiness($user, $business, $password, $request->role));
+            $notify = new NotifyProcess();
+            $notify->setTemplate(SettingKeys::NEW_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+            ->withShortCodes([
+                'role' => $request->role,
+                'business_name' => $business->name,
+                'site_name' => config('app.name'),
+                'password' => $password,
+                'business_message' => $business->custom_email_message,
+            ]);
+            $notify->send();
             return redirect()->route('members.index', $business)->with('success', 'Member Added Successfully');
         
         } else {
