@@ -104,7 +104,7 @@
                                             <a href="{{ route('business.destroy', $business) }}"
                                                 class="delete relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Delete') }}</a>
                                         @endif
-                                        @if ($business->trashed())
+                                        @if ($business->trashed() && $business->created_by !== auth()->id())
                                             <a href="{{ route('business.destroy', $business) }}"
                                                 class="delete relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Delete') }}</a>
                                         @endif
