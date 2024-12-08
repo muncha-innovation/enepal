@@ -34,7 +34,7 @@ class BusinessController extends Controller
         }
 
         if ($tab === 'inactive') {
-            $businesses = $query->withTrashed()->paginate(10);
+            $businesses = $query->onlyTrashed()->paginate(10);
         } else {
             $businesses = $query->active()->paginate(10);
         }
@@ -195,8 +195,10 @@ class BusinessController extends Controller
         return response()->json(['location' => $location]);
     }
 
-    public function restore(Business $business)
+    public function restore($businessId)
     {
+        $business = Business::withTrashed()->findOrFail($businessId);
+        
         abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to restore this business');
 
         $business->restore();

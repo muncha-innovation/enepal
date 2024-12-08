@@ -149,7 +149,7 @@
                                     @endrole
                                     @if($tab == 'inactive')
                                         <td>
-                                            {{ $business->deleted_at->translatedFormat('Y, F d') }}
+                                            {{ $business->deleted_at?->addDays(30)->translatedFormat('Y, F d') }}
                                         </td>
                                     @endif
                                 </tr>
