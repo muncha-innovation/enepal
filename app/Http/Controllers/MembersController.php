@@ -51,6 +51,9 @@ class MembersController extends Controller
                 'business_name' => $business->name,
                 'site_name' => config('app.name'),
                 'business_message' => $business->custom_email_message,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
             ]);
             $notify->send();
             return redirect()->back()->with('success', 'Member Added Successfully');
@@ -86,6 +89,9 @@ class MembersController extends Controller
                 'site_name' => config('app.name'),
                 'password' => $password,
                 'business_message' => $business->custom_email_message,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
             ]);
             $notify->send();
             return redirect()->route('members.index', $business)->with('success', 'Member Added Successfully');
