@@ -10,6 +10,7 @@ use App\Models\BusinessSetting;
 use App\Models\BusinessType;
 use App\Models\Country;
 use App\Models\User;
+use App\Notify\NotifyProcess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -198,7 +199,7 @@ class BusinessController extends Controller
     public function restore($businessId)
     {
         $business = Business::withTrashed()->findOrFail($businessId);
-        
+
         abort_unless($business->created_by === auth()->id(), 403, 'You are not authorized to restore this business');
 
         $business->restore();
@@ -220,6 +221,15 @@ class BusinessController extends Controller
     {
         abort_unless(auth()->user()->hasRole('super-admin'), 403);
         $business->update(['is_verified' => !$business->is_verified]);
+        if ($business->is_verified) {
+            $notify = new NotifyProcess();
+            $notify->setTemplate(SettingKeys::BUSINESS_VERIFICATION_EMAIL)->withShortCodes([
+                'business_name' => $business->name,
+                'site_name' => config('app.name'),
+            ]);
+            $notify->send();
+        }
+
         return back()->with('success', 'Business Verified Successfully');
     }
     public function featured(Request $request, Business $business)

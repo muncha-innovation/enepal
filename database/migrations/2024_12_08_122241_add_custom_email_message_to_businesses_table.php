@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddSoftDeleteToBusinessesTable extends Migration
+class AddCustomEmailMessageToBusinessesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddSoftDeleteToBusinessesTable extends Migration
     public function up()
     {
         Schema::table('businesses', function (Blueprint $table) {
-            $table->softDeletes()->after('updated_at');
+            $table->text('custom_email_message')->nullable();
             //
         });
     }
@@ -27,8 +27,8 @@ class AddSoftDeleteToBusinessesTable extends Migration
     public function down()
     {
         Schema::table('businesses', function (Blueprint $table) {
+            $table->dropColumn('custom_email_message');
             //
-            $table->dropSoftDeletes();
         });
     }
 }

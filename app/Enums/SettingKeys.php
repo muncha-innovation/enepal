@@ -9,5 +9,11 @@ class SettingKeys {
     const WELCOME_EMAIL = 'welcome_email';
     const PASSWORD_RESET_EMAIL = 'password_reset_email';
 
-    const MEMBER_ADDED_TO_BUSINESS_EMAIL = 'member_added_to_business_email';
+    const BUSINESS_VERIFICATION_EMAIL = 'business_verification_email';
+
+    const NEW_MEMBER_INSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL = 'new_member_inside_nepal_added_to_business_email';
+    const NEW_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL = 'new_member_outside_nepal_added_to_business_email';
+    
+    const EXISTING_MEMBER_INSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL = 'existing_member_inside_nepal_added_to_business_email';
+    const EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL = 'existing_member_outside_nepal_added_to_business_email';
 }

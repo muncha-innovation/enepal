@@ -9,7 +9,6 @@ class AddSoftDeletesToBusinessesTable extends Migration
     public function up()
     {
         Schema::table('businesses', function (Blueprint $table) {
-            $table->timestamp('deletion_scheduled_at')->nullable();
             $table->softDeletes();
         });
     }
@@ -18,7 +17,7 @@ class AddSoftDeletesToBusinessesTable extends Migration
     {
         Schema::table('businesses', function (Blueprint $table) {
             $table->dropSoftDeletes();
-            $table->dropColumn('deletion_scheduled_at');
+            
         });
     }
 } 

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SettingKeys;
 use App\Events\MemberAddedToBusiness;
 use App\Models\Address;
 use App\Models\Business;
 use App\Models\Country;
 use App\Models\User;
+use App\Notify\NotifyProcess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -36,16 +38,21 @@ class MembersController extends Controller
         ]);
         $user = User::where('email', $request->email)->first();
         if($user) {
-            $password = '';
-            if($user->force_update_password) {
-                $password = \Str::random(8);
-                $user->password = Hash::make($password);
-                $user->save();
-            }
+            
             $business->users()->detach($user->id);
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
             
-            event(new MemberAddedToBusiness($user, $business, $password, $request->role));
+            // event(new MemberAddedToBusiness($user, $business, $password, $request->role));
+            
+            $notify = new NotifyProcess();
+            $notify->setTemplate(SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+            ->withShortCodes([
+                'role' => $request->role,
+                'business_name' => $business->name,
+                'site_name' => config('app.name'),
+                'business_message' => $business->custom_email_message,
+            ]);
+            $notify->send();
             return redirect()->back()->with('success', 'Member Added Successfully');
         } else if($request->has('member_type')){
             $request->validate([

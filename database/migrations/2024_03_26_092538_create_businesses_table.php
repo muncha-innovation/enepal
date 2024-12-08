@@ -31,8 +31,6 @@ class CreateBusinessesTable extends Migration
             $table->boolean('active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('contact_person_id')->nullable();
-            $table->timestamp('deletion_scheduled_at')->nullable();
-            $table->softDeletes();
             $table->foreign('type_id')->references('id')->on('business_types')->onDelete('set null');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('contact_person_id')->references('id')->on('users')->onDelete('set null');

@@ -35,13 +35,13 @@ class StoreBusinessRequest extends FormRequest
         return [
             'name' => ['required'],
             'email' => ['required', 'email'],
-            'type_id' => ['required',],
+            'type_id' => ['required'],
             'phone_1' => ['required'],
             'active' => ['required'],
             'description' => ['array', 'sometimes'],
             'cover_image' => $coverImageValidation,
             'logo' => $logoValidation,
-            'phone_2'  => ['sometimes'],
+            'phone_2' => ['sometimes'],
             'address.city' => ['sometimes'],
             'address.state_id' => ['sometimes'],
             'address.street' => ['sometimes'],
@@ -57,6 +57,7 @@ class StoreBusinessRequest extends FormRequest
             'settings' => ['sometimes'],
             'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
+            'custom_email_message' => ['sometimes', 'string', 'max:1000'],
         ];
     }
 
@@ -71,6 +72,7 @@ class StoreBusinessRequest extends FormRequest
             'cover_image.required' => 'Business cover image is required',
             'logo.required' => 'Business logo is required',
             'address.country_id.required' => 'Country is required',
+            'custom_email_message.max' => 'Custom email message cannot be longer than 1000 characters',
         ];
     }
 
@@ -81,9 +83,8 @@ class StoreBusinessRequest extends FormRequest
             SettingKeys::MAX_NOTIFICATION_PER_DAY => 0,
             SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
         ];
-        $data['settings'] = isset($data['settings']) ? $data['settings'] : 
-        $default_settings;
-        if($this->isMethod('post')){
+        $data['settings'] = isset($data['settings']) ? $data['settings'] : $default_settings;
+        if ($this->isMethod('post')) {
             $data['created_by'] = auth()->id();
         }
         return $data;
