@@ -87,7 +87,7 @@
                                     </td>
                                     <td class="whitespace-nowrap py-2 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"
-                                            class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">View</a>
+                                            class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">{{__('View')}}</a>
                                         @if (!$business->trashed())
                                             <a href="{{ route('business.setting', $business) }}"
                                                 class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Edit') }}<span
@@ -100,7 +100,7 @@
                                                 <button type="submit"
                                                     class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Restore') }}</button>
                                             </form>
-                                        @else
+                                        @elseif($business->created_by === auth()->id())
                                             <a href="{{ route('business.destroy', $business) }}"
                                                 class="delete relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Delete') }}</a>
                                         @endif
