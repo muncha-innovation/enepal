@@ -13,7 +13,7 @@ class Business extends Model
 {
     use SoftDeletes;
     use HasFactory, HasTranslations;
-    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id'];
+    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message'];
     protected $translatable = ['description'];
     protected $dates = ['deleted_at'];
 
