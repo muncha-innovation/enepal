@@ -69,6 +69,9 @@ class emails
                 'role' => 'Role',
                 'password' => 'Password',
                 'business_message' => 'Business Message',
+                'first_name' => 'First Name',
+                'last_name' => 'Last Name',
+                'email' => 'Email',
             ],
             'subject' => [
                 'en'=> '{{business_name}} - New Member Added',
@@ -93,7 +96,9 @@ class emails
                 'site_name' => 'Site Name',
                 'role' => 'Role',
                 'business_message' => 'Business Message',
-                
+                'first_name' => 'First Name',
+                'last_name' => 'Last Name',
+                'email' => 'Email',
             ],
             'subject' => [
                 'en'=> '{{business_name}} - Existing Member Added',
@@ -119,6 +124,9 @@ class emails
                 'role' => 'Role',
                 'password' => 'Password',
                 'business_message' => 'Business Message',
+                'first_name' => 'First Name',
+                'last_name' => 'Last Name',
+                'email' => 'Email',
             ],
             'subject' => [
                 'en'=> '{{business_name}} - New Member Added',
@@ -143,6 +151,9 @@ class emails
                 'site_name' => 'Site Name',
                 'role' => 'Role',
                 'business_message' => 'Business Message',
+                'first_name' => 'First Name',
+                'last_name' => 'Last Name',
+                'email' => 'Email',
             ],
             'subject' => [
                 'en'=> '{{business_name}} - Existing Member Added',
