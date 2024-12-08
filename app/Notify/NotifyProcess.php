@@ -2,14 +2,10 @@
 
 namespace App\Notify;
 
+use App\Jobs\SendEmailJob;
 use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-// sending mail with queue
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 class NotifyProcess
 {
     protected $template;
@@ -105,22 +101,13 @@ class NotifyProcess
         $subject = $this->replaceShortCodes($subject);
         $fromEmail = $this->replaceShortCodes($this->notificationTemplate->email_sent_from_email);
         $fromName = $this->replaceShortCodes($this->notificationTemplate->email_sent_from_name);
-        // Your existing email sending logic here
-        // Example using Laravel's Mail facade:
         try {
-            Mail::send([], [], function ($message) use ($subject, $body, $fromEmail, $fromName) {
-                $message->to($this->user->email, $this->user->full_name)
-                    ->subject($subject)
-                    ->from(
-                        $fromEmail,
-                        $fromName
-                    )
-                    ->setBody($body, 'text/html');
-            });
+            
+            SendEmailJob::dispatch($subject, $body, $fromEmail, $fromName, $this->user->email, $this->user->full_name);
+
             
             return true;
         } catch (\Exception $e) {
-            dd($e);
             Log::error('Email sending failed: ' . $e->getMessage());
             return false;
         }
