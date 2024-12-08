@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-700 mb-2">Business / Organization</h1>
+    <h1 class="text-2xl font-semibold text-gray-700 mb-2">{{__('Business / Organization')}}</h1>
 
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -12,7 +12,7 @@
                 </a>
                 <a href="{{ route('business.index', ['tab' => 'inactive']) }}"
                     class="@if ($tab === 'inactive') bg-blue-500 text-white @endif px-4 py-2 rounded">
-                    Inactive
+                    {{__('Inactive')}}
                 </a>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                 <a href="{{ route('business.create') }}">
                     <button type="button"
-                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add</button>
+                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{__('Add')}}</button>
                 </a>
             </div>
 
@@ -65,6 +65,10 @@
                                     @if ($tab == 'active')
                                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                             {{ __('Featured') }}</th>
+                                    
+                                    @elseif($tab == 'inactive')
+                                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                            {{ __('Auto Delete On') }}</th>
                                     @endif
                                 @endrole
                             </tr>
@@ -87,7 +91,7 @@
                                     </td>
                                     <td class="whitespace-nowrap py-2 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
                                         <a href="{{ route('business.show', $business) }}"
-                                            class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">{{__('View')}}</a>
+                                            class="bg-indigo-500 text-white relative inline-flex items-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-indigo-500 hover:bg-indigo-600 focus:z-10">{{ __('View') }}</a>
                                         @if (!$business->trashed())
                                             <a href="{{ route('business.setting', $business) }}"
                                                 class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">{{ __('Edit') }}<span
@@ -116,9 +120,9 @@
                                                     <button type="submit"
                                                         class="relative inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-indigo-200 hover:bg-gray-200 focus:z-10">
                                                         @if ($business->is_verified)
-                                                            Unverify
+                                                            {{ __('Unverify') }}
                                                         @else
-                                                            Verify
+                                                            {{ __('Verify') }}
                                                         @endif
                                                     </button>
                                                 </form>
@@ -141,7 +145,13 @@
                                                 </form>
                                             </td>
                                         @endif
+
                                     @endrole
+                                    @if($tab == 'inactive')
+                                        <td>
+                                            {{ $business->deleted_at->translatedFormat('Y, F d') }}
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
