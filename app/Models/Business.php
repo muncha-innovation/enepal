@@ -26,7 +26,10 @@ class Business extends Model
     {
         return $query->whereNull('deleted_at');
     }
-
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
     public function scopeInactive($query)
     {
         return $query->whereNotNull('deleted_at');

@@ -49,6 +49,11 @@ class User extends Authenticatable
 
     const SuperAdmin = 'super-admin';
     const User = 'user';
+
+    public function getFullNameAttribute(): string
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

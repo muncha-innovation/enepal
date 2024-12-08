@@ -90,7 +90,7 @@ class NotifyProcess
         $template = $this->notificationTemplate;
         
         // Get user's preferred locale, fallback to default
-        $locale = $this->user->preferred_locale ?? config('app.locale');
+        $locale = $this->user?->preferred_locale ?? config('app.locale');
         
         $subject = $template->getTranslation('subject', $locale);
         $body = $template->getTranslation('email_body', $locale);
@@ -103,7 +103,7 @@ class NotifyProcess
         // Example using Laravel's Mail facade:
         try {
             Mail::send([], [], function ($message) use ($subject, $body) {
-                $message->to($this->user->email, $this->user->fullname)
+                $message->to($this->user->email, $this->user->full_name)
                     ->subject($subject)
                     ->from(
                         $this->notificationTemplate->email_sent_from_email,

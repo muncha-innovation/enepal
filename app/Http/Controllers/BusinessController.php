@@ -223,9 +223,11 @@ class BusinessController extends Controller
         $business->update(['is_verified' => !$business->is_verified]);
         if ($business->is_verified) {
             $notify = new NotifyProcess();
-            $notify->setTemplate(SettingKeys::BUSINESS_VERIFICATION_EMAIL)->withShortCodes([
-                'business_name' => $business->name,
-                'site_name' => config('app.name'),
+            $notify->setTemplate(SettingKeys::BUSINESS_VERIFICATION_EMAIL)
+                ->setUser($business)
+                ->withShortCodes([
+                    'business_name' => $business->name,
+                    'site_name' => config('app.name'),
             ]);
             $notify->send();
         }

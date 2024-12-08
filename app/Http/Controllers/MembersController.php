@@ -46,6 +46,7 @@ class MembersController extends Controller
             
             $notify = new NotifyProcess();
             $notify->setTemplate(SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+            ->setUser($user)
             ->withShortCodes([
                 'role' => $request->role,
                 'business_name' => $business->name,
@@ -83,6 +84,7 @@ class MembersController extends Controller
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
             $notify = new NotifyProcess();
             $notify->setTemplate(SettingKeys::NEW_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+            ->setUser($user)
             ->withShortCodes([
                 'role' => $request->role,
                 'business_name' => $business->name,
