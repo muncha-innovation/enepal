@@ -26,6 +26,12 @@ class Business extends Model
     {
         return $query->whereNull('deleted_at');
     }
+
+    public function scopeVerified($query)
+    {
+        return $query->where('is_verified', true);
+    }
+
     public function getFullNameAttribute(): string
     {
         return $this->name;

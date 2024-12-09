@@ -18,7 +18,7 @@ class BusinessController extends Controller
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
-        $businesses = Business::query();
+        $businesses = Business::verified()->query();
         if ($typeId) {
             $businesses->where('type_id', $typeId);
         }
@@ -69,7 +69,7 @@ class BusinessController extends Controller
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
 
-        $business = Business::findOrFail($request->business_id);
+        $business = Business::verified()->findOrFail($request->business_id);
         $notices = $business->notices()->limit($limit)->offset($offset)->get();
         return response()->json($notices);
     }
@@ -86,18 +86,18 @@ class BusinessController extends Controller
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
 
-        $business = Business::findOrFail($request->business_id);
+        $business = Business::verified()->findOrFail($request->business_id);
         $galleries = $business->galleries()->limit($limit)->offset($offset)->get();
         return response()->json($galleries);
     }
     public function getById($id)
     {
-        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'notices'])->findOrFail($id));
+        return new BusinessResource(Business::verified()->with(['type', 'address', 'posts', 'products', 'notices'])->findOrFail($id));
     }
 
     public function followUnfollow($businessId)
     {
-        $business = Business::findOrFail($businessId);
+        $business = Business::verified()->findOrFail($businessId);
         $user = $business->users()->where('user_id', auth()->id())->first();
         if (!$user) {
             $business->users()->attach(auth()->id(), [
@@ -122,7 +122,7 @@ class BusinessController extends Controller
     }
 
     public function following() {
-        $businesses = Business::whereHas('users', function($query) {
+        $businesses = Business::verified()->whereHas('users', function($query) {
             $query->where('user_id', auth()->id());
         })->with(['type'])->get();
         
