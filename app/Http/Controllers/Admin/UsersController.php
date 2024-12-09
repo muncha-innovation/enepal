@@ -94,7 +94,7 @@ class UsersController extends Controller
     public function edit(User $user): View
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        $user->load(['address.country', 'roles']);
+        $user->load(['addresses.country', 'roles']);
         return view('admin.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),

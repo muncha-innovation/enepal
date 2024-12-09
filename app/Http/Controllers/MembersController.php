@@ -115,6 +115,11 @@ class MembersController extends Controller
             return response()->json(['message'=> trans('You are not authorized to perform this action')], 403);
 
         }
+        // if memberId is owner, throw error
+        if(Business::find($businessId)->users()->wherePivot('role', 'owner')->wherePivot('user_id', $memberId)->exists()) {
+            return response()->json(['message'=>'Owner cannot be removed'], 403);
+        }
+        
         // if auth user removes himself, throw error
         if(auth()->user()->id == $memberId) {
             return response()->json(['message'=> trans('User cannot be removed')], 403);
