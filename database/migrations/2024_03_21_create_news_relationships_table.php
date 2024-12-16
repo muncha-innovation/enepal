@@ -18,21 +18,30 @@ return new class extends Migration
             $table->unique(['parent_news_id', 'child_news_id']);
         });
 
-        // First drop the foreign key constraint
+        // First check if the foreign key exists before trying to drop it
         Schema::table('news_items', function (Blueprint $table) {
-            $table->dropForeign(['main_news_id']);
-        });
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $foreignKeys = $sm->listTableForeignKeys('news_items');
+            $foreignKeyExists = collect($foreignKeys)->contains(function($fk) {
+                return $fk->getName() === 'news_items_main_news_id_foreign';
+            });
 
-        // Then drop the column
-        Schema::table('news_items', function (Blueprint $table) {
-            $table->dropColumn('main_news_id');
+            if ($foreignKeyExists) {
+                $table->dropForeign('news_items_main_news_id_foreign');
+            }
+
+            if (Schema::hasColumn('news_items', 'main_news_id')) {
+                $table->dropColumn('main_news_id');
+            }
         });
     }
 
     public function down()
     {
+        // First drop the relationships table
         Schema::dropIfExists('news_relationships');
         
+        // Then add back the main_news_id column
         Schema::table('news_items', function (Blueprint $table) {
             $table->foreignId('main_news_id')->nullable()->constrained('news_items')->nullOnDelete();
         });
