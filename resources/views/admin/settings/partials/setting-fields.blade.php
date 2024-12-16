@@ -8,7 +8,7 @@
             @endphp
 
             @if (is_array($value))
-                @foreach ($value as $fieldKey => $fieldValue)
+                @foreach ($value as $fieldKey => $fieldValue) 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             {{ $formatLabel($fieldKey) }}
@@ -27,7 +27,7 @@
                         @else
                             <input type="text"
                                 name="settings[{{ $type }}][{{ $key }}][{{ $fieldKey }}]"
-                                value="{{ $fieldValue }}"
+                                value="{{ is_array($fieldValue) ? json_encode($fieldValue) : $fieldValue }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                         @endif
                     </div>
@@ -39,7 +39,7 @@
                     </label>
                     <input type="text"
                         name="settings[{{ $type }}][{{ $key }}]"
-                        value="{{ $value }}"
+                        value="{{ is_array($value) ? json_encode($value) : $value }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 </div>
             @endif

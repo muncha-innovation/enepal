@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "386b2246ab3b44e397842091608ad77a",
+    "content-hash": "88151aa1ba3009d4def71db17d742fc5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2436,6 +2436,69 @@
                 }
             ],
             "time": "2022-05-21T17:30:32+00:00"
+        },
+        {
+            "name": "kalnoy/nestedset",
+            "version": "v6.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lazychaser/laravel-nestedset.git",
+                "reference": "d81102c980b9962516c0fd8fda21dd916a23a3d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lazychaser/laravel-nestedset/zipball/d81102c980b9962516c0fd8fda21dd916a23a3d7",
+                "reference": "d81102c980b9962516c0fd8fda21dd916a23a3d7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0",
+                "php": "^7.2.5|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "7.*|8.*|9.*|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Kalnoy\\Nestedset\\NestedSetServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "v5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kalnoy\\Nestedset\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander Kalnoy",
+                    "email": "lazychaser@gmail.com"
+                }
+            ],
+            "description": "Nested Set Model for Laravel 5.7 and up",
+            "keywords": [
+                "database",
+                "hierarchy",
+                "laravel",
+                "nested sets",
+                "nsm"
+            ],
+            "support": {
+                "issues": "https://github.com/lazychaser/laravel-nestedset/issues",
+                "source": "https://github.com/lazychaser/laravel-nestedset/tree/v6.0.4"
+            },
+            "time": "2024-04-08T06:10:42+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -6368,6 +6431,82 @@
             "time": "2024-08-30T07:09:40+00:00"
         },
         {
+            "name": "simplepie/simplepie",
+            "version": "1.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simplepie/simplepie.git",
+                "reference": "a567b8ab9b6145a23e6a9ec2b6b74f56d52f7ad1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/a567b8ab9b6145a23e6a9ec2b6b74f56d52f7ad1",
+                "reference": "a567b8ab9b6145a23e6a9ec2b6b74f56d52f7ad1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcre": "*",
+                "ext-xml": "*",
+                "ext-xmlreader": "*",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.19 || ^3.8",
+                "psr/simple-cache": "^1 || ^2 || ^3",
+                "yoast/phpunit-polyfills": "^1.0.1"
+            },
+            "suggest": {
+                "ext-curl": "",
+                "ext-iconv": "",
+                "ext-intl": "",
+                "ext-mbstring": "",
+                "mf2/mf2": "Microformat module that allows for parsing HTML for microformats"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "SimplePie": "library"
+                },
+                "psr-4": {
+                    "SimplePie\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Ryan Parman",
+                    "homepage": "http://ryanparman.com/",
+                    "role": "Creator, alumnus developer"
+                },
+                {
+                    "name": "Sam Sneddon",
+                    "homepage": "https://gsnedders.com/",
+                    "role": "Alumnus developer"
+                },
+                {
+                    "name": "Ryan McCue",
+                    "email": "me@ryanmccue.info",
+                    "homepage": "http://ryanmccue.info/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple Atom/RSS parsing library for PHP",
+            "homepage": "http://simplepie.org/",
+            "keywords": [
+                "atom",
+                "feeds",
+                "rss"
+            ],
+            "support": {
+                "issues": "https://github.com/simplepie/simplepie/issues",
+                "source": "https://github.com/simplepie/simplepie/tree/1.8.1"
+            },
+            "time": "2024-11-22T16:33:20+00:00"
+        },
+        {
             "name": "spatie/enum",
             "version": "3.13.0",
             "source": {
@@ -9400,6 +9539,67 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.2.7"
             },
             "time": "2023-12-08T13:03:43+00:00"
+        },
+        {
+            "name": "vedmant/laravel-feed-reader",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vedmant/laravel-feed-reader.git",
+                "reference": "d44fe8010026cc541443bc56c69c8dd89c4b12b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vedmant/laravel-feed-reader/zipball/d44fe8010026cc541443bc56c69c8dd89c4b12b3",
+                "reference": "d44fe8010026cc541443bc56c69c8dd89c4b12b3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "php": ">=5.6.0",
+                "simplepie/simplepie": "^1.8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7.0",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FeedReader": "Vedmant\\FeedReader\\Facades\\FeedReader"
+                    },
+                    "providers": [
+                        "Vedmant\\FeedReader\\FeedReaderServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vedmant\\FeedReader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vedmant",
+                    "email": "vedmant@gmail.com"
+                },
+                {
+                    "name": "Andrew Judd",
+                    "email": "contact@andrewjudd.ca"
+                }
+            ],
+            "description": "A simple RSS feed reader for Laravel",
+            "support": {
+                "issues": "https://github.com/vedmant/laravel-feed-reader/issues",
+                "source": "https://github.com/vedmant/laravel-feed-reader/tree/1.6.1"
+            },
+            "time": "2024-03-13T03:27:20+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

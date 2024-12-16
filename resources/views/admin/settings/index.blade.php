@@ -63,7 +63,6 @@
                                      x-transition:enter-start="opacity-0 transform scale-95"
                                      x-transition:enter-end="opacity-100 transform scale-100"
                                      class="space-y-6">
-                                    
                                     @include('admin.settings.partials.setting-fields', [
                                         'typeSettings' => $typeSettings,
                                         'type' => $type,

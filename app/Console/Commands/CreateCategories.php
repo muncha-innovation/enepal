@@ -69,13 +69,14 @@ class CreateCategories extends Command
             'Human Rights',
         ];
         foreach($categories as $category) {
-            $existing = \App\Models\Category::where('title', $category)->first();
+            $existing = \App\Models\NewsCategory::where('name', $category)->first();
             if(!empty($existing)) {
                 continue;
             }
-            \App\Models\Category::create([
-                'title' => $category,
-                'slug' => Str::slug($category)
+            \App\Models\NewsCategory::create([
+                'name' => $category,
+                'slug' => Str::slug($category),
+                'type' => 'category'
             ]);
         }
     }

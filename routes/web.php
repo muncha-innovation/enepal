@@ -17,6 +17,10 @@ use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\NewsSourceController;
+use App\Http\Controllers\NewsCategoryController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsCurationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,6 +152,32 @@ Route::get(
 
 Route::get('send/mail', function() {
     Mail::to('cooloozewall@gmail.com')->send(new \App\Mail\TestMail());
+});
+
+// News Management Routes
+Route::middleware(['auth', 'role:super-admin'])->prefix('admin')->name('admin.')->group(function () {
+    // News Sources
+    Route::resource('news-sources', NewsSourceController::class);
+    
+    // News Categories
+    Route::resource('news-categories', NewsCategoryController::class);
+    
+    // News Items
+    Route::get('news/curation', [NewsController::class, 'curation'])->name('news.curation');
+    Route::post('news/{news}/curate', [NewsController::class, 'curate'])->name('news.curate');
+    Route::resource('news', NewsController::class);
+    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image');
+    Route::get('news/{news}/manage-related', [NewsController::class, 'manageRelated'])->name('news.manage-related');
+    Route::post('news/{news}/related/{related}', [NewsController::class, 'addRelated'])->name('news.add-related');
+    Route::delete('news/{news}/related/{related}', [NewsController::class, 'removeRelated'])->name('news.remove-related');
+    Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');
+});
+
+// Public News Routes
+Route::prefix('news')->name('news.')->group(function () {
+    Route::get('/', [NewsController::class, 'publicIndex'])->name('public.index');
+    Route::get('/{newsItem}', [NewsController::class, 'publicShow'])->name('public.show');
+    Route::get('/category/{category}', [NewsController::class, 'publicCategory'])->name('public.category');
 });
 
 require __DIR__ . '/auth.php';

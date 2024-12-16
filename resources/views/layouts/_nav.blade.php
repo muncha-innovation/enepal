@@ -1,12 +1,15 @@
 @php
     $isUserRoute = str_contains(url()->current(), 'user');
     $isProfileRoute = str_contains(url()->current(), 'profile');
-
     $isBusinessRoute = str_contains(url()->current(), 'business');
     $isBusinessTypesRoute = str_contains(url()->current(), 'businessTypes');
     $isFacilitiesRoute = str_contains(url()->current(), 'facilities');
     $isSettingsRoute = str_contains(url()->current(), 'settings');
     $isTemplatesRoute = str_contains(url()->current(), 'template');
+    $isLanguageRoute = str_contains(url()->current(), 'language');
+    $isNewsSourcesRoute = str_contains(url()->current(), 'news-sources');
+    $isNewsRoute = str_contains(url()->current(), 'news') && !str_contains(url()->current(), 'news-sources') && !str_contains(url()->current(), 'news-categories');
+    $isNewsCategoriesRoute = str_contains(url()->current(), 'news-categories');
     if (!$isBusinessRoute) {
         $isBusinessRoute = 0;
     }
@@ -200,6 +203,97 @@
                 </div>
             </div>
         @endrole
+        @role('super-admin')
+            <div x-data="{ open: {{ $isNewsSourcesRoute ? 1 : 0 }} }" class="space-y-1">
+                <button type="button" x-on:click="open = !open"
+                    class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
+                    <div class="flex items-center">
+                        <svg class="mr-3 text-gray-500" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 11.5A2.5 2.5 0 0 1 9.5 9 2.5 2.5 0 0 1 12 6.5 2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5m0-9.5A7 7 0 0 0 5 9c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Z"/>
+                        </svg>
+                        {{ __('News Sources') }}
+                    </div>
+                    <svg x-bind:class="!open ? '' : 'rotate-90'"
+                        class="flex-shrink-0 w-5 h-5 text-gray-500 transition-colors duration-150 ease-in-out transform group-hover:text-gray-400"
+                        viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+                <div x-show="open" class="space-y-1">
+                    <a href="{{ route('admin.news-sources.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (request()->routeIs('admin.news-sources.*')) bg-gray-200 @endif">
+                        {{ __('List') }}
+                    </a>
+                    <a href="{{ route('admin.news-sources.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
+                        {{ __('Create') }}
+                    </a>
+                </div>
+            </div>
+
+            <div x-data="{ open: {{ $isNewsRoute ? 1 : 0 }} }" class="space-y-1">
+                <button type="button" x-on:click="open = !open"
+                    class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
+                    <div class="flex items-center">
+                        <svg class="mr-3 text-gray-500" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 3H4c-1.1 0-1.99.9-1.99 2L2 19c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H5c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1z"/>
+                            <path d="M14 6h-4c-.55 0-1 .45-1 1s.45 1 1 1h4c.55 0 1-.45 1-1s-.45-1-1-1zm0 4h-4c-.55 0-1 .45-1 1s.45 1 1 1h4c.55 0 1-.45 1-1s-.45-1-1-1z"/>
+                        </svg>
+                        {{ __('News') }}
+                    </div>
+                    <svg x-bind:class="!open ? '' : 'rotate-90'"
+                        class="flex-shrink-0 w-5 h-5 text-gray-500 transition-colors duration-150 ease-in-out transform group-hover:text-gray-400"
+                        viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+                <div x-show="open" class="space-y-1">
+                    <a href="{{ route('admin.news.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (request()->routeIs('admin.news.index')) bg-gray-200 @endif">
+                        {{ __('List') }}
+                    </a>
+                    <a href="{{ route('admin.news.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
+                        {{ __('Create') }}
+                    </a>
+                    {{-- <a href="{{ route('admin.news.curation') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
+                        {{ __('Curation') }}
+                    </a> --}}
+                </div>
+            </div>
+
+            <div x-data="{ open: {{ $isNewsCategoriesRoute ? 1 : 0 }} }" class="space-y-1">
+                <button type="button" x-on:click="open = !open"
+                    class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
+                    <div class="flex items-center">
+                        <svg class="mr-3 text-gray-500" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm10 0h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM10 13H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm7 0a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+                        </svg>
+                        {{ __('News Categories') }}
+                    </div>
+                    <svg x-bind:class="!open ? '' : 'rotate-90'"
+                        class="flex-shrink-0 w-5 h-5 text-gray-500 transition-colors duration-150 ease-in-out transform group-hover:text-gray-400"
+                        viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+                <div x-show="open" class="space-y-1">
+                    <a href="{{ route('admin.news-categories.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (request()->routeIs('admin.news-categories.index')) bg-gray-200 @endif">
+                        {{ __('List') }}
+                    </a>
+                    <a href="{{ route('admin.news-categories.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
+                        {{ __('Create') }}
+                    </a>
+                </div>
+            </div>
+        @endrole
+
         @role('super-admin')
             <div x-data="{ open: {{ $isSettingsRoute }} }" class="space-y-1">
                 <a href="{{ route('admin.settings.index') }}"
