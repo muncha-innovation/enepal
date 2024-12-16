@@ -66,20 +66,34 @@ class NewsController extends Controller
     public function update(Request $request, NewsItem $news)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'source_id' => 'required|exists:news_sources,id',
-            'categories' => 'sometimes|array',
-            'categories.*' => 'exists:news_categories,id',
-            'published_at' => 'required|date',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'url' => 'nullable|url',
+            'source_id' => 'nullable|exists:news_sources,id',
+            'published_at' => 'nullable|date',
             'is_active' => 'boolean',
-            'image' => 'nullable|string'
+            'image' => 'nullable|string',
+            'language' => 'nullable|string|max:4',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:news_categories,id'
         ]);
 
-        $news->update($validated);
-        $news->categories()->sync($request->categories);
+        // Remove categories from the update data since it's handled separately
+        $updateData = collect($validated)
+            ->except(['categories'])
+            ->filter(function($value) {
+                return $value !== null;
+            })
+            ->toArray();
 
-        return redirect()->route('admin.news.index')->with('success', 'News updated successfully');
+        $news->update($updateData);
+
+        // Update categories if they are present in the request
+        if (isset($validated['categories'])) {
+            $news->categories()->sync($validated['categories']);
+        }
+
+        return back()->with('success', 'News updated successfully');
     }
 
     public function destroy(NewsItem $news)
@@ -169,29 +183,31 @@ class NewsController extends Controller
     }
 
     public function manageRelated(NewsItem $news)
-    {
-        $subNews = $news->isMainNews() 
-            ? $news->childNews()
-                ->when(request('search'), function($query) {
-                    $query->where('news_items.title', 'like', '%' . request('search') . '%');
-                })
-                ->latest()
-                ->paginate(10)
-            : collect();
+{
+    $subNews = $news->isMainNews() 
+        ? $news->childNews()
+            ->when(request('search'), function($query) {
+                $query->where('news_items.title', 'like', '%' . request('search') . '%');
+            })
+            ->latest()
+            ->paginate(10)
+        : collect();
 
-        $availableNews = !$news->isSubNews() 
-            ? NewsItem::where('news_items.id', '!=', $news->id)
-                ->whereDoesntHave('parentNews')
-                ->where('news_items.source_id', $news->source_id)
-                ->when(request('available_search'), function($query) {
-                    $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
-                })
-                ->latest()
-                ->paginate(10)
-            : collect();
+    $availableNews = !$news->isSubNews() 
+        ? NewsItem::where('news_items.id', '!=', $news->id)
+            ->whereDoesntHave('parentNews')
+            ->where('news_items.source_id', $news->source_id)
+            ->when(request('available_search'), function($query) {
+                $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
+            })
+            ->latest()
+            ->paginate(10)
+        : collect();
 
-        return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews'));
-    }
+    $categories = NewsCategory::get()->groupBy('type');
+
+    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories'));
+}
 
     public function addRelated(NewsItem $news, NewsItem $related)
     {
