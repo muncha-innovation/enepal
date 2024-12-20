@@ -6,6 +6,9 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\BusinessTypesController;
 use App\Http\Controllers\Admin\FacilitiesController;
 use App\Http\Controllers\Admin\NotificationTemplateController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsCategoryController;
+use App\Http\Controllers\NewsSourceController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -18,4 +21,24 @@ Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin',
     Route::put('settings', [BusinessSettingController::class, 'update'])->name('settings.update');
     Route::match(['get', 'post'], 'templates/global', [NotificationTemplateController::class, 'global'])->name('templates.global');
     Route::resource('templates', NotificationTemplateController::class);
+    // News Sources
+    Route::resource('news-sources', NewsSourceController::class);
+    
+    // News Categories
+    Route::resource('news-categories', NewsCategoryController::class);
+    
+    // News Items - Special Routes First
+    Route::get('news/search-tags', [NewsController::class, 'searchTags'])->name('news.search-tags');
+    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image');
+    Route::post('news/fetch', [NewsController::class, 'fetch'])->name('news.fetch');
+    
+    // News Items - Resource Routes
+    Route::get('news/{news}/manage-related', [NewsController::class, 'manageRelated'])->name('news.manage-related');
+    Route::post('news/{news}/related/{related}', [NewsController::class, 'addRelated'])->name('news.add-related');
+    Route::delete('news/{news}/related/{related}', [NewsController::class, 'removeRelated'])->name('news.remove-related');
+    Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');
+    Route::put('news/{news}/categories', [NewsController::class, 'updateCategories'])->name('news.update-categories');
+    
+    // Main Resource Route Last
+    Route::resource('news', NewsController::class);
 });

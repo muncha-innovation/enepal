@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "API Documentation",
+    "version": "1.0.0",
+    "description": "Complete API documentation with sample requests and responses"
+  },
+  "endpoints": {
+    "auth": {
+      "login": {
+        "url": "/api/login",
+        "method": "POST",
+        "description": "Authenticate user and get token",
+        "request": {
+          "body": {
+            "email": "user@example.com",
+            "password": "password123"
+          }
+        },
+        "response": {
+          "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        }
+      },
+      "register": {
+        "url": "/api/register",
+        "method": "POST",
+        "request": {
+          "body": {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "password": "password123",
+            "password_confirmation": "password123"
+          }
+        },
+        "response": {
+          "message": "Registration successful",
+          "user": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com"
+          }
+        }
+      },
+      "password_reset": {
+        "url": "/api/password/reset",
+        "method": "POST",
+        "request": {
+          "body": {
+            "email": "user@example.com"
+          }
+        },
+        "response": {
+          "message": "Password reset link sent"
+        }
+      }
+    },
+    "countries": {
+      "list": {
+        "url": "/api/countries",
+        "method": "GET",
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "name": "United States",
+              "code": "US"
+            }
+          ]
+        }
+      },
+      "states": {
+        "url": "/api/countries/{country}/states",
+        "method": "GET",
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "name": "California",
+              "code": "CA"
+            }
+          ]
+        }
+      }
+    },
+    "news": {
+      "list": {
+        "url": "/api/v1/news",
+        "method": "GET",
+        "query_params": {
+          "page": "1"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "title": "Sample News Title",
+              "description": "News description here",
+              "url": "https://example.com/news/1",
+              "image": "https://example.com/images/news1.jpg",
+              "published_at": "2024-03-20T10:00:00Z",
+              "source": {
+                "id": 1,
+                "name": "News Source",
+                "logo": "https://example.com/logo.png"
+              },
+              "categories": [
+                {
+                  "id": 1,
+                  "name": "Technology",
+                  "type": "category"
+                }
+              ],
+              "tags": [
+                {
+                  "id": 1,
+                  "name": "tech"
+                }
+              ]
+            }
+          ],
+          "meta": {
+            "current_page": 1,
+            "total": 50,
+            "per_page": 20
+          }
+        }
+      },
+      "recommendations": {
+        "url": "/api/v1/news/recommendations",
+        "method": "GET",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "query_params": {
+          "latitude": "27.7172",
+          "longitude": "85.3240",
+          "limit": "20"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "title": "Recommended News",
+              "description": "Personalized news content",
+              "url": "https://example.com/news/1",
+              "image": "https://example.com/images/news1.jpg",
+              "published_at": "2024-03-20T10:00:00Z",
+              "source": {
+                "id": 1,
+                "name": "News Source"
+              },
+              "categories": [
+                {
+                  "id": 1,
+                  "name": "Local News"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "by_category": {
+        "url": "/api/v1/news/categories/{category}",
+        "method": "GET",
+        "query_params": {
+          "page": "1"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "title": "Category News",
+              "description": "News in specific category"
+            }
+          ],
+          "meta": {
+            "current_page": 1,
+            "total": 30,
+            "per_page": 20
+          }
+        }
+      },
+      "by_tag": {
+        "url": "/api/v1/news/tags/{tag}",
+        "method": "GET",
+        "query_params": {
+          "page": "1"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "title": "Tagged News",
+              "description": "News with specific tag"
+            }
+          ],
+          "meta": {
+            "current_page": 1,
+            "total": 20,
+            "per_page": 20
+          }
+        }
+      }
+    },
+    "user": {
+      "profile": {
+        "url": "/api/user",
+        "method": "GET",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "response": {
+          "id": 1,
+          "name": "John Doe",
+          "email": "john@example.com"
+        }
+      },
+      "fcm_token": {
+        "url": "/api/fcm/update",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "request": {
+          "body": {
+            "fcm_token": "firebase_cloud_messaging_token_here"
+          }
+        },
+        "response": {
+          "message": "FCM Token updated successfully"
+        }
+      },
+      "toggle_news_preference": {
+        "url": "/api/news-preferences/toggle/{category}",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "response": {
+          "success": true
+        }
+      }
+    },
+    "business": {
+      "list": {
+        "url": "/api/businesses",
+        "method": "GET",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "name": "Business Name",
+              "type": "Business Type",
+              "address": "Business Address"
+            }
+          ]
+        }
+      },
+      "types": {
+        "url": "/api/business/types",
+        "method": "GET",
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "name": "Restaurant"
+            }
+          ]
+        }
+      },
+      "following": {
+        "url": "/api/business/user/following",
+        "method": "GET",
+        "headers": {
+          "Authorization": "Bearer {token}"
+        },
+        "response": {
+          "data": [
+            {
+              "id": 1,
+              "name": "Followed Business"
+            }
+          ]
+        }
+      }
+    }
+  }
+} 

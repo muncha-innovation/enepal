@@ -1,0 +1,138 @@
+{
+    "info": {
+      "name": "News API",
+      "description": "API documentation for the News System",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "News",
+        "description": "News related endpoints",
+        "item": [
+          {
+            "name": "Get News List",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/v1/news",
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1",
+                    "description": "Page number for pagination"
+                  }
+                ]
+              },
+              "description": "Get paginated list of active news items"
+            }
+          },
+          {
+            "name": "Get News Item",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/v1/news/:newsItem",
+                "variables": [
+                  {
+                    "key": "newsItem",
+                    "value": "",
+                    "description": "ID of the news item"
+                  }
+                ]
+              },
+              "description": "Get details of a specific news item"
+            }
+          },
+          {
+            "name": "Get News by Category",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/v1/news/categories/:category",
+                "variables": [
+                  {
+                    "key": "category",
+                    "value": "",
+                    "description": "ID of the category"
+                  }
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1",
+                    "description": "Page number for pagination"
+                  }
+                ]
+              },
+              "description": "Get news items filtered by category"
+            }
+          },
+          {
+            "name": "Get News by Tag",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/v1/news/tags/:tag",
+                "variables": [
+                  {
+                    "key": "tag",
+                    "value": "",
+                    "description": "ID of the tag"
+                  }
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1",
+                    "description": "Page number for pagination"
+                  }
+                ]
+              },
+              "description": "Get news items filtered by tag"
+            }
+          },
+          {
+            "name": "Get News Recommendations",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{base_url}}/api/v1/news/recommendations",
+                "query": [
+                  {
+                    "key": "latitude",
+                    "value": "",
+                    "description": "Latitude for location-based recommendations"
+                  },
+                  {
+                    "key": "longitude",
+                    "value": "",
+                    "description": "Longitude for location-based recommendations"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "20",
+                    "description": "Number of recommendations to return"
+                  }
+                ]
+              },
+              "description": "Get personalized news recommendations",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "description": "JWT token for authentication"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8000",
+        "type": "string"
+      }
+    ]
+  }

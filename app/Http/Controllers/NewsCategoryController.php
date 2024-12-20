@@ -10,13 +10,13 @@ class NewsCategoryController extends Controller
 {
     public function index()
     {
-        $categories = NewsCategory::with('parent')->latest()->paginate(20);
+        $categories = NewsCategory::with('parent')->orderBy('name')->latest()->paginate(20);
         return view('modules.news.categories.index', compact('categories'));
     }
 
     public function create()
     {
-        $categories = NewsCategory::get();
+        $categories = NewsCategory::orderBy('name')->get();
         return view('modules.news.categories.create', compact('categories'));
     }
 

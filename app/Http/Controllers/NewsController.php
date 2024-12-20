@@ -33,8 +33,7 @@ class NewsController extends Controller
     public function create()
     {
         $sources = NewsSource::where('is_active', true)->get();
-        $categories = NewsCategory::get()->groupBy('type');
-
+        $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
         return view('modules.news.create', compact('sources', 'categories'));
     }
 
@@ -211,7 +210,7 @@ class NewsController extends Controller
         ->latest()
         ->paginate(10);
 
-    $categories = NewsCategory::get()->groupBy('type');
+    $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
 
     return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories'));
 }
