@@ -23,7 +23,7 @@ class NewsController extends Controller
             ->when(request('source'), function($query) {
                 $query->where('source_id', request('source'));
             })
-            ->latest()
+            ->latest('published_at')
             ->paginate(20)
             ->withQueryString();
             
