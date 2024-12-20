@@ -6,7 +6,12 @@
         @foreach ($news->parentNews as $parent)
             <div class="flex items-center justify-between mb-4">
                 <div class="flex-1">
-                    <h4 class="text-base font-medium">{{ $parent->title }}</h4>
+                    <h4 class="text-base font-medium">
+                        <a href="{{ route('admin.news.manage-related', $parent) }}"
+                            class="text-blue-600 hover:underline">
+                        {{ $parent->title }}
+                    </a>
+                    </h4>
                     <p class="text-sm text-gray-500">{{ $parent->published_at->format('Y-m-d H:i') }}</p>
                 </div>
                 <a href="{{ route('admin.news.manage-related', $parent) }}"

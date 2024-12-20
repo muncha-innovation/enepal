@@ -17,7 +17,13 @@
             <div class="p-4">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
-                        <h3 class="text-lg font-medium">{{ $availableNewsItem->title }}</h3>
+                        <h3 class="text-lg font-medium">
+
+                            <a href="{{ route('admin.news.manage-related', $availableNewsItem) }}"
+                            class="text-blue-600 hover:underline">
+                        {{ $availableNewsItem->title }}
+                    </a>
+                        </h3>
                         <p class="text-sm text-gray-500">
                             {{ $availableNewsItem->published_at->format('Y-m-d H:i') }}</p>
                     </div>
