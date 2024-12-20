@@ -15,6 +15,37 @@ class UpdateNewsFeed extends Command
      * @var string
      */
     protected $signature = 'fetch:news';
+    protected $defaultSources = [
+        // [
+        //     'name' => 'BBC News',
+        //     'url' => 'https://feeds.bbci.co.uk/news/rss.xml',
+        //     'is_active' => true,
+        // ],
+        // [
+        //     'name' => 'CNN',
+        //     'url' => 'https://rss.cnn.com/rss/edition.rss',
+        //     'is_active' => true,
+        // ],
+        [
+            'name' => 'Ratopati',
+            'url' => 'https://www.ratopati.com/feed',
+            'is_active' => true,
+            'language' => 'np',
+        ],
+        [
+            'name' => 'Setopati',
+            'url' => 'https://www.setopati.com/feed',
+            'is_active' => true,
+            'language' => 'np',
+        ],
+        
+        [
+            'name' => 'Setopati English',
+            'url' => 'https://en.setopati.com/feed',
+            'is_active' => true,
+            'language' => 'en',
+        ]
+    ];
 
     /**
      * The console command description.
@@ -40,6 +71,7 @@ class UpdateNewsFeed extends Command
      */
     public function handle()
     {
+        $this->updateSources();
         $sources = NewsSource::where('is_active', true)->get();
 
         foreach ($sources as $source) {
@@ -50,7 +82,15 @@ class UpdateNewsFeed extends Command
         $this->info('News fetched successfully');
         return 0;
     }
-
+    private function updateSources()
+    {
+        $sources = NewsSource::all();
+        if ($sources->isEmpty()) {
+            foreach ($this->defaultSources as $source) {
+                NewsSource::create($source);
+            }
+        }
+    }
     private function fetchNewsFromSource(NewsSource $source)
     {
         $reader = FeedReader::read($source->url);
@@ -65,6 +105,7 @@ class UpdateNewsFeed extends Command
                 $newsItem->source_id = $source->id;
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $item->get_enclosure()->thumbnails[0] ?? null;
+                $newsItem->language = $source->language;
                 $newsItem->save();
             } else {
                 $newsItem = new NewsItem();
@@ -72,13 +113,13 @@ class UpdateNewsFeed extends Command
                 $newsItem->description = $item->get_description();
                 $newsItem->url = $item->get_link();
                 $newsItem->published_at = $item->get_date();
+                $newsItem->is_active = false;
                 $newsItem->source_id = $source->id;
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $item->get_enclosure()->thumbnails[0] ?? null;
+                $newsItem->language = $source->language;
                 $newsItem->save();
             }
-
-            
         }
     }
 }

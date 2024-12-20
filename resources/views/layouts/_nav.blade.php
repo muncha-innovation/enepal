@@ -258,10 +258,6 @@
                         class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
                         {{ __('Create') }}
                     </a>
-                    {{-- <a href="{{ route('admin.news.curation') }}"
-                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900">
-                        {{ __('Curation') }}
-                    </a> --}}
                 </div>
             </div>
 

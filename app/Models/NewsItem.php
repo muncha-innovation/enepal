@@ -8,11 +8,12 @@ class NewsItem extends Model
 {
     protected $fillable = [
         'source_id', 'title', 'description', 'url', 'image',
-        'published_at', 'id', 'original_id'
+        'published_at', 'id', 'original_id','is_active'
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function parentNews()
@@ -46,4 +47,14 @@ class NewsItem extends Model
     {
         return $this->belongsToMany(NewsCategory::class, 'news_item_category');
     }
-} 
+
+    public function locations()
+    {
+        return $this->hasMany(NewsLocation::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(NewsTag::class, 'news_item_tag');
+    }
+}

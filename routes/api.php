@@ -11,9 +11,11 @@ use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\NoticeController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PostsController;
-use App\Http\Controllers\API\PreferencesController;
+use App\Http\Controllers\API\AddressPreferencesController;
 use App\Http\Controllers\API\ProductsController;
 use App\Http\Controllers\API\UsersController;
+use App\Http\Controllers\API\NewsApiController;
+use App\Http\Controllers\Api\NewsRecommendationController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
@@ -59,13 +61,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
     });
-    Route::group(['prefix' => 'preferences'], function() {
-        Route::get('fetch', [PreferencesController::class, 'fetch']);
-        Route::post('update', [PreferencesController::class, 'update']);
-        Route::post(uri: 'address/update', action: [PreferencesController::class, 'updateAddress']);
+    Route::group(['prefix' => 'address/preferences'], function() {
+        Route::get('fetch', [AddressPreferencesController::class, 'fetch']);
+        Route::post('update', [AddressPreferencesController::class, 'update']);
+        Route::post(uri: 'address/update', action: [AddressPreferencesController::class, 'updateAddress']);
     });
+
 
 });
 
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
+
+Route::prefix('v1')->group(function () {
+    Route::prefix('news')->group(function () {
+        Route::get('recommendations', [NewsRecommendationController::class, 'index']);
+        Route::get('/', [NewsApiController::class, 'index']);
+        Route::get('categories/{category}', [NewsApiController::class, 'category']);
+        Route::get('tags/{tag}', [NewsApiController::class, 'tag']);
+        Route::get('{newsItem}', [NewsApiController::class, 'show']);
+    });
+});

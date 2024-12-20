@@ -85,10 +85,6 @@ class User extends Authenticatable
     {
         return $this->fcm_token;
     }
-    public function addresses(): MorphMany
-    {
-        return $this->morphMany(related: Address::class, name: 'addressable');
-    }
 
     public function primaryAddress(): MorphOne
     {
@@ -130,6 +126,9 @@ class User extends Authenticatable
         $this->preferredCategories()->toggle($category_id);
     }
 
-
+    public function addresses()
+    {
+        return $this->morphMany(Address::class, 'addressable');
+    }
 
 }

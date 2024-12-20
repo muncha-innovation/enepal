@@ -9,10 +9,11 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Business;
 use App\Models\Category;
 use App\Models\Country;
+use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-class PreferencesController extends Controller
+class AddressPreferencesController extends Controller
 {
     public function fetch(Request $request): array {
         $data = [];
@@ -23,7 +24,7 @@ class PreferencesController extends Controller
 
         // todo: refactor
         $data['businesses'] = BusinessResource::collection(resource: Business::following()->with(relations: ['type'])->get());
-        $data['categories'] = CategoryResource::collection(resource: Category::all());
+        $data['categories'] = CategoryResource::collection(resource: NewsCategory::all());
         return $data;
         
     }

@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\NewsSourceController;
 use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\NewsController;
-use App\Http\Controllers\NewsCurationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,15 +161,20 @@ Route::middleware(['auth', 'role:super-admin'])->prefix('admin')->name('admin.')
     // News Categories
     Route::resource('news-categories', NewsCategoryController::class);
     
-    // News Items
-    Route::get('news/curation', [NewsController::class, 'curation'])->name('news.curation');
-    Route::post('news/{news}/curate', [NewsController::class, 'curate'])->name('news.curate');
-    Route::resource('news', NewsController::class);
+    // News Items - Special Routes First
+    Route::get('news/search-tags', [NewsController::class, 'searchTags'])->name('news.search-tags');
     Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload-image');
+    Route::post('news/fetch', [NewsController::class, 'fetch'])->name('news.fetch');
+    
+    // News Items - Resource Routes
     Route::get('news/{news}/manage-related', [NewsController::class, 'manageRelated'])->name('news.manage-related');
     Route::post('news/{news}/related/{related}', [NewsController::class, 'addRelated'])->name('news.add-related');
     Route::delete('news/{news}/related/{related}', [NewsController::class, 'removeRelated'])->name('news.remove-related');
     Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');
+    Route::put('news/{news}/categories', [NewsController::class, 'updateCategories'])->name('news.update-categories');
+    
+    // Main Resource Route Last
+    Route::resource('news', NewsController::class);
 });
 
 // Public News Routes

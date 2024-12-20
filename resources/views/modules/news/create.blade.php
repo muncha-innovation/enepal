@@ -21,3 +21,8 @@
     </form>
 </div>
 @endsection 
+@section('js')
+    @include('modules.news.partials._upload_scripts')
+    @include('modules.news.partials._map_scripts')
+    @include('modules.news.partials._tag_scripts')
+@endsection

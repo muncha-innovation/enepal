@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\NewsItem;
 use App\Models\NewsCategory;
 use App\Models\NewsSource;
+use App\Models\NewsTag;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Http\Requests\StoreNewsRequest;
+use Illuminate\Support\Facades\Artisan;
 
 class NewsController extends Controller
 {
@@ -36,21 +38,42 @@ class NewsController extends Controller
         return view('modules.news.create', compact('sources', 'categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreNewsRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'content' => 'required|string',
-            'source_id' => 'required|exists:news_sources,id',
-            'categories' => 'required|array',
-            'categories.*' => 'exists:news_categories,id',
-            'published_at' => 'nullable|date',
-            'is_active' => 'boolean'
-        ]);
+        $validated = $request->validated();
+        
+        // Remove locations and categories from the data going into news_items table
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags'])->toArray();
+        
+        $news = NewsItem::create($newsData);
 
-        $news = NewsItem::create($validated);
-        $news->categories()->sync($request->categories);
+        if (isset($validated['categories'])) {
+            $news->categories()->sync($validated['categories']);
+        }
+
+        if (isset($validated['tags'])) {
+            foreach ($validated['tags'] as $tagName) {
+                $tag = NewsTag::firstOrCreate(
+                    ['name' => $tagName],
+                    ['usage_count' => 0]
+                );
+                $tag->increment('usage_count');
+            }
+            
+            $tagIds = NewsTag::whereIn('name', $validated['tags'])->pluck('id');
+            $news->tags()->sync($tagIds);
+        }
+
+        if (isset($validated['locations'])) {
+            foreach ($validated['locations'] as $locationData) {
+                $news->locations()->create([
+                    'name' => $locationData['name'],
+                    'latitude' => $locationData['latitude'],
+                    'longitude' => $locationData['longitude'],
+                    'radius' => $locationData['radius']
+                ]);
+            }
+        }
 
         return redirect()->route('admin.news.index')->with('success', 'News created successfully');
     }
@@ -63,34 +86,46 @@ class NewsController extends Controller
         return view('modules.news.edit', compact('news', 'sources', 'categories'));
     }
 
-    public function update(Request $request, NewsItem $news)
+    public function update(StoreNewsRequest $request, NewsItem $news)
     {
-        $validated = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'url' => 'nullable|url',
-            'source_id' => 'nullable|exists:news_sources,id',
-            'published_at' => 'nullable|date',
-            'is_active' => 'boolean',
-            'image' => 'nullable|string',
-            'language' => 'nullable|string|max:4',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:news_categories,id'
-        ]);
+        $validated = $request->validated();
+        
+        // Remove locations and categories from the data going into news_items table
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags'])->toArray();
+        
+        $news->update($newsData);
 
-        // Remove categories from the update data since it's handled separately
-        $updateData = collect($validated)
-            ->except(['categories'])
-            ->filter(function($value) {
-                return $value !== null;
-            })
-            ->toArray();
-
-        $news->update($updateData);
-
-        // Update categories if they are present in the request
         if (isset($validated['categories'])) {
             $news->categories()->sync($validated['categories']);
+        }
+
+        if (isset($validated['tags'])) {
+            foreach ($validated['tags'] as $tagName) {
+                $tag = NewsTag::firstOrCreate(
+                    ['name' => $tagName],
+                    ['usage_count' => 0]
+                );
+                $tag->increment('usage_count');
+            }
+            
+            $tagIds = NewsTag::whereIn('name', $validated['tags'])->pluck('id');
+            $news->tags()->sync($tagIds);
+        }
+
+        // Handle locations
+        if (isset($validated['locations'])) {
+            // Delete existing locations
+            $news->locations()->delete();
+            
+            // Create new locations
+            foreach ($validated['locations'] as $locationData) {
+                $news->locations()->create([
+                    'name' => $locationData['name'],
+                    'latitude' => $locationData['latitude'],
+                    'longitude' => $locationData['longitude'],
+                    'radius' => $locationData['radius']
+                ]);
+            }
         }
 
         return back()->with('success', 'News updated successfully');
@@ -98,8 +133,12 @@ class NewsController extends Controller
 
     public function destroy(NewsItem $news)
     {
+        $currentPage = request()->get('page', 1);
         $news->delete();
-        return redirect()->route('admin.news.index')->with('success', 'News deleted successfully');
+        
+        return redirect()
+            ->route('admin.news.index', ['page' => $currentPage])
+            ->with('success', 'News deleted successfully');
     }
 
     public function uploadImage(Request $request)
@@ -153,56 +192,24 @@ class NewsController extends Controller
         return view('modules.news.show', compact('news'));
     }
 
-    public function curation()
-    {
-        $uncuratedNews = NewsItem::with(['source', 'categories'])
-            ->latest()
-            ->paginate(20);
 
-        $categories = NewsCategory::get()->groupBy('type');
-
-        return view('modules.news.curation.index', compact('uncuratedNews', 'categories'));
-    }
-
-    public function curate(Request $request, NewsItem $news)
-    {
-        $validated = $request->validate([
-            'categories' => 'required|array',
-            'categories.*' => 'exists:news_categories,id',
-            'main_news_id' => 'nullable|exists:news_items,id'
-        ]);
-
-        $news->categories()->sync($request->categories);
-        if ($request->main_news_id) {
-            $news->main_news_id = $request->main_news_id;
-        }
-        $news->curated_at = now();
-        $news->save();
-
-        return redirect()->back()->with('success', 'News curated successfully');
-    }
 
     public function manageRelated(NewsItem $news)
 {
-    $subNews = $news->isMainNews() 
-        ? $news->childNews()
-            ->when(request('search'), function($query) {
-                $query->where('news_items.title', 'like', '%' . request('search') . '%');
-            })
-            ->latest()
-            ->paginate(10)
-        : collect();
+    $subNews = $news->childNews()
+        ->when(request('search'), function($query) {
+            $query->where('news_items.title', 'like', '%' . request('search') . '%');
+        })
+        ->latest()
+        ->paginate(10);
 
-    $availableNews = !$news->isSubNews() 
-        ? NewsItem::where('news_items.id', '!=', $news->id)
-            ->whereDoesntHave('parentNews')
-            ->where('news_items.source_id', $news->source_id)
-            ->when(request('available_search'), function($query) {
-                $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
-            })
-            ->latest()
-            ->paginate(10)
-        : collect();
+    $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
+        ->where('news_items.source_id', $news->source_id)
+        ->when(request('available_search'), function($query) {
+            $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
+        })
+        ->latest()
+        ->paginate(10);
 
     $categories = NewsCategory::get()->groupBy('type');
 
@@ -211,11 +218,14 @@ class NewsController extends Controller
 
     public function addRelated(NewsItem $news, NewsItem $related)
     {
-        if ($related->isMainNews()) {
-            return back()->with('error', 'Cannot add a main news as sub-news.');
-        }
+        \DB::transaction(function() use ($news, $related) {
+            // Detach the related news from its current parents
+            $related->parentNews()->detach();
 
-        $news->childNews()->attach($related->id);
+            // Attach the related news as sub-news without removing existing child news
+            $news->childNews()->syncWithoutDetaching($related->id);
+        });
+
         return back()->with('success', 'Related news added successfully');
     }
 
@@ -253,5 +263,75 @@ class NewsController extends Controller
         });
 
         return back()->with('success', 'News promoted to main news successfully');
+    }
+
+    // Add this new method to handle category updates
+    public function updateCategories(Request $request, NewsItem $news)
+    {
+        $validated = $request->validate([
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:news_categories,id'
+        ]);
+
+        $news->categories()->sync($validated['categories'] ?? []);
+
+        // Update categories for sub-news
+        if ($news->isMainNews()) {
+            foreach ($news->childNews as $subNews) {
+                // Merge existing sub-news categories with main news categories
+                $existingCategories = $subNews->categories->pluck('id')->toArray();
+                $newCategories = array_unique(array_merge($existingCategories, $validated['categories'] ?? []));
+                $subNews->categories()->sync($newCategories);
+            }
+        }
+
+        return back()->with('success', 'Categories updated successfully');
+    }
+
+    public function searchTags(Request $request)
+    {
+        $search = $request->get('q');
+        $tags = NewsTag::where('name', 'like', "%{$search}%")
+            ->orderBy('usage_count', 'desc')
+            ->limit(10)
+            ->get();
+        return response()->json($tags);
+    }
+
+    public function updateTags(Request $request, NewsItem $news)
+    {
+        $validated = $request->validate([
+            'tags' => 'required|array',
+            'tags.*' => 'string|max:50'
+        ]);
+
+        foreach ($validated['tags'] as $tagName) {
+            $tag = NewsTag::firstOrCreate(
+                ['name' => $tagName],
+                ['usage_count' => 0]
+            );
+            $tag->increment('usage_count');
+        }
+
+        $tagIds = NewsTag::whereIn('name', $validated['tags'])->pluck('id');
+        $news->tags()->sync($tagIds);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function fetch(Request $request)
+    {
+        try {
+            // Call the artisan command
+            Artisan::call('fetch:news');
+            
+            return redirect()
+                ->route('admin.news.index')
+                ->with('success', 'News fetch initiated successfully.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.news.index')
+                ->with('error', 'Failed to fetch news: ' . $e->getMessage());
+        }
     }
 }
