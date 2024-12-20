@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('fetch:news')
-                ->hourly()
+        ->hourly()
                 ->withoutOverlapping()
                 ->appendOutputTo(storage_path('logs/fetch-news.log'));
     }

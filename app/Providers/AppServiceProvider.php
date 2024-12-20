@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Facility;
+use Illuminate\Support\Facades\URL;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        
+
         Model::unguard();
 
         Schema::defaultStringLength(191);
@@ -45,5 +49,9 @@ class AppServiceProvider extends ServiceProvider
     
             return false;
         });
+
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
