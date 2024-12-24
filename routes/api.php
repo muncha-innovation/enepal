@@ -1,21 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\Auth\LoginController;
-use App\Http\Controllers\API\Auth\RegistrationController;
-use App\Http\Controllers\API\Auth\ResetPasswordController;
-use App\Http\Controllers\API\BusinessController;
-use App\Http\Controllers\API\BusinessTypesController;
-use App\Http\Controllers\API\CountryController;
-use App\Http\Controllers\API\GalleryController;
-use App\Http\Controllers\API\NoticeController;
-use App\Http\Controllers\API\NotificationController;
-use App\Http\Controllers\API\PostsController;
-use App\Http\Controllers\API\AddressPreferencesController;
-use App\Http\Controllers\API\ProductsController;
-use App\Http\Controllers\API\UsersController;
-use App\Http\Controllers\API\NewsApiController;
-use App\Http\Controllers\API\NewsRecommendationController;
+use App\Http\Controllers\ApiAuth\LoginController;
+use App\Http\Controllers\ApiAuth\RegistrationController;
+use App\Http\Controllers\ApiAuth\ResetPasswordController;
+use App\Http\Controllers\APIS\BusinessController;
+use App\Http\Controllers\APIS\BusinessTypesController;
+use App\Http\Controllers\APIS\CountryController;
+use App\Http\Controllers\APIS\GalleryController;
+use App\Http\Controllers\APIS\NoticeController;
+use App\Http\Controllers\APIS\NotificationController;
+use App\Http\Controllers\APIS\PostsController;
+use App\Http\Controllers\APIS\AddressPreferencesController;
+use App\Http\Controllers\APIS\ProductsController;
+use App\Http\Controllers\APIS\UsersController;
+use App\Http\Controllers\APIS\NewsApiController;
+use App\Http\Controllers\APIS\NewsRecommendationController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
