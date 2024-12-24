@@ -26,7 +26,6 @@ class NewsRecommendationController extends Controller
         $recommendations = $service->getRecommendations(
             limit: $validated['limit'] ?? 20
         );
-
         return NewsResource::collection($recommendations);
     }
 } 

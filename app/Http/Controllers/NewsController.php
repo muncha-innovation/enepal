@@ -211,7 +211,7 @@ class NewsController extends Controller
         ->paginate(10);
 
     $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
-
+    
     return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories'));
 }
 

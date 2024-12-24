@@ -22,10 +22,10 @@ class NewsRecommendationService
 
     public function getRecommendations(int $limit = 20)
     {
-        $query = NewsItem::with(['categories', 'tags', 'source', 'locations'])
+        $query = NewsItem::with(['categories', 'tags', 'source', 'locations','childNews'])
             ->where('is_active', true)
             ->latest('published_at');
-
+        
         // Apply location-based filtering if coordinates are provided
         if ($this->currentLat && $this->currentLng) {
             $query->whereHas('locations', function (Builder $query) {

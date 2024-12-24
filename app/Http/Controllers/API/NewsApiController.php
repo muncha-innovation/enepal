@@ -22,7 +22,7 @@ class NewsApiController extends Controller
 
     public function show(NewsItem $newsItem)
     {
-        return new NewsResource($newsItem->load(['categories', 'tags', 'source']));
+        return new NewsResource($newsItem->load(['categories', 'tags', 'source','childNews']));
     }
 
     public function category(NewsCategory $category)

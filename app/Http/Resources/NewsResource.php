@@ -11,7 +11,7 @@ class NewsResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'content' => $this->content,
+            'content' => $this->description,
             'url' => $this->url,
             'image' => $this->image,
             'published_at' => $this->published_at,
@@ -43,6 +43,7 @@ class NewsResource extends JsonResource
                     'radius' => $location->radius,
                 ];
             }),
+            'subnews' => NewsResource::collection($this->whenLoaded('childNews')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
