@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegistrationController;
-use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\BusinessController;
 use App\Http\Controllers\API\BusinessTypesController;
 use App\Http\Controllers\API\CountryController;
@@ -15,7 +15,7 @@ use App\Http\Controllers\API\AddressPreferencesController;
 use App\Http\Controllers\API\ProductsController;
 use App\Http\Controllers\API\UsersController;
 use App\Http\Controllers\API\NewsApiController;
-use App\Http\Controllers\Api\NewsRecommendationController;
+use App\Http\Controllers\API\NewsRecommendationController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
