@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingKeys;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Models\Country;
 use App\Models\User;
+use App\Notify\NotifyProcess;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -68,8 +70,17 @@ class UsersController extends Controller
 
         $user->addresses()->create($address);
         $user->assignRole($validated->get('role'));
-        // todo: send email to user with their password
-        // todo: make email templates configurable from admin panel
+        $notify = new NotifyProcess();
+        $notify->setTemplate(SettingKeys::WELCOME_EMAIL)
+            ->setUser($user)
+            ->withShortCodes([
+                'site_name' => config('app.name'),
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'password' => $data['password'],
+            ]);
+        $notify->send();
         return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
     }
 

@@ -27,6 +27,7 @@ MAIL_FROM_NAME="${APP_NAME}"
     // 2. Add title to images
     // 3. Replace generalsettings table with business settings as we already have this.
     4. Vendor can create categories for their users and segment them.
+    convert url to text. for string it is too long in news
     5. Implement uuid instead of id
     6. Business members permissions need to be refined
     //7. Business archiving and auto delete after 30 days 
