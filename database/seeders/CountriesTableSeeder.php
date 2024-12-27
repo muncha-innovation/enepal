@@ -15,7 +15,11 @@ class CountriesTableSeeder extends Seeder
      */
     public function run()
     {        
-        $this->seedAll();   
+        if(config('app.env') == 'local'){
+            $this->seedNepal();
+        } else {
+            $this->seedAll();   
+        }
         
     }
 

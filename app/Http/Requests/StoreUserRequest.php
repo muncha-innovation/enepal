@@ -65,7 +65,6 @@ class StoreUserRequest extends FormRequest
 
     protected function passedValidation()
     {
-
         if ($this->input('password')) {
             $this->merge([
                 'password' => Hash::make($this->password),
@@ -73,17 +72,20 @@ class StoreUserRequest extends FormRequest
         } else if ($this->route()->getName() == 'profile.update') {
         
         } else {
+            $password = \Str::random(8);
             $this->merge([
-                'password' => Hash::make('password'),
+                'password' => Hash::make($password),
+                'original_password' => $password,
             ]);
         }
         return $this;
     }
     public function validated(): array
     {
+        
         $final = parent::validated();
         if ($this->input('password')) {
-            $final = array_merge($final, ['password' => $this->input('password')]);
+            $final = array_merge($final, ['password' => $this->input('password'), 'original_password' => $this->input('original_password')]);
         } else {
             unset($final['password']);
         }

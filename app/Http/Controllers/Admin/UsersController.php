@@ -55,6 +55,7 @@ class UsersController extends Controller
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
 
         $data = $request->validated();
+
         if ($request->hasFile('image')) {
             $data['profile_picture'] = upload(
                 'profile/',
@@ -65,7 +66,7 @@ class UsersController extends Controller
         }
         $validated = collect($data);
 
-        $user = User::create($validated->except(['address', 'role'])->toArray());
+        $user = User::create($validated->except(['address', 'role', 'original_password'])->toArray());
         $address = $validated->get('address');
 
         $user->addresses()->create($address);
@@ -78,7 +79,7 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
-                'password' => $data['password'],
+                'password' => $data['original_password'],
             ]);
         $notify->send();
         return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
