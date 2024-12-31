@@ -36,9 +36,7 @@ Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin',
     Route::get('news/{news}/manage-related', [NewsController::class, 'manageRelated'])->name('news.manage-related');
     Route::post('news/{news}/related/{related}', [NewsController::class, 'addRelated'])->name('news.add-related');
     Route::delete('news/{news}/related/{related}', [NewsController::class, 'removeRelated'])->name('news.remove-related');
-    Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');
-    Route::put('news/{news}/categories', [NewsController::class, 'updateCategories'])->name('news.update-categories');
-    
+    Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');    
     // Main Resource Route Last
     Route::resource('news', NewsController::class);
 });

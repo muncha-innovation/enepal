@@ -14,8 +14,7 @@
                     </form>
                 </div>
 
-                <!-- Categories Section -->
-                @include('modules.news.partials._categories_form')
+                
             </div>
 
             <!-- Right Column - Related News Management -->

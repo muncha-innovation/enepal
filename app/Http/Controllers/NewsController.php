@@ -264,28 +264,6 @@ class NewsController extends Controller
         return back()->with('success', 'News promoted to main news successfully');
     }
 
-    // Add this new method to handle category updates
-    public function updateCategories(Request $request, NewsItem $news)
-    {
-        $validated = $request->validate([
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:news_categories,id'
-        ]);
-
-        $news->categories()->sync($validated['categories'] ?? []);
-
-        // Update categories for sub-news
-        if ($news->isMainNews()) {
-            foreach ($news->childNews as $subNews) {
-                // Merge existing sub-news categories with main news categories
-                $existingCategories = $subNews->categories->pluck('id')->toArray();
-                $newCategories = array_unique(array_merge($existingCategories, $validated['categories'] ?? []));
-                $subNews->categories()->sync($newCategories);
-            }
-        }
-
-        return back()->with('success', 'Categories updated successfully');
-    }
 
     public function searchTags(Request $request)
     {

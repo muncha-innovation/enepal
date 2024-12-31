@@ -42,6 +42,9 @@ class StoreNewsRequest extends FormRequest
         if(empty($validated['tags'])) {
             $validated['tags'] = [];
         }
+        if(empty($validated['categories'])) {
+            $validated['categories'] = [];
+        }
         return $validated;
     }
 }
