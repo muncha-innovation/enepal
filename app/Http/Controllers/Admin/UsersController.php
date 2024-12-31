@@ -137,7 +137,7 @@ class UsersController extends Controller
         }
         $validated = collect($data);
 
-        $user->update($validated->except(['address', 'role'])->toArray());
+        $user->update($validated->except(['address', 'role','original_password'])->toArray());
         $address = $validated->get('address');
         $user->addresses()->update($address);
         $user->syncRoles([$validated->get('role')]);

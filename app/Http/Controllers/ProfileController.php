@@ -23,7 +23,7 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $data = collect($request->validated());
-        $userData = $data->except('address')->toArray();
+        $userData = $data->except(['address','original_password'])->toArray();
         if ($request->hasFile('profile_picture')) {
             $userData['profile_picture'] = upload('profile/', 'png', $request->file('profile_picture'));
         }

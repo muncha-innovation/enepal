@@ -16,7 +16,7 @@ class RegistrationController extends Controller
     {
         $data = collect($request->validated());
 
-        $user = User::create($data->except('address')->toArray());
+        $user = User::create($data->except(['address','original_password'])->toArray());
         $user->assignRole('user');
         $address = new Address($data->get('address'));
         $user->addresses()->save($address);
