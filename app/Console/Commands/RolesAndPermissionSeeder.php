@@ -40,7 +40,7 @@ class RolesAndPermissionSeeder extends Command
      */
     public function handle(): int
     {
-        $roles = ['super-admin','user'];
+        $roles = ['super-admin', 'user'];
         foreach ($roles as $role) {
             if (!Role::where('name', $role)->exists()) {
                 Role::create(['name' => $role,]);
@@ -58,21 +58,22 @@ class RolesAndPermissionSeeder extends Command
             $user->assignRole('super-admin');
             $this->info('email: admin@admin.com password: password');
         }
-       
-        $users=User::all();
+
+        $users = User::all();
         foreach ($users as $user) {
+
             // if user is not super admin, assign user role
-            if(Arr::first($user->getRoleNames()->toArray())!='super-admin'){ {
-                $user->syncRoles(['user']);
+            if (Arr::first($user->getRoleNames()->toArray()) != 'super-admin') { {
+                    $user->syncRoles(['user']);
+                }
             }
         }
         $roles = Role::all();
-        foreach($roles as $role){
-            if($role->name!='super-admin' && $role->name!='user'){
+        foreach ($roles as $role) {
+            if ($role->name != 'super-admin' && $role->name != 'user') {
                 $role->delete();
             }
         }
         return 0;
     }
-}
 }
