@@ -11,9 +11,9 @@ use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\NewsSourceController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
-   
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UsersController::class);
     Route::resource('businessTypes', BusinessTypesController::class);
     Route::resource('facilities', FacilitiesController::class);
