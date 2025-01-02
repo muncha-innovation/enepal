@@ -8,7 +8,7 @@ class NewsItem extends Model
 {
     protected $fillable = [
         'source_id', 'title', 'description', 'url', 'image',
-        'published_at', 'id', 'original_id','is_active'
+        'published_at', 'id', 'original_id','is_active','min_age','max_age'
     ];
 
     protected $casts = [
@@ -56,5 +56,10 @@ class NewsItem extends Model
     public function tags()
     {
         return $this->belongsToMany(NewsTag::class, 'news_item_tag');
+    }
+
+    public function genders()
+    {
+        return $this->belongsToMany(UserGender::class, 'news_item_gender','news_item_id','gender_id');
     }
 }

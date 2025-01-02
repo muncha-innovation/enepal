@@ -106,7 +106,6 @@ class BusinessController extends Controller
     public function show(Business $business)
     {
         //
-        $b = $business;
         return view('modules.business.show', compact('business'));
     }
 

@@ -6,6 +6,7 @@ use App\Models\NewsItem;
 use App\Models\NewsCategory;
 use App\Models\NewsSource;
 use App\Models\NewsTag;
+use App\Models\UserGender;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreNewsRequest;
 use Illuminate\Support\Facades\Artisan;
@@ -81,8 +82,9 @@ class NewsController extends Controller
     {
         $sources = NewsSource::where('is_active', true)->get();
         $categories = NewsCategory::get()->groupBy('type');
+        $genders = UserGender::all();
 
-        return view('modules.news.edit', compact('news', 'sources', 'categories'));
+        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders'));
     }
 
     public function update(StoreNewsRequest $request, NewsItem $news)
@@ -126,6 +128,9 @@ class NewsController extends Controller
                 ]);
             }
         }
+
+        // Sync genders
+        $news->genders()->sync($request->input('genders', []));
 
         return back()->with('success', 'News updated successfully');
     }
@@ -211,8 +216,8 @@ class NewsController extends Controller
         ->paginate(10);
 
     $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
-    
-    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories'));
+    $genders = UserGender::all();
+    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories','genders'));
 }
 
     public function addRelated(NewsItem $news, NewsItem $related)

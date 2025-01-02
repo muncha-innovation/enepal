@@ -72,6 +72,7 @@
         @endif
     </div>
     @include('modules.news.partials._categories_form')
+    @include('modules.news.partials._gender_form')
     <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Tags</label>
         <div class="mt-1">
