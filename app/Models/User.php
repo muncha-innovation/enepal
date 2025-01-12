@@ -54,6 +54,10 @@ class User extends Authenticatable
     {
         return $this->first_name . ' ' . $this->last_name;
     }
+    public function getLogoAttribute(): string
+    {
+        return $this->profile_picture ? Storage::url($this->profile_picture) : '';
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

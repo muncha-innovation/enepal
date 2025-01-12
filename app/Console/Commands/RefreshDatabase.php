@@ -50,6 +50,7 @@ class RefreshDatabase extends Command
         $this->call('fetch:news');
         $this->call('seed:age');
         $this->call('seed:gender');
+        $this->call('db:seed');
         return 0;
     }
 }

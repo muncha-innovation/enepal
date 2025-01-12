@@ -17,9 +17,9 @@ class NewsResource extends JsonResource
             'published_at' => $this->published_at,
             'is_active' => $this->is_active,
             'source' => [
-                'id' => $this->source->id,
-                'name' => $this->source->name,
-                'logo' => $this->source->logo,
+                'id' => $this->sourceable->id,
+                'name' => $this->sourceable->name,
+                'logo' => $this->sourceable?->logo,
             ],
             'categories' => $this->categories->map(function($category) {
                 return [
