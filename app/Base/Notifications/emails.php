@@ -28,7 +28,83 @@ class emails
             ],
             'email_body' => [
                 'en' =>
-                    '<p>Dear &lt;Name&gt;,</p><p><br></p><p>Namaste and welcome to Enepali. </p><p><br></p><ul><li style="text-align: left;">We are thrilled to have you join our community of Nepalese living abroad. Our mission is to connect you to with businesses and news that matter to you, no matter where you are in the world.</li></ul><p><br></p><p>What We Offer:</p><p>Local Businesses: Discover Nepalese-owned businesses and services catering to you in your area.</p><p>New Updates: Stay informed with the latest news and events from Nepal and the Nepalese community around you.</p><p><br></p><p>We are committed to providing you with a platform that keeps you connected to your roots while helping you thrive in your new environment. Your feedback is invaluable to us, so please feel free to share your thoughts and suggestions.</p><p><br></p><p>Thank you for being a part of our growing family. We look forward to serving you and making your experience with Enepali enriching and enjoyable.</p><p><br></p><p>Warm regards,</p><p><br></p><p>...</p><p>Enepali.com</p><p><br></p><p>ps: If you haven\'t done so yet, you can download our app through the links below:</p><p><span style="background-color: transparent; color: inherit; font-family: inherit; font-size: 16px;"><br></span></p><p><span style="background-color: transparent; color: inherit; font-family: inherit; font-size: 16px;">Download for Android</span></p><p><span style="background-color: transparent; color: inherit; font-family: inherit; font-size: 16px;"><br></span><span style="background-color: transparent; color: inherit; font-family: inherit; font-size: 16px;">Download for iOS</span></p><p><br></p><ul><li><br></li></ul>',
+                '<p>
+                    Dear {{first_name}}
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    Namaste and welcome to Enepali.
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    We are thrilled to have you join our community of Nepalese living abroad. Our mission is to connect you to with businesses and news that matter to you, no matter where you are in the world.
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    Your password is {{password}}
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    What We Offer:
+                    </p>
+                    <p>
+                    Local Businesses: Discover Nepalese-owned businesses and services catering to you in your area.
+                    </p>
+                    <p>
+                    New Updates: Stay informed with the latest news and events from Nepal and the Nepalese community around you.
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    We are committed to providing you with a platform that keeps you connected to your roots while helping you thrive in your new environment. Your feedback is invaluable to us, so please feel free to share your thoughts and suggestions.
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    Thank you for being a part of our growing family. We look forward to serving you and making your experience with Enepali enriching and enjoyable.
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    Warm regards,
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    ...
+                    </p>
+                    <p>
+                    Enepali.com
+                    </p>
+                    <p>
+                    &nbsp;
+                    </p>
+                    <p>
+                    ps: If you haven\'t done so yet, you can download our app through the links below:
+                    </p>
+                    <p>
+                    <br>
+                    &nbsp;
+                    </p>
+                    <p>
+                    <span style="background-color:transparent;color:inherit;font-family:inherit;font-size:16px;">Download for Android</span>
+                    </p>
+                    <p>
+                    <br>
+                    <span style="background-color:transparent;color:inherit;font-family:inherit;font-size:16px;">Download for iOS</span>
+                    </p>',
                 'np' => '',
             ],
         ],
@@ -41,7 +117,7 @@ class emails
 
             'name' => 'Reset Password Email',
             'action' => SettingKeys::PASSWORD_RESET_EMAIL,
-            
+
             'email_status' => 1,
             'sms_status' => 0,
             'push_status' => 0,
@@ -74,8 +150,8 @@ class emails
                 'email' => 'Email',
             ],
             'subject' => [
-                'en'=> '{{business_name}} - New Member Added',
-                'np'=> '{{business_name}} - New Member Added',
+                'en' => '{{business_name}} - New Member Added',
+                'np' => '{{business_name}} - New Member Added',
             ],
             'email_body' => [
                 'en' => '',
@@ -101,8 +177,8 @@ class emails
                 'email' => 'Email',
             ],
             'subject' => [
-                'en'=> '{{business_name}} - Existing Member Added',
-                'np'=> '{{business_name}} - Existing Member Added',
+                'en' => '{{business_name}} - Existing Member Added',
+                'np' => '{{business_name}} - Existing Member Added',
             ],
             'email_body' => [
                 'en' => '',
@@ -129,8 +205,8 @@ class emails
                 'email' => 'Email',
             ],
             'subject' => [
-                'en'=> '{{business_name}} - New Member Added',
-                'np'=> '{{business_name}} - New Member Added',
+                'en' => '{{business_name}} - New Member Added',
+                'np' => '{{business_name}} - New Member Added',
             ],
             'email_body' => [
                 'en' => '',
@@ -139,7 +215,7 @@ class emails
         ],
         SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL => [
             'action' => SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL,
-                'name' => 'Existing Member Outside Nepal Added to Business Email',
+            'name' => 'Existing Member Outside Nepal Added to Business Email',
             'email_status' => 1,
             'sms_status' => 0,
             'push_status' => 0,
@@ -156,8 +232,8 @@ class emails
                 'email' => 'Email',
             ],
             'subject' => [
-                'en'=> '{{business_name}} - Existing Member Added',
-                'np'=> '{{business_name}} - Existing Member Added',
+                'en' => '{{business_name}} - Existing Member Added',
+                'np' => '{{business_name}} - Existing Member Added',
             ],
             'email_body' => [
                 'en' => '',
@@ -179,8 +255,8 @@ class emails
                 'site_name' => 'Site Name',
             ],
             'subject' => [
-                'en'=> '{{business_name}} - Business Verification',
-                'np'=> '{{business_name}} - Business Verification',
+                'en' => '{{business_name}} - Business Verification',
+                'np' => '{{business_name}} - Business Verification',
             ],
             'email_body' => [
                 'en' => '',
