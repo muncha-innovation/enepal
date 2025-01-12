@@ -53,10 +53,18 @@
         </div>
     </div>
 
-    <div class="flex items-center">
-        <input type="checkbox" name="is_active" id="is_active" value="1" {{ $news->is_active ? 'checked' : '' }}
-            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-        <label for="is_active" class="ml-2 text-sm text-gray-700">Active</label>
+    <div class="flex items-center space-x-4">
+        <div class="flex items-center">
+            <input type="checkbox" name="is_active" id="is_active" value="1" {{ $news->is_active ? 'checked' : '' }}
+                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <label for="is_active" class="ml-2 text-sm text-gray-700">Active</label>
+        </div>
+        
+        <div class="flex items-center">
+            <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ $news->is_featured ? 'checked' : '' }}
+                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <label for="is_featured" class="ml-2 text-sm text-gray-700">Featured</label>
+        </div>
     </div>
 
     <div class="mb-6">
@@ -73,6 +81,33 @@
     </div>
     @include('modules.news.partials._categories_form')
     @include('modules.news.partials._gender_form')
+
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Age Groups</label>
+        <div class="mt-2 space-y-2">
+            @foreach($ageGroups as $ageGroup)
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           name="age_groups[]" 
+                           value="{{ $ageGroup->id }}"
+                           id="age-group-{{ $ageGroup->id }}"
+                           @if($news->exists) 
+                               @if($news->ageGroups->contains($ageGroup->id)) checked @endif
+                           @else
+                               checked
+                           @endif
+                           class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <label for="age-group-{{ $ageGroup->id }}" class="ml-2 text-sm text-gray-700">
+                        {{ $ageGroup->name }}
+                    </label>
+                </div>
+            @endforeach
+        </div>
+        @error('age_groups')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
     <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Tags</label>
         <div class="mt-1">
@@ -122,4 +157,4 @@ $(document).ready(function() {
     });
 });
 </script>
-@endpush 
+@endpush

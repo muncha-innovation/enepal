@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddAgeRangeToNewsTable extends Migration
+class AddIsFeaturedToNewsItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,7 @@ class AddAgeRangeToNewsTable extends Migration
     public function up()
     {
         Schema::table('news_items', function (Blueprint $table) {
-
-            $table->integer('min_age')->nullable()->default(0);
-            $table->integer('max_age')->nullable();
+            $table->boolean('is_featured')->default(false)->after('is_active');
         });
     }
 
@@ -29,8 +27,7 @@ class AddAgeRangeToNewsTable extends Migration
     {
         Schema::table('news_items', function (Blueprint $table) {
             //
-            $table->dropColumn('min_age');
-            $table->dropColumn('max_age');
+            $table->dropColumn('is_featured');
         });
     }
 }

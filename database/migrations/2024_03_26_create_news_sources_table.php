@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('news_sources', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('url');
+            $table->string('url')->nullable();
             $table->string('logo')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->string('language', 4)->default('np');
+            $table->string('language', 4)->nullable();
             $table->timestamps();
         });
     }

@@ -131,4 +131,8 @@ class User extends Authenticatable
         return $this->morphMany(Address::class, 'addressable');
     }
 
+    public function newsItems()
+    {
+        return $this->morphMany(NewsItem::class, 'sourceable');
+    }
 }

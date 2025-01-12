@@ -28,7 +28,10 @@ class StoreNewsRequest extends FormRequest
             'locations.*.name' => 'required|string|max:255',
             'locations.*.latitude' => 'required|numeric',
             'locations.*.longitude' => 'required|numeric',
-            'locations.*.radius' => 'required|numeric'
+            'locations.*.radius' => 'required|numeric',
+            'age_groups' => 'nullable|array',
+            'age_groups.*' => 'exists:age_groups,id',
+            'is_featured' => 'boolean',
         ];
     }
 
@@ -45,6 +48,13 @@ class StoreNewsRequest extends FormRequest
         if(empty($validated['categories'])) {
             $validated['categories'] = [];
         }
+        if(empty($validated['age_groups'])) {
+            $validated['age_groups'] = [];
+        }
+        if(empty($validated['is_featured'])) {
+            $validated['is_featured'] = false;
+        }
+        
         return $validated;
     }
 }

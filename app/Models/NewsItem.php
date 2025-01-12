@@ -7,13 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 class NewsItem extends Model
 {
     protected $fillable = [
-        'source_id', 'title', 'description', 'url', 'image',
-        'published_at', 'id', 'original_id','is_active','min_age','max_age'
+        'title',
+        'description',
+        'url',
+        'image',
+        'published_at',
+        'id',
+        'original_id',
+        'is_active',
+        'is_rejected',
+        'is_featured',
+        'sourceable_id',
+        'sourceable_type',
+        'created_by',
+        'language',
+
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
     public function parentNews()
@@ -38,11 +52,10 @@ class NewsItem extends Model
         return $this->parentNews()->exists();
     }
 
-    public function source()
+    public function sourceable()
     {
-        return $this->belongsTo(NewsSource::class);
+        return $this->morphTo();
     }
-
     public function categories()
     {
         return $this->belongsToMany(NewsCategory::class, 'news_item_category');
@@ -60,6 +73,11 @@ class NewsItem extends Model
 
     public function genders()
     {
-        return $this->belongsToMany(UserGender::class, 'news_item_gender','news_item_id','gender_id');
+        return $this->belongsToMany(UserGender::class, 'news_item_gender', 'news_item_id', 'gender_id');
+    }
+
+    public function ageGroups()
+    {
+        return $this->belongsToMany(AgeGroup::class, 'news_item_age_group');
     }
 }

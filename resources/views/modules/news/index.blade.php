@@ -22,6 +22,24 @@
         </a>
     </div>
 
+    <!-- News Status Tabs -->
+    <div class="mb-6">
+        <nav class="flex space-x-4 border-b">
+            <a href="{{ route('admin.news.index', array_merge(request()->except('status', 'page'), ['status' => ''])) }}" 
+               class="px-3 py-2 text-sm font-medium {{ !request('status') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                All News
+            </a>
+            <a href="{{ route('admin.news.index', array_merge(request()->except('status', 'page'), ['status' => 'active'])) }}" 
+               class="px-3 py-2 text-sm font-medium {{ request('status') === 'active' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Active News
+            </a>
+            <a href="{{ route('admin.news.index', array_merge(request()->except('status', 'page'), ['status' => 'rejected'])) }}" 
+               class="px-3 py-2 text-sm font-medium {{ request('status') === 'rejected' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
+                Rejected News
+            </a>
+        </nav>
+    </div>
+
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200">
             <form class="flex flex-col lg:flex-row gap-4">
@@ -99,7 +117,7 @@
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                {{ $newsItem->source->name }}
+                                {{ $newsItem?->sourceable?->name }}
                             </td>
                             <td class="px-3 py-4">
                                 <div class="flex flex-wrap gap-1 max-w-xs">
@@ -158,6 +176,23 @@
                                         </svg>
                                         Manage
                                     </a>
+
+                                    @if(!$newsItem->is_rejected)
+                                    <form action="{{ route('admin.news.reject', $newsItem) }}" 
+                                          method="POST" 
+                                          class="inline-block"
+                                          onsubmit="return confirm('Are you sure you want to reject this news?')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-2.5 py-1.5 border border-yellow-600 text-xs font-medium rounded text-yellow-600 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                            <svg class="h-3.5 w-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                            </svg>
+                                            Reject
+                                        </button>
+                                    </form>
+                                    @endif
 
                                     <form action="{{ route('admin.news.destroy', $newsItem) }}" 
                                           method="POST" 

@@ -48,6 +48,8 @@ class RefreshDatabase extends Command
         $this->call('notifications:save');
         $this->call('categories:make');
         $this->call('fetch:news');
+        $this->call('seed:age');
+        $this->call('seed:gender');
         return 0;
     }
 }

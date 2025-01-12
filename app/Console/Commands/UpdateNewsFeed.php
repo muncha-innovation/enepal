@@ -16,16 +16,6 @@ class UpdateNewsFeed extends Command
      */
     protected $signature = 'fetch:news';
     protected $defaultSources = [
-        // [
-        //     'name' => 'BBC News',
-        //     'url' => 'https://feeds.bbci.co.uk/news/rss.xml',
-        //     'is_active' => true,
-        // ],
-        // [
-        //     'name' => 'CNN',
-        //     'url' => 'https://rss.cnn.com/rss/edition.rss',
-        //     'is_active' => true,
-        // ],
         [
             'name' => 'Ratopati',
             'url' => 'https://www.ratopati.com/feed',
@@ -98,23 +88,25 @@ class UpdateNewsFeed extends Command
             // if original id is already in the database, update
             if (NewsItem::where('original_id', $item->get_id())->exists()) {
                 $newsItem = NewsItem::where('original_id', $item->get_id())->first();
+                $newsItem->sourceable_id = $source->id;
+                $newsItem->sourceable_type = NewsSource::class;
                 $newsItem->title = $item->get_title();
                 $newsItem->description = $item->get_description();
                 $newsItem->url = $item->get_link();
                 $newsItem->published_at = $item->get_date();
-                $newsItem->source_id = $source->id;
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $item->get_enclosure()->thumbnails[0] ?? null;
                 $newsItem->language = $source->language;
                 $newsItem->save();
             } else {
                 $newsItem = new NewsItem();
+                $newsItem->sourceable_id = $source->id;
+                $newsItem->sourceable_type = NewsSource::class;
                 $newsItem->title = $item->get_title();
                 $newsItem->description = $item->get_description();
                 $newsItem->url = $item->get_link();
                 $newsItem->published_at = $item->get_date();
                 $newsItem->is_active = false;
-                $newsItem->source_id = $source->id;
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $item->get_enclosure()->thumbnails[0] ?? null;
                 $newsItem->language = $source->language;

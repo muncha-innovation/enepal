@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class NewsSource extends Model
 {
-    protected $fillable = ['name', 'url', 'logo', 'is_active'];
+    protected $fillable = ['name', 'url', 'logo', 'is_active', 'type', 'language', ];
 
     public function newsItems()
     {
-        return $this->hasMany(NewsItem::class, 'source_id');
+        return $this->morphMany(NewsItem::class, 'sourceable');
     }
-} 
+}

@@ -9,6 +9,7 @@ use App\Models\NewsTag;
 use App\Models\UserGender;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreNewsRequest;
+use App\Models\AgeGroup;
 use Illuminate\Support\Facades\Artisan;
 
 class NewsController extends Controller
@@ -17,12 +18,19 @@ class NewsController extends Controller
     {
         $sources = NewsSource::where('is_active', true)->get();
         
-        $news = NewsItem::with(['source', 'categories'])
+        $news = NewsItem::with(['sourceable', 'categories'])
             ->when(request('search'), function($query) {
                 $query->where('title', 'like', '%' . request('search') . '%');
             })
             ->when(request('source'), function($query) {
-                $query->where('source_id', request('source'));
+                $query->where('sourceable_id', request('source'));
+            })
+            ->when(request('status'), function($query, $status) {
+                if ($status === 'active') {
+                    $query->where('is_active', true)->where('is_rejected', false);
+                } elseif ($status === 'rejected') {
+                    $query->where('is_rejected', true);
+                }
             })
             ->latest('published_at')
             ->paginate(20)
@@ -35,16 +43,20 @@ class NewsController extends Controller
     {
         $sources = NewsSource::where('is_active', true)->get();
         $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
-        return view('modules.news.create', compact('sources', 'categories'));
+        $genders = UserGender::all();
+        $ageGroups = AgeGroup::all();
+        return view('modules.news.create', compact('sources', 'categories', 'genders', 'ageGroups'));
     }
 
     public function store(StoreNewsRequest $request)
     {
         $validated = $request->validated();
         
-        // Remove locations and categories from the data going into news_items table
-        $newsData = collect($validated)->except(['locations', 'categories', 'tags'])->toArray();
         
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups'])->toArray();
+        $newsData['published_at'] = now();
+        $newsData['sourceable_id'] = auth()->id();
+        $newsData['sourceable_type'] = 'App\Models\User';
         $news = NewsItem::create($newsData);
 
         if (isset($validated['categories'])) {
@@ -75,6 +87,11 @@ class NewsController extends Controller
             }
         }
 
+        // Sync age groups
+        if ($request->has('age_groups')) {
+            $news->ageGroups()->sync($request->age_groups);
+        }
+
         return redirect()->route('admin.news.index')->with('success', 'News created successfully');
     }
 
@@ -83,8 +100,9 @@ class NewsController extends Controller
         $sources = NewsSource::where('is_active', true)->get();
         $categories = NewsCategory::get()->groupBy('type');
         $genders = UserGender::all();
+        $ageGroups = AgeGroup::all();
 
-        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders'));
+        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders', 'ageGroups'));
     }
 
     public function update(StoreNewsRequest $request, NewsItem $news)
@@ -92,7 +110,7 @@ class NewsController extends Controller
         $validated = $request->validated();
         
         // Remove locations and categories from the data going into news_items table
-        $newsData = collect($validated)->except(['locations', 'categories', 'tags'])->toArray();
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups'])->toArray();
         
         $news->update($newsData);
 
@@ -131,6 +149,9 @@ class NewsController extends Controller
 
         // Sync genders
         $news->genders()->sync($request->input('genders', []));
+
+        // Sync age groups
+        $news->ageGroups()->sync($request->input('age_groups', []));
 
         return back()->with('success', 'News updated successfully');
     }
@@ -208,7 +229,6 @@ class NewsController extends Controller
         ->paginate(10);
 
     $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
-        ->where('news_items.source_id', $news->source_id)
         ->when(request('available_search'), function($query) {
             $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
         })
@@ -217,7 +237,8 @@ class NewsController extends Controller
 
     $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
     $genders = UserGender::all();
-    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories','genders'));
+    $ageGroups = AgeGroup::all();
+    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories','genders', 'ageGroups'));
 }
 
     public function addRelated(NewsItem $news, NewsItem $related)
@@ -315,5 +336,15 @@ class NewsController extends Controller
                 ->route('admin.news.index')
                 ->with('error', 'Failed to fetch news: ' . $e->getMessage());
         }
+    }
+
+    public function reject(NewsItem $news)
+    {
+        $news->update([
+            'is_rejected' => true,
+            'is_active' => false
+        ]);
+
+        return back()->with('success', 'News has been rejected successfully');
     }
 }

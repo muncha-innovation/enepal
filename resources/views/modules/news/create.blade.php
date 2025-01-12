@@ -10,14 +10,11 @@
     </div>
 
     <form action="{{ route('admin.news.store') }}" method="POST">
+        @include('modules.shared.success_error')
         @csrf
         @include('modules.news._form', ['news' => new \App\Models\NewsItem])
 
-        <div class="mt-6">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Create News
-            </button>
-        </div>
+       
     </form>
 </div>
 @endsection 
