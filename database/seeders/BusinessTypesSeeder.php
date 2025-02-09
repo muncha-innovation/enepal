@@ -18,18 +18,23 @@ class BusinessTypesSeeder extends Seeder
         $types = BusinessType::all();
         if(sizeof($types)==0){
             $types = [
-                'Restaurant',
-                'Shop',
-                'Travel Agencies',
-                'Association',
-                'Manpower Agencies',
-                'Educational Consultancies',
-                'News Outlets'
+                ['title' => 'Restaurant', 'slug' => 'restaurant', 'icon' => asset('images/business/restaurant.png')],
+                ['title' => 'Shop', 'slug' => 'shop', 'icon' => asset('images/business/shop.png')],
+
+                ['title' => 'Travel Agencies', 'slug' => 'travel-agency', 'icon' => asset('images/business/travel-agency.png')],
+
+                ['title' => 'Association', 'slug' => 'association', 'icon' => asset('images/business/association.png')],
+
+                ['title' => 'Manpower Agencies', 'slug' => 'manpower', 'icon' => asset('images/business/manpower.jpg')],
+
+                ['title' => 'Educational Consultancies', 'slug' => 'consultancy', 'icon' => asset('images/business/education-consultancy.jpg')],
+
+                ['title' => 'News Outlets', 'slug' => 'news-outlets', 'icon' => asset('images/business/news-outlets.png')],
             ];
             foreach ($types as $type) {
-                $type = BusinessType::firstOrCreate([
-                    'title'           => $type,
-                ]);
+                $type = BusinessType::firstOrCreate(
+                    $type
+                );
             }   
         }
     }

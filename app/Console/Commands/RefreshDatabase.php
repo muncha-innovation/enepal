@@ -38,7 +38,11 @@ class RefreshDatabase extends Command
     public function handle()
     {
         // ask confirmation
-        if (!$this->confirm('Are you sure you want to refresh the database?')) {
+        $confirm = true;
+        if (env('APP_ENV') === 'production') {
+            $confirm = $this->confirm('You are in production environment. Are you sure you want to refresh the database?');
+        }
+        if (!$confirm) {
             return 0;
         }
 
@@ -49,6 +53,7 @@ class RefreshDatabase extends Command
         $this->call('categories:make');
         $this->call('fetch:news');
         $this->call('seed:age');
+        $this->call('seed:language');
         $this->call('seed:gender');
         $this->call('db:seed');
         return 0;

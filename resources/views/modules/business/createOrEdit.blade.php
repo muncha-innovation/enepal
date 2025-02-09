@@ -191,20 +191,35 @@
                         {{ __('Phone Number') }}</label>
                     <div class="mt-1">
                         <input id="phone_1" name="phone_1" type="text" value="{{ $business->phone_1 }}" required
-                            minLength="6" maxLength="15" placeholder="Eg. 9812312323"
+                            minLength="6" maxLength="15" placeholder={{__("Eg:9812312323")}}
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
                 <div class="mb-2">
                     <label for="phone_2"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Contact Person
-                                                                                                                        Phone') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Contact Person Phone') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="phone_2" id="phone_2" value="{{ $business->phone_2 }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder={{ __('"Eg. 9812312323"') }}>
+                            placeholder={{ __('Eg:9812312323') }}>
                     </div>
                 </div>
+
+                @php
+                    $educationBusinessTypes = [5, 6]; // IDs for manpower and consultancy
+                    $showEducationFields = in_array($business->type_id ?? old('type_id'), $educationBusinessTypes) || 
+                        (isset($businessTypes) && in_array($business->type_id ?? old('type_id'), 
+                            $businessTypes->whereIn('title', ['Manpower', 'Consultancy'])->pluck('id')->toArray()
+                        ));
+                @endphp
+
+                @include('modules.business.components.education_fields', [
+                    'showEducationFields' => $showEducationFields,
+                    'business' => $business ?? null,
+                    'languages' => $languages,
+                    'countries' => $countries
+                ])
+
                 <div class="mb-2">
                     <label for="custom_email_message"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('Custom Email Message') }}</label>
@@ -386,5 +401,66 @@
 
         // Initialize the map when the window loads
         google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+
+    <script>
+        // Add dynamic form handling for languages and destinations
+        document.getElementById('add-language').addEventListener('click', async function() {
+            const container = document.getElementById('languages-container');
+            const index = container.children.length;
+            
+            try {
+                const response = await fetch(`/admin/business/language-row/${index}`);
+                const html = await response.text();
+                container.insertAdjacentHTML('beforeend', html);
+                
+                // Re-apply Tailwind classes to new elements
+                const newRow = container.lastElementChild;
+                newRow.querySelectorAll('select, input').forEach(el => {
+                    el.classList.add('rounded-md', 'border-gray-300');
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        document.getElementById('add-destination').addEventListener('click', async function() {
+            const container = document.getElementById('destinations-container');
+            const index = container.children.length;
+            
+            try {
+                const response = await fetch(`/admin/business/destination-row/${index}`);
+                const html = await response.text();
+                container.insertAdjacentHTML('beforeend', html);
+                
+                // Re-apply Tailwind classes to new elements
+                const newRow = container.lastElementChild;
+                newRow.querySelectorAll('select, input').forEach(el => {
+                    el.classList.add('rounded-md', 'border-gray-300');
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function toggleEducationFields(selectedType) {
+            const educationFields = document.querySelector('.education-fields');
+            const educationBusinessTypes = ['5', '6']; // Update these IDs to match your manpower/consultancy type IDs
+            const showFields = educationBusinessTypes.includes(selectedType);
+            educationFields.style.display = showFields ? 'block' : 'none';
+        }
+
+        // Handle type selection changes
+        document.getElementById('type_id').addEventListener('change', function() {
+            toggleEducationFields(this.value);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.getElementById('type_id');
+            if (typeSelect) {
+                toggleEducationFields(typeSelect.value);
+            }
+        });
     </script>
 @endpush

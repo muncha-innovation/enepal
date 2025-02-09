@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddIsFeaturedToNewsItemsTable extends Migration
+class CreateLanguagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class AddIsFeaturedToNewsItemsTable extends Migration
      */
     public function up()
     {
-        Schema::table('news_items', function (Blueprint $table) {
-            $table->boolean('is_featured')->default(false)->after('is_active');
+        Schema::create('languages', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 50);
+            $table->string('code')->unique();
+            $table->timestamps();
         });
     }
 
@@ -25,9 +28,6 @@ class AddIsFeaturedToNewsItemsTable extends Migration
      */
     public function down()
     {
-        Schema::table('news_items', function (Blueprint $table) {
-            //
-            $table->dropColumn('is_featured');
-        });
+        Schema::dropIfExists('languages');
     }
 }

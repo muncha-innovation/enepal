@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\NewsSourceController;
 use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\TaughtLanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +101,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
 
+ 
 
     
     Route::resource('galleryImage', GalleryImageController::class);
@@ -159,6 +161,8 @@ Route::prefix('news')->name('news.')->group(function () {
     Route::get('/{newsItem}', [NewsController::class, 'publicShow'])->name('public.show');
     Route::get('/category/{category}', [NewsController::class, 'publicCategory'])->name('public.category');
 });
+
+
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';

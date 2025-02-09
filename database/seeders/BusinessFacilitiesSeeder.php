@@ -15,17 +15,20 @@ class BusinessFacilitiesSeeder extends Seeder
     public function run()
     {
         $businessFacilities = [
-            ['title' => 'Parking', 'input_type' => 'radio', 'business_types'=>[1,2,3,4,5]],
-            ['title' => 'Credit Cards', 'input_type' =>'radio', 'business_types' => [1,2,3]],
-            ['title' => 'Online Orders', 'input_type' => 'radio', 'business_types' => [1,2,3]],
-            ['title' => 'Wi-Fi', 'input_type' => 'radio', 'business_types' => [1]],
-            ['title' => 'Opening Hours', 'input_type' => 'text', 'business_types' => [1,2,3,5,6]],
-            ['title' => 'Home Page', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]],
-            ['title' => 'Instagram', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]],
-            ['title' => 'Facebook', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]]
+            ['name' => 'Parking', 'input_type' => 'radio', 'business_types'=>[1,2,3,4,5]],
+            ['name' => 'Credit Cards', 'input_type' =>'radio', 'business_types' => [1,2,3]],
+            ['name' => 'Online Orders', 'input_type' => 'radio', 'business_types' => [1,2,3]],
+            ['name' => 'Wi-Fi', 'input_type' => 'radio', 'business_types' => [1]],
+            ['name' => 'Opening Hours', 'input_type' => 'text', 'business_types' => [1,2,3,5,6]],
+            ['name' => 'Home Page', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]],
+            ['name' => 'Instagram', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]],
+            ['name' => 'Facebook', 'input_type' => 'text', 'business_types' => [1,2,3,4,5,6,7]]
         ];
         foreach ($businessFacilities as $facility) {
-            Facility::create($facility);
+            $businessTypes = $facility['business_types'];
+            unset($facility['business_types']);
+            $f = Facility::create($facility);
+            $f->businessTypes()->attach($businessTypes);
         }
     }
 }

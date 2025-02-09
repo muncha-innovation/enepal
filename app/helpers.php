@@ -69,6 +69,9 @@ if (!function_exists('getImage')) {
         if ($fileName == null) {
             return asset('images/profile/default.png');
         }
+        else if (str_starts_with($fileName, asset(''))) {
+            return $fileName;
+        }
         return Storage::disk('public')->url($fileName);
     }
 }

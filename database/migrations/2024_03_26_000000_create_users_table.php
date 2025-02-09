@@ -18,6 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('email', 100)->unique()->nullable();
+            $table->date('dob')->nullable();
+            $table->boolean('has_passport')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone', 20)->nullable();
@@ -25,6 +27,8 @@ class CreateUsersTable extends Migration
             $table->string('profile_picture')->nullable();
             $table->boolean('force_update_password')->default(false);
             $table->timestamp('last_password_updated')->nullable();
+            $table->string('fcm_token')->nullable();
+            $table->timestamp('fcm_token_updated_at')->nullable();
             $table->boolean('active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->rememberToken();

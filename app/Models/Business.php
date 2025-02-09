@@ -13,7 +13,7 @@ class Business extends Model
 {
     use SoftDeletes;
     use HasFactory, HasTranslations;
-    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message'];
+    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message', 'established_year'];
     protected $translatable = ['description'];
     protected $dates = ['deleted_at'];
 
@@ -87,7 +87,12 @@ class Business extends Model
         return $this->hasMany(Notice::class);
     }
 
-    
+    public function destinations() {
+        return $this->belongsToMany(BusinessDestination::class, 'business_destinations', 'business_id', 'country_id');
+    }
+    public function taughtLanguages() {
+        return $this->belongsToMany(Language::class, 'business_languages')->where('type', 'taught');
+    }
     public function facilities()
     {
         return $this->belongsToMany(Facility::class, 'business_facilities')->withPivot('value');

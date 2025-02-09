@@ -25,7 +25,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with(['addresses.country'])->paginate(10);
+        $users = User::with(['addresses.country','workExperience','education'])->paginate(10);
         return view('admin.users.index', compact(['users']));
     }
 
@@ -64,13 +64,42 @@ class UsersController extends Controller
             );
             unset($data['image']);
         }
-        $validated = collect($data);
+        
+        // Remove nested arrays and relationship data before creating user
+        $userData = collect($data)->except(['address', 'role', 'original_password', 'education', 'experience', 'preferences'])->toArray();
+        $user = User::create($userData);
+        
+        // Handle relationships
+        if (isset($data['address'])) {
+            $user->addresses()->create($data['address']);
+        }
 
-        $user = User::create($validated->except(['address', 'role', 'original_password'])->toArray());
-        $address = $validated->get('address');
+        if (isset($data['role'])) {
+            $user->assignRole($data['role']);
+        }
 
-        $user->addresses()->create($address);
-        $user->assignRole($validated->get('role'));
+        // Create related records
+        if (isset($data['education'])) {
+            foreach ($data['education'] as $education) {
+                $user->education()->create($education);
+            }
+        }
+
+        if (isset($data['experience'])) {
+            foreach ($data['experience'] as $experience) {
+                $user->workExperience()->create($experience);
+            }
+        }
+
+        if (isset($data['preferences'])) {
+            $preferences = $data['preferences'];
+            if (isset($preferences['countries'])) {
+                $preferences['countries'] = json_encode($preferences['countries']);
+            }
+            $user->preference()->create($preferences);
+        }
+
+        // Send notification
         $notify = new NotifyProcess();
         $notify->setTemplate(SettingKeys::WELCOME_EMAIL)
             ->setUser($user)
@@ -79,9 +108,10 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
-                'password' => $data['original_password'],
+                'password' => $data['original_password'] ?? null,
             ]);
         $notify->send();
+
         return redirect()->route('admin.users.index')->with('success', __('User created successfully'));
     }
 
@@ -93,6 +123,9 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
+        $user->load(['preference']);
+        // dd($user->preference->countries);
+
         return view('admin.users.view', compact(['user']));
     }
 
@@ -105,7 +138,7 @@ class UsersController extends Controller
     public function edit(User $user): View
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
-        $user->load(['addresses.country', 'roles']);
+        $user->load(['addresses.country', 'roles', 'education', 'workExperience', 'preference']);
         return view('admin.users.createOrEdit', [
             'user' => $user,
             'roles' => Role::get(),
@@ -126,6 +159,7 @@ class UsersController extends Controller
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
 
         $data = $request->validated();
+        
         if ($request->hasFile('image')) {
             $data['profile_picture'] = upload(
                 'profile/',
@@ -134,12 +168,45 @@ class UsersController extends Controller
             );
             unset($data['image']);
         }
-        $validated = collect($data);
 
-        $user->update($validated->except(['address', 'role','original_password'])->toArray());
-        $address = $validated->get('address');
-        $user->addresses()->update($address);
-        $user->syncRoles([$validated->get('role')]);
+        // Remove nested arrays and relationship data before updating user
+        $userData = collect($data)->except(['address', 'role', 'original_password', 'education', 'experience', 'preferences'])->toArray();
+        $user->update($userData);
+        // Handle relationships
+        if (isset($data['address'])) {
+            $user->addresses()->update($data['address']);
+        }
+
+        if (isset($data['role'])) {
+            $user->syncRoles([$data['role']]);
+        }
+
+        // Update education records
+        if (isset($data['education'])) {
+            $user->education()->delete();
+            foreach ($data['education'] as $education) {
+                $user->education()->create($education);
+            }
+        }
+
+        // Update work experience records
+        if (isset($data['experience'])) {
+            $user->workExperience()->delete();
+            foreach ($data['experience'] as $experience) {
+                $user->workExperience()->create($experience);
+            }
+        }
+
+        // Update preferences
+        if (isset($data['preferences'])) {
+            $preferences = $data['preferences'];
+            if (isset($preferences['countries'])) {
+                $preferences['countries'] = json_encode($preferences['countries']);
+                
+            }
+            $user->preference()->delete();
+            $user->preference()->create($preferences);
+        }
 
         return redirect()->route('admin.users.index')->with('success', __('User updated successfully'));
     }

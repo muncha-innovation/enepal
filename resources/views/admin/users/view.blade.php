@@ -193,6 +193,150 @@
                         </fieldset>
 
                     </div>
+
+                    <h2 class="col-span-4 my-2 text-lg font-bold text-gray-700">{{ __('Additional Information') }}</h2>
+                    <div class="grid grid-cols-4 gap-4">
+                        <fieldset class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Date of Birth') }}</label>
+                            <input type="text" disabled 
+                                value="{{ $user->dob instanceof \DateTime ? $user->dob->format('Y-m-d') : $user->dob }}" 
+                                class="block w-full rounded-md border-gray-300">
+                        </fieldset>
+                        
+                        <fieldset class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Has Passport') }}</label>
+                            <input type="text" disabled value="{{ $user->has_passport ? __('Yes') : __('No') }}" 
+                                class="block w-full rounded-md border-gray-300">
+                        </fieldset>
+                    </div>
+                    
+                    @if($user->education->whereNotIn('type', ['training'])->count() > 0)
+                    <h2 class="col-span-4 my-2 text-lg font-bold text-gray-700">{{ __('Education') }}</h2>
+                    <div class="col-span-4">
+                        @foreach($user->education->whereNotIn('type', ['training']) as $education)
+                            <div class="border rounded p-4 mb-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Type') }}</label>
+                                        <p class="mt-1">{{ __(ucfirst(str_replace('_', ' ', $education->type))) }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Degree/Course') }}</label>
+                                        <p class="mt-1">{{ $education->degree }}</p>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Institution') }}</label>
+                                        <p class="mt-1">{{ $education->institution }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                                        <p class="mt-1">{{ optional($education->start_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
+                                        <p class="mt-1">{{ optional($education->end_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @if($user->education->where('type', 'training')->count() > 0)
+                    <h2 class="col-span-4 my-2 text-lg font-bold text-gray-700">{{ __('Training') }}</h2>
+                    <div class="col-span-4">
+                        @foreach($user->education->where('type', 'training') as $training)
+                            <div class="border rounded p-4 mb-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Training Course') }}</label>
+                                        <p class="mt-1">{{ $training->degree }}</p>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Institution') }}</label>
+                                        <p class="mt-1">{{ $training->institution }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                                        <p class="mt-1">{{ optional($training->start_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
+                                        <p class="mt-1">{{ optional($training->end_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @if($user->workExperience->count() > 0)
+                    <h2 class="col-span-4 my-2 text-lg font-bold text-gray-700">{{ __('Work Experience') }}</h2>
+                    <div class="col-span-4">
+                        @foreach($user->workExperience as $experience)
+                            <div class="border rounded p-4 mb-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Job Title') }}</label>
+                                        <p class="mt-1">{{ $experience->job_title }}</p>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Company') }}</label>
+                                        <p class="mt-1">{{ $experience->company }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                                        <p class="mt-1">{{ optional($experience->start_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
+                                        <p class="mt-1">{{ optional($experience->end_date)->format('Y-m-d') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @if($user->preference)
+                    <h2 class="col-span-4 my-2 text-lg font-bold text-gray-700">{{ __('Preferences') }}</h2>
+                    <div class="col-span-4 grid grid-cols-2 gap-4">
+                        @if($user->preference->countries)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Preferred Countries') }}</label>
+                            <div class="mt-1">
+                                @foreach(json_decode($user->preference->countries) as $countryId)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2">
+                                        {{ \App\Models\Country::find($countryId)?->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($user->preference->departure_date)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Departure Date') }}</label>
+                            <p class="mt-1">{{ optional($user->preference->departure_date)->format('Y-m-d') }}</p>
+                        </div>
+                        @endif
+
+                        @if($user->preference->study_field)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Study Field') }}</label>
+                            <p class="mt-1">{{ $user->preference->study_field }}</p>
+                        </div>
+                        @endif
+
+                        @if($user->preference->app_language)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ __('App Language') }}</label>
+                            <p class="mt-1">{{ $user->preference->app_language }}</p>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
                     <div class="col-span-4 text-center my-3">
                         <a href="{{ route('admin.users.index') }}"
                             class="inline-flex items-center px-4 py-2 border border-transparent

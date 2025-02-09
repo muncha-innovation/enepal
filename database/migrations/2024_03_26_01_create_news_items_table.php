@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('url')->nullable();
             $table->text('image')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_rejected')->default(false);
+            $table->boolean('is_featured')->default(false);
             $table->string('language', 4)->default('np');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();

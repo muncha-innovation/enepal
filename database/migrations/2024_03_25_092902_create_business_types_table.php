@@ -17,6 +17,7 @@ class CreateBusinessTypesTable extends Migration
             $table->mediumIncrements('id');
             $table->string('title',100);
             $table->string('icon',100)->nullable();
+            $table->string('slug');
             $table->text('description')->nullable();
             $table->timestamps();
         });

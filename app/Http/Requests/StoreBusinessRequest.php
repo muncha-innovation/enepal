@@ -58,6 +58,14 @@ class StoreBusinessRequest extends FormRequest
             'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
             'custom_email_message' => ['sometimes', 'string', 'max:1000'],
+            'languages' => ['sometimes', 'array'],
+            'languages.*.id' => ['required', 'exists:languages,id'],
+            'languages.*.price' => ['required', 'numeric', 'min:0'],
+            'languages.*.num_people_taught' => ['nullable', 'numeric', 'min:0'],
+            'languages.*.level' => ['required', 'in:beginner,intermediate,advanced'],
+            'destinations' => ['sometimes', 'array'],
+            'destinations.*.country_id' => ['required', 'exists:countries,id'],
+            'destinations.*.num_people_sent' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

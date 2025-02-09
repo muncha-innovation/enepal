@@ -18,6 +18,22 @@ use Spatie\Activitylog\Models\Activity;
 
 class User extends Authenticatable
 {
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'dob',
+        'has_passport',
+        'password',
+        'phone',
+        'profile_picture',
+        'force_update_password',
+        'last_password_updated',
+        'fcm_token',
+        'fcm_token_updated_at',
+        'active',
+        'created_by',
+    ];
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
     use LogsActivity;
     /**
@@ -44,7 +60,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-
+        'dob' => 'datetime',
+        'has_passport' => 'boolean',
+        'active' => 'boolean',
     ];
 
     const SuperAdmin = 'super-admin';
@@ -138,5 +156,16 @@ class User extends Authenticatable
     public function newsItems()
     {
         return $this->morphMany(NewsItem::class, 'sourceable');
+    }
+    public function education()
+    {
+        return $this->hasMany(UserEducation::class);
+    }
+    public function workExperience()
+    {
+        return $this->hasMany(UserExperience::class);
+    }
+    public function preference() {
+        return $this->hasOne(UserPreference::class);
     }
 }

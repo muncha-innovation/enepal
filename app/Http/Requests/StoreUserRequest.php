@@ -36,7 +36,7 @@ class StoreUserRequest extends FormRequest
             $email_validation = 'unique:users,email';
             $password_validation = 'nullable';
         }
-        return [
+        return array_merge([
             'email' => ['nullable', 'string', 'email', 'max:191', $email_validation],
             'password' => [$password_validation, 'confirmed', Rules\Password::defaults()],
             'last_name' => ['required', 'string', 'max:191'],
@@ -57,8 +57,25 @@ class StoreUserRequest extends FormRequest
                 'max:2048',
             ],
             'role' => ['nullable', 'exists:roles,id'],
-            'active' => ['nullable']
-        ];
+            'active' => ['nullable'],
+            'dob' => ['nullable', 'date'],
+            'has_passport' => ['nullable', 'boolean'],
+            'education.*.type' => ['required', 'string', 'in:under_slc,slc,plus_two,bachelors,masters,phd,training'],
+            'education.*.degree' => ['nullable', 'string', 'max:191'],
+            'education.*.institution' => ['required', 'string', 'max:191'],
+            'education.*.start_date' => ['required', 'date'],
+            'education.*.end_date' => ['nullable'],
+            'experience.*.job_title' => ['required', 'string', 'max:191'],
+            'experience.*.company' => ['required', 'string', 'max:191'],
+            'experience.*.start_date' => ['required', 'date'],
+            'experience.*.end_date' => ['nullable', 'date'],
+            'experience.*.description' => ['nullable', 'string'],
+            'preferences.countries' => ['nullable', 'array'],
+            'preferences.countries.*' => ['exists:countries,id'],
+            'preferences.departure_date' => ['nullable', 'date'],
+            'preferences.study_field' => ['nullable', 'string', 'max:255'],
+            'preferences.app_language' => ['nullable', 'string', 'max:255'],
+        ]);
     }
 
 

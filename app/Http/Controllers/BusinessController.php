@@ -9,6 +9,7 @@ use App\Models\Business;
 use App\Models\BusinessSetting;
 use App\Models\BusinessType;
 use App\Models\Country;
+use App\Models\Language;
 use App\Models\User;
 use App\Notify\NotifyProcess;
 use Illuminate\Http\Request;
@@ -54,7 +55,8 @@ class BusinessController extends Controller
         $businessTypes = BusinessType::with(['facilities'])->get();
 
         $countries = Country::all();
-        return view('modules.business.createOrEdit', compact('businessTypes', 'countries'));
+        $languages = Language::all();
+        return view('modules.business.createOrEdit', compact('businessTypes', 'countries', 'languages'));
     }
 
     /**
@@ -94,6 +96,31 @@ class BusinessController extends Controller
             }
             $business->facilities()->sync($facilities);
         }
+
+        // Only handle languages and destinations for manpower and consultancy
+        $educationBusinessTypes = [5, 6]; // Adjust IDs based on your actual manpower/consultancy type IDs
+        if (in_array($data['type_id'], $educationBusinessTypes)) {
+            // Handle languages
+            if (isset($data['languages']) && is_array($data['languages'])) {
+                foreach ($data['languages'] as $language) {
+                    $business->taughtLanguages()->attach($language['id'], [
+                        'price' => $language['price'],
+                        'num_people_taught' => $language['num_people_taught'],
+                        'level' => $language['level']
+                    ]);
+                }
+            }
+
+            // Handle destinations
+            if (isset($data['destinations']) && is_array($data['destinations'])) {
+                foreach ($data['destinations'] as $destination) {
+                    $business->destinations()->attach($destination['country_id'], [
+                        'num_people_sent' => $destination['num_people_sent']
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('business.index')->with('success', 'Business Created Successfully');
     }
 
@@ -120,9 +147,10 @@ class BusinessController extends Controller
         //
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load(['address', 'settings']);
+        $languages = Language::all();
+        $business->load(['address', 'settings', 'taughtLanguages', 'destinations']);
         $facilities = $business->facilities;
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries']));
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages']));
     }
 
     /**
@@ -170,6 +198,36 @@ class BusinessController extends Controller
                 $facilities[$facilityId] = ['value' => $value];
             }
             $business->facilities()->sync($facilities);
+        }
+
+        // Only handle languages and destinations for manpower and consultancy
+        $educationBusinessTypes = [5, 6]; // Adjust IDs based on your actual manpower/consultancy type IDs
+        if (in_array($data['type_id'], $educationBusinessTypes)) {
+            // Handle languages
+            if (isset($data['languages'])) {
+                $business->taughtLanguages()->detach();
+                foreach ($data['languages'] as $language) {
+                    $business->taughtLanguages()->attach($language['id'], [
+                        'price' => $language['price'],
+                        'num_people_taught' => $language['num_people_taught'],
+                        'level' => $language['level']
+                    ]);
+                }
+            }
+
+            // Handle destinations
+            if (isset($data['destinations'])) {
+                $business->destinations()->detach();
+                foreach ($data['destinations'] as $destination) {
+                    $business->destinations()->attach($destination['country_id'], [
+                        'num_people_sent' => $destination['num_people_sent']
+                    ]);
+                }
+            }
+        } else {
+            // If business type changed from education to non-education, remove related data
+            $business->taughtLanguages()->detach();
+            $business->destinations()->detach();
         }
 
         return back()->with('success', 'Business Updated Successfully');
@@ -256,5 +314,21 @@ class BusinessController extends Controller
         $businessType = BusinessType::with('facilities')->findOrFail($typeId);
 
         return response()->json(['facilities' => $businessType->facilities]);
+    }
+
+    public function getLanguageRow($index)
+    {
+        return view('modules.business.components.language_row', [
+            'index' => $index,
+            'languages' => \App\Models\Language::all(),
+        ])->render();
+    }
+
+    public function getDestinationRow($index)
+    {
+        return view('modules.business.components.destination_row', [
+            'index' => $index,
+            'countries' => \App\Models\Country::all(),
+        ])->render();
     }
 }
