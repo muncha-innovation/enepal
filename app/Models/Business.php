@@ -88,10 +88,12 @@ class Business extends Model
     }
 
     public function destinations() {
-        return $this->belongsToMany(BusinessDestination::class, 'business_destinations', 'business_id', 'country_id');
+        return $this->belongsToMany(Country::class, 'business_destinations')
+            ->withPivot('num_people_sent')
+            ->withTimestamps();
     }
     public function taughtLanguages() {
-        return $this->belongsToMany(Language::class, 'business_languages')->where('type', 'taught');
+        return $this->belongsToMany(Language::class, 'business_languages')->withPivot(['price','currency'])->where('type', 'taught');
     }
     public function facilities()
     {

@@ -33,7 +33,7 @@
 @endsection
 @section('content')
     @if (isset($showSettings))
-        @include('modules.business.header', ['title' => 'Settings'])
+        @include('modules.business.header', ['title' => __('business.settings')])
     @else
         <h1 class="text-2xl font-semibold text-gray-700 mb-2">{{ $title }}</h1>
     @endif
@@ -48,7 +48,7 @@
                 @include('modules.shared.success_error')
                 <div class="mb-2">
                     <label for="name"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Business Name') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.business_name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input required type="text" name="name" id="name" value="{{ $business->name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -57,7 +57,7 @@
                 </div>
                 <div class="mb-2">
                     <label for="type_id"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Type') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.type') }}</label>
                     <select required id="type_id" name="type_id"
                         class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         @foreach ($businessTypes as $type)
@@ -67,7 +67,7 @@
                     </select>
                 </div>
                 <div id="facilities-section" class="mt-4">
-                    <h2 class="text-lg font-semibold text-gray-700">{{ __('Facilities') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-700">{{ __('business.facilities') }}</h2>
                     <div id="facilities-container">
                         @if ($isEdit)
                             @include('modules.business.components.existing_facilities', [
@@ -86,11 +86,11 @@
                     </div>
                 @endforeach
 
-                <p class="text-sm mb-2 mt-4">{{ __('Business Address') }}</p>
+                <p class="text-sm mb-2 mt-4">{{ __('business.business_address') }}</p>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="address[country_id]" class="block text-sm font-medium text-gray-700">
-                            {{ __('Country') }}</label>
+                            {{ __('business.country') }}</label>
                         <div class="mt-1">
                             <select id="country" name="address[country_id]" id="address[country_id]" required
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -104,7 +104,7 @@
                     </div>
                     <div>
                         <label for="address[state_id]" class="block text-sm font-medium text-gray-700">
-                            {{ __('Region/State') }}</label>
+                            {{ __('business.region_state') }}</label>
                         <div class="mt-1">
                             <select id="state" name="address[state_id]"
                                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -120,7 +120,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900">City</label>
+                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.city') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[city]" id="city" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -131,8 +131,7 @@
 
 
                 <div class="mb-2">
-                    <label for="address[address_line_1]" class="block text-sm font-medium leading-6 text-gray-900">Address
-                        1</label>
+                    <label for="address[address_line_1]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_1') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" value="{{ $business->address?->address_line_1 }}"
                             name="address[address_line_1]" id="address_line_1"
@@ -142,8 +141,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label for="address[address_line_2]" class="block text-sm font-medium leading-6 text-gray-900">Address
-                        2</label>
+                    <label for="address[address_line_2]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_2') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[address_line_2]"
                             value="{{ $business->address?->address_line_2 }}" id="address_line_2"
@@ -155,7 +153,7 @@
 
                 <div class="mb-2">
                     <label for="address[postal_code]"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Postal/Zip Code') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.postal_code') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code }}"
                             id="postal_code"
@@ -165,30 +163,30 @@
                 </div>
                 <div class="mb-2">
                     <label for="coordinates"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Location') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.location') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="coordinates" id="coordinates"
                             value="{{ $business->address?->coordinates }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="{{ __('Please select from map') }}" disabled>
+                            placeholder="{{ __('business.please_select_from_map') }}" disabled>
                         <input type="hidden" name="address[latitude]" id='latitude'
                             value={{ $business->address?->latitude }}>
                         <input type="hidden" name="address[longitude]" id='longitude'
                             value={{ $business->address?->longitude }}>
                     </div>
                     <div id="map"></div>
-                    <input id="pac-input" class="controls" type="text" placeholder={{ __('Search Box') }}>
+                    <input id="pac-input" class="controls" type="text" placeholder="{{ __('business.search_box') }}">
                 </div>
                 <div class="mb-2">
                     <label for="email"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Email') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.email') }}</label>
                     <input required type="email" name="email" id="email" value="{{ $business->email }}"
                         placeholder="Eg. abc@gmail.com"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
                 <div>
                     <label for="phone_1" class="block text-sm font-medium text-gray-700">
-                        {{ __('Phone Number') }}</label>
+                        {{ __('business.phone_number') }}</label>
                     <div class="mt-1">
                         <input id="phone_1" name="phone_1" type="text" value="{{ $business->phone_1 }}" required
                             minLength="6" maxLength="15" placeholder={{__("Eg:9812312323")}}
@@ -197,7 +195,7 @@
                 </div>
                 <div class="mb-2">
                     <label for="phone_2"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Contact Person Phone') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.contact_person_phone') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="phone_2" id="phone_2" value="{{ $business->phone_2 }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -221,26 +219,35 @@
                 ])
 
                 <div class="mb-2">
+                    <label for="established_year" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.established_year') }}</label>
+                    <input type="number" name="established_year" id="established_year" 
+                        value="{{ $business->established_year }}"
+                        min="1900" max="{{ date('Y') }}"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="{{ __('e.g. 2010') }}">
+                </div>
+
+                <div class="mb-2">
                     <label for="custom_email_message"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Custom Email Message') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.custom_email_message') }}</label>
                     <textarea name="custom_email_message" id="custom_email_message" class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="{{ __('This message will be sent to the member in the email') }}">{{ $business->custom_email_message }}</textarea>
                 </div>
                 <div class="mb-2">
                     <label for="active"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Status') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.status') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="active" id="active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="1" @if ($business->active) selected @endif>{{ __('Active') }}
+                            <option value="1" @if ($business->active) selected @endif>{{ __('business.active') }}
                             </option>
-                            <option value="0" @if (!$business->active) selected @endif>{{ __('Inactive') }}
+                            <option value="0" @if (!$business->active) selected @endif>{{ __('business.inactive') }}
                             </option>
                         </select>
                     </div>
                 </div>
                 <div class="mb-2">
                     <label for="logo"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ 'Logo' }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.logo') }}</label>
                     <input type="file" @if (!$isEdit) required @endif name="logo" id="logo"
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
@@ -251,7 +258,7 @@
                 </div>
                 <div class="mb-2">
                     <label for="cover_image"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('Cover Image') }}</label>
+                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.cover_image') }}</label>
                     <input type="file" @if (!$isEdit) required @endif name="cover_image"
                         id="cover_image" accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
@@ -292,7 +299,7 @@
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"
-                            class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+                            class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{{ __('business.save') }}</button>
                     </div>
                 </div>
             </form>
@@ -407,6 +414,7 @@
         // Add dynamic form handling for languages and destinations
         document.getElementById('add-language').addEventListener('click', async function() {
             const container = document.getElementById('languages-container');
+            document.getElementById('no-languages-message')?.remove(); // Remove the message before adding new item
             const index = container.children.length;
             
             try {
@@ -426,6 +434,7 @@
 
         document.getElementById('add-destination').addEventListener('click', async function() {
             const container = document.getElementById('destinations-container');
+            document.getElementById('no-destinations-message')?.remove(); // Remove the message before adding new item
             const index = container.children.length;
             
             try {

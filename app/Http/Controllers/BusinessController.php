@@ -71,9 +71,10 @@ class BusinessController extends Controller
         $data = $request->validated();
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
+        // dd($data);
         $business = Business::create(
             collect($data)
-                ->except(['address', 'settings', 'facilities'])
+                ->except(['address', 'settings', 'facilities', 'languages', 'destinations'])
                 ->toArray(),
         );
         $business->setTranslation('description', 'en', $data['description']['en'])->setTranslation('description', 'np', $data['description']['np']);
@@ -105,8 +106,7 @@ class BusinessController extends Controller
                 foreach ($data['languages'] as $language) {
                     $business->taughtLanguages()->attach($language['id'], [
                         'price' => $language['price'],
-                        'num_people_taught' => $language['num_people_taught'],
-                        'level' => $language['level']
+                        'currency' => $language['currency'],
                     ]);
                 }
             }
@@ -171,7 +171,7 @@ class BusinessController extends Controller
         }
         $business->update(
             collect($data)
-                ->except(['address', 'settings', 'facilities'])
+                ->except(['address', 'settings', 'facilities', 'languages','destinations'])
                 ->toArray(),
         );
         $address = $business->address;
@@ -209,8 +209,8 @@ class BusinessController extends Controller
                 foreach ($data['languages'] as $language) {
                     $business->taughtLanguages()->attach($language['id'], [
                         'price' => $language['price'],
-                        'num_people_taught' => $language['num_people_taught'],
-                        'level' => $language['level']
+                        'currency' => $language['currency'],
+                        
                     ]);
                 }
             }
@@ -268,11 +268,11 @@ class BusinessController extends Controller
     {
         $businessTypes = BusinessType::all();
         $countries = Country::all();
-        $business->load(['address', 'settings']);
+        $business->load(['address', 'settings','destinations','taughtLanguages']);
+        $languages = Language::all();
 
         $showSettings = true;
-
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings']));
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings','languages']));
     }
     public function verify(Business $business)
     {

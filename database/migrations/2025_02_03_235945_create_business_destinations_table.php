@@ -15,11 +15,14 @@ class CreateBusinessDestinationsTable extends Migration
     {
         Schema::create('business_destinations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained('businesses')->onDelete('cascade');
-            $table->unsignedInteger('country_id')->nullable();
+            $table->foreignId('business_id')->constrained()->onDelete('cascade');
+            $table->unsignedInteger('country_id');
             $table->integer('num_people_sent')->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
             $table->timestamps();
+
+            // Add unique constraint to prevent duplicate entries
+            $table->unique(['business_id', 'country_id']);
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
         });
     }
 
