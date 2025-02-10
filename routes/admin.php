@@ -45,6 +45,7 @@ Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin',
     Route::delete('news/{news}/related/{related}', [NewsController::class, 'removeRelated'])->name('news.remove-related');
     Route::post('news/{news}/promote', [NewsController::class, 'promoteToMain'])->name('news.promote-to-main');    
     Route::patch('news/{news}/reject', [NewsController::class, 'reject'])->name('news.reject');
+    Route::patch('news/{news}/activate', [NewsController::class, 'activate'])->name('news.activate');
     // Main Resource Route Last
     Route::resource('news', NewsController::class);
 });

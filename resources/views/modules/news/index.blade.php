@@ -194,6 +194,23 @@
                                     </form>
                                     @endif
 
+                                    @if(!$newsItem->is_active)
+                                        <form action="{{ route('admin.news.activate', $newsItem) }}" 
+                                              method="POST" 
+                                              class="inline-block"
+                                              onsubmit="return confirm('Are you sure you want to activate this news?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-2.5 py-1.5 border border-green-600 text-xs font-medium rounded text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                <svg class="h-3.5 w-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                Activate
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     <form action="{{ route('admin.news.destroy', $newsItem) }}" 
                                           method="POST" 
                                           class="inline-block"

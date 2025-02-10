@@ -347,4 +347,15 @@ class NewsController extends Controller
 
         return back()->with('success', 'News has been rejected successfully');
     }
+
+
+    public function activate(NewsItem $news)
+    {
+        $news->update([
+            'is_rejected' => false,
+            'is_active' => true
+        ]);
+
+        return back()->with('success', 'News has been activated successfully');
+    }
 }
