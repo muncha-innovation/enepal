@@ -14,7 +14,6 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 class OptimizeImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     /**
      * Create a new job instance.
      *
@@ -22,7 +21,7 @@ class OptimizeImage implements ShouldQueue
      */
     public function __construct(public string $path)
     {
-
+        $this->path = $path;
     }
 
     /**
@@ -32,6 +31,6 @@ class OptimizeImage implements ShouldQueue
      */
     public function handle()
     {
-        ImageOptimizer::optimize($path);
+        ImageOptimizer::optimize($this->path);
     }
 }

@@ -10,7 +10,11 @@ use App\Models\UserGender;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreNewsRequest;
 use App\Models\AgeGroup;
+use App\Models\Country;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use App\Models\NewsLocation;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class NewsController extends Controller
 {
@@ -34,7 +38,7 @@ class NewsController extends Controller
             })
             ->latest('published_at')
             ->paginate(20)
-            ->withQueryString();
+            ->appends(request()->query());
             
         return view('modules.news.index', compact('news', 'sources'));
     }
@@ -77,12 +81,13 @@ class NewsController extends Controller
         }
 
         if (isset($validated['locations'])) {
-            foreach ($validated['locations'] as $locationData) {
-                $news->locations()->create([
-                    'name' => $locationData['name'],
-                    'latitude' => $locationData['latitude'],
-                    'longitude' => $locationData['longitude'],
-                    'radius' => $locationData['radius']
+            foreach ($validated['locations'] as $location) {
+                NewsLocation::create([
+                    'news_item_id' => $news->id,
+                    'name' => $location['name'],
+                    'location' => $location['location'],
+                    'country_id' => $location['country_id'],
+                    'state_id' => $location['state_id'],
                 ]);
             }
         }
@@ -101,8 +106,9 @@ class NewsController extends Controller
         $categories = NewsCategory::get()->groupBy('type');
         $genders = UserGender::all();
         $ageGroups = AgeGroup::all();
+        $locations = $news->formatted_locations;
 
-        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders', 'ageGroups'));
+        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders', 'ageGroups', 'locations'));
     }
 
     public function update(StoreNewsRequest $request, NewsItem $news)
@@ -137,12 +143,13 @@ class NewsController extends Controller
             $news->locations()->delete();
             
             // Create new locations
-            foreach ($validated['locations'] as $locationData) {
-                $news->locations()->create([
-                    'name' => $locationData['name'],
-                    'latitude' => $locationData['latitude'],
-                    'longitude' => $locationData['longitude'],
-                    'radius' => $locationData['radius']
+            foreach ($validated['locations'] as $location) {
+                NewsLocation::create([
+                    'news_item_id' => $news->id,
+                    'name' => $location['name'],
+                    'location' => $location['location'],
+                    'country_id' => $location['country_id'],
+                    'state_id' => $location['state_id'],
                 ]);
             }
         }
@@ -220,34 +227,48 @@ class NewsController extends Controller
 
 
     public function manageRelated(NewsItem $news)
-{
-    $subNews = $news->childNews()
-        ->when(request('search'), function($query) {
-            $query->where('news_items.title', 'like', '%' . request('search') . '%');
-        })
-        ->latest()
-        ->paginate(10);
+    {
+        // Eager load all necessary relationships including locations
+        $news->load(['childNews', 'parentNews', 'locations', 'categories', 'tags', 'ageGroups']);
+        $subNews = $news->childNews()
+            ->when(request('search'), function($query) {
+                $query->where('news_items.title', 'like', '%' . request('search') . '%');
+            })
+            ->latest()
+            ->paginate(10);
 
-    $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
-        ->when(request('available_search'), function($query) {
-            $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
-        })
-        ->latest()
-        ->paginate(10);
+        $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
+            ->when(request('available_search'), function($query) {
+                $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
+            })
+            ->latest()
+            ->paginate(10);
 
-    $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
-    $genders = UserGender::all();
-    $ageGroups = AgeGroup::all();
-    return view('modules.news.manage-related', compact('news', 'subNews', 'availableNews', 'categories','genders', 'ageGroups'));
-}
+        $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
+        $genders = UserGender::all();
+        $ageGroups = AgeGroup::all();
+        $countries = Country::orderBy('name')->get();
+        
+        // Get formatted locations using the accessor
+        $locations = $news->formatted_locations;
+        
+        return view('modules.news.manage-related', compact(
+            'news',
+            'subNews',
+            'availableNews',
+            'categories',
+            'genders',
+            'ageGroups',
+            'countries',
+            'locations'
+        ));
+    }
 
     public function addRelated(NewsItem $news, NewsItem $related)
     {
-        \DB::transaction(function() use ($news, $related) {
-            // Detach the related news from its current parents
+        DB::transaction(function() use ($news, $related) {
             $related->parentNews()->detach();
 
-            // Attach the related news as sub-news without removing existing child news
             $news->childNews()->syncWithoutDetaching($related->id);
         });
 
@@ -266,7 +287,7 @@ class NewsController extends Controller
             return back()->with('error', 'This news is already a main news or has no relations.');
         }
 
-        \DB::transaction(function() use ($news) {
+        DB::transaction(function() use ($news) {
             foreach ($news->parentNews as $parent) {
                 // Get all siblings excluding the current news
                 $siblings = $parent->childNews()

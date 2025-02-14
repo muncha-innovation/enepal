@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Address extends Model
 {
-    use HasFactory;
+    use HasFactory, SpatialTrait;
     protected $guarded = [];
-
+    protected $spatialFields = ['location'];
     public function addressable(): MorphTo
     {
         return $this->morphTo();

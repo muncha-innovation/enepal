@@ -6,11 +6,10 @@ use App\Base\Slug\HasSlug;
 use App\Models\Traits\HasActive;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Country extends Model
 {
-    use SearchableTrait, HasActive;
+    use  HasActive;
 
     /**
      * The table associated with the model.

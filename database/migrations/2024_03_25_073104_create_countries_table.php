@@ -16,6 +16,7 @@ class CreateCountriesTable extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 255);
+            $table->point('location')->nullable();
             $table->string('dial_code', 255);
             $table->integer('dial_min_length')->default(0);
             $table->integer('dial_max_length')->default(0);

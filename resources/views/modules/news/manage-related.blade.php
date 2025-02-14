@@ -10,11 +10,9 @@
                     <form action="{{ route('admin.news.update', $news) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        @include('modules.news.partials._news_form')
+                        @include('modules.news.partials._news_form', ['locations' => $locations])
                     </form>
                 </div>
-
-                
             </div>
 
             <!-- Right Column - Related News Management -->
@@ -31,7 +29,6 @@
 @endsection
 
 @push('js')
-    @include('modules.news.partials._map_scripts')
     @include('modules.news.partials._upload_scripts')
     @include('modules.news.partials._tag_scripts')
 @endpush

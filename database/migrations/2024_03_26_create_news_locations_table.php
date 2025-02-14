@@ -11,11 +11,16 @@ return new class extends Migration
         Schema::create('news_locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('news_item_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
-            $table->decimal('radius', 8, 2)->default(0); // radius in kilometers
+            $table->string('name')->nullable();
+            $table->string('place_id')->nullable();
+            $table->point('location')->nullable();
+            $table->unsignedInteger('country_id')->nullable();
+            $table->unsignedInteger('state_id')->nullable();
+
             $table->timestamps();
+        
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
+            $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
         });
     }
 
@@ -23,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('news_locations');
     }
-}; 
+};

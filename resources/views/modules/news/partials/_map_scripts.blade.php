@@ -1,4 +1,4 @@
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.map_key') }}&libraries=places,drawing"></script>
+{{-- <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&libraries=places,drawing"></script>
 <script>
 let map;
 let drawingManager;
@@ -72,7 +72,7 @@ function initMap() {
         const center = circle.getCenter();
         const radius = circle.getRadius() / 1000; // Convert to kilometers
         
-        const locationName = prompt('Enter location name:');
+        const locationName = 'Location ' +( Object.keys(circles).length+1);
         if (locationName) {
             const locationId = Date.now();
             addLocationToForm(locationName, center.lat(), center.lng(), radius, locationId);
@@ -158,4 +158,4 @@ function loadExistingLocations() {
 }
 
 google.maps.event.addDomListener(window, 'load', initMap);
-</script> 
+</script> --}}

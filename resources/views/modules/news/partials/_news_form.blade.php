@@ -36,23 +36,6 @@
         </div>
     </div>
 
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Locations</label>
-        <div id="map" style="height: 300px;" class="mt-2 rounded-lg border border-gray-300"></div>
-        <div id="location-tags" class="space-y-2 mt-2">
-            @foreach($news->locations ?? [] as $location)
-                <div class="flex items-center gap-2 bg-gray-50 p-2 rounded" data-location-id="{{ $location->id }}">
-                    <input type="hidden" name="locations[{{ $location->id }}][name]" value="{{ $location->name }}">
-                    <input type="hidden" name="locations[{{ $location->id }}][latitude]" value="{{ $location->latitude }}">
-                    <input type="hidden" name="locations[{{ $location->id }}][longitude]" value="{{ $location->longitude }}">
-                    <input type="hidden" name="locations[{{ $location->id }}][radius]" value="{{ $location->radius }}">
-                    <span class="flex-1">{{ $location->name }}</span>
-                    <button type="button" onclick="removeLocation(this, {{ $location->id }})" class="text-red-600 hover:text-red-800">Remove</button>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
     <div class="flex items-center space-x-4">
         <div class="flex items-center">
             <input type="checkbox" name="is_active" id="is_active" value="1" {{ $news->is_active ? 'checked' : '' }}
@@ -81,6 +64,7 @@
     </div>
     @include('modules.news.partials._categories_form')
     @include('modules.news.partials._gender_form')
+    @include('modules.news.partials._location_form', ['locations' => $locations ?? null])
 
     <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Age Groups</label>
@@ -129,6 +113,7 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://maps.googleapis.com/maps/api/js?key={{config('services.google.places.api_key')}}&libraries=places&v=weekly"></script>
 <script>
 $(document).ready(function() {
     $('#tags').select2({
@@ -153,6 +138,41 @@ $(document).ready(function() {
                     })
                 };
             }
+        }
+    });
+
+    $('#location-select').select2({
+        placeholder: 'Search for a location...',
+        minimumInputLength: 3,
+        ajax: {
+            transport: function (params, success, failure) {
+                let service = new google.maps.places.AutocompleteService();
+                service.getPlacePredictions({ input: params.data.term, types: ['(regions)'] }, function(predictions, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        success(predictions.map(function(prediction) {
+                            return { id: prediction.place_id, text: prediction.description };
+                        }));
+                    } else {
+                        failure();
+                    }
+                });
+            },
+            processResults: function(data) {
+                return {
+                    results: data
+                };
+            }
+        }
+    });
+
+    $('.location-type-btn').on('click', function() {
+        $('.location-type-btn').removeClass('active');
+        $(this).addClass('active');
+        $('.location-section').addClass('hidden');
+        if ($(this).data('type') === 'map') {
+            $('#map').removeClass('hidden');
+        } else {
+            $('#region-location').removeClass('hidden');
         }
     });
 });

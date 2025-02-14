@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class BusinessController extends Controller
 {
@@ -69,6 +70,16 @@ class BusinessController extends Controller
     {
         //
         $data = $request->validated();
+        
+        if (isset($data['address']['location'])) {
+            // Convert POINT string to Point object
+            preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
+            if (isset($matches[1])) {
+                list($lng, $lat) = explode(' ', $matches[1]);
+                $data['address']['location'] = new Point($lat, $lng);
+            }
+        }
+
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
         // dd($data);
@@ -163,6 +174,16 @@ class BusinessController extends Controller
     public function update(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
+
+        if (isset($data['address']['location'])) {
+            // Convert POINT string to Point object
+            preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
+            if (isset($matches[1])) {
+                list($lng, $lat) = explode(' ', $matches[1]);
+                $data['address']['location'] = new Point($lat, $lng);
+            }
+        }
+
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         }

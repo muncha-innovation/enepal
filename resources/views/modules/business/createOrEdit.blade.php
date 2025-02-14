@@ -166,13 +166,10 @@
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.location') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="coordinates" id="coordinates"
-                            value="{{ $business->address?->coordinates }}"
+                            value="{{ $business->address?->location ? $business->address->location->getLat().','.$business->address->location->getLng() : '' }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="{{ __('business.please_select_from_map') }}" disabled>
-                        <input type="hidden" name="address[latitude]" id='latitude'
-                            value={{ $business->address?->latitude }}>
-                        <input type="hidden" name="address[longitude]" id='longitude'
-                            value={{ $business->address?->longitude }}>
+                        <input type="hidden" name="address[location]" id='location'>
                     </div>
                     <div id="map"></div>
                     <input id="pac-input" class="controls" type="text" placeholder="{{ __('business.search_box') }}">
@@ -310,100 +307,93 @@
     @include('modules.business._js_load_facilities')
 
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.map_key') }}&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&libraries=places"></script>
 
     <script>
         async function initMap() {
-            // ask user for location and get the coordinates
-
+            // Default center
             var center = {
                 lat: -33.8688,
                 lng: 151.2195
             };
-            var lat = document.getElementById('latitude').value;
-            var lng = document.getElementById('longitude').value;
 
-            if (navigator.geolocation) {
-                let position = await navigator.geolocation.getCurrentPosition(function(position) {
-                    if (lat && lng) return;
-                    center = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    map.setCenter(center);
-                });
+            // Get existing coordinates if any
+            var coordsInput = document.getElementById('coordinates');
+            if (coordsInput && coordsInput.value) {
+                let [lat, lng] = coordsInput.value.split(',');
+                center = {
+                    lat: parseFloat(lat),
+                    lng: parseFloat(lng)
+                };
             }
-            // Initialize the map centered at a default location
+
+            // Initialize map
             var map = new google.maps.Map(document.getElementById('map'), {
                 center: center,
                 zoom: 13
             });
 
-            // Create the search box and link it to the UI element
+            // Create the search box
             var input = document.getElementById('pac-input');
             var searchBox = new google.maps.places.SearchBox(input);
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
 
-            // Create a marker
+            // Create marker
             var marker = new google.maps.Marker({
                 map: map,
                 draggable: true,
+                position: center
             });
 
-            // Set the marker position
-            if (lat && lng) {
-                marker.setPosition(new google.maps.LatLng(lat, lng));
-                map.setCenter(new google.maps.LatLng(lat, lng));
+            // Update location function
+            function updateLocation(latlng) {
+                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
+                document.getElementById('location').value = `POINT(${latlng.lng()} ${latlng.lat()})`;
             }
 
-            // Listen for the event fired when the user selects a prediction from the search box
+            // Search box event listener
             searchBox.addListener('places_changed', function() {
                 var places = searchBox.getPlaces();
+                if (places.length == 0) return;
 
-                if (places.length == 0) {
-                    return;
-                }
-
-                // For each place, get the icon, name and location
-                var bounds = new google.maps.LatLngBounds();
                 places.forEach(function(place) {
-                    if (!place.geometry) {
-                        console.log("Returned place contains no geometry");
-                        return;
-                    }
+                    if (!place.geometry) return;
 
-                    // Create a marker for each place
                     marker.setPosition(place.geometry.location);
-                    document.getElementById('coordinates').value = place.geometry.location.lat() + ',' +
-                        place.geometry.location.lng();
-                    document.getElementById('latitude').value = place.geometry.location.lat();
-                    document.getElementById('longitude').value = place.geometry.location.lng();
+                    updateLocation(place.geometry.location);
+                    
                     if (place.geometry.viewport) {
-                        // Only geocodes have viewport
-                        bounds.union(place.geometry.viewport);
+                        map.fitBounds(place.geometry.viewport);
                     } else {
-                        bounds.extend(place.geometry.location);
+                        map.setCenter(place.geometry.location);
+                        map.setZoom(17);
                     }
                 });
-                map.fitBounds(bounds);
             });
 
-            // Listen for map clicks to place a marker and get coordinates
+            // Map click event
             map.addListener('click', function(e) {
-                var latlng = e.latLng;
-                marker.setPosition(latlng);
-                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
-                document.getElementById('latitude').value = latlng.lat();
-                document.getElementById('longitude').value = latlng.lng();
+                marker.setPosition(e.latLng);
+                updateLocation(e.latLng);
             });
 
-            // Update coordinates when dragging the marker
+            // Marker drag event
             marker.addListener('dragend', function(e) {
-                var latlng = e.latLng;
-                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
-                document.getElementById('latitude').value = latlng.lat();
-                document.getElementById('longitude').value = latlng.lng();
+                updateLocation(e.latLng);
             });
+
+            // Try to get user's location if no existing coordinates
+            if (!coordsInput.value && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(pos);
+                    marker.setPosition(pos);
+                    updateLocation(new google.maps.LatLng(pos.lat, pos.lng));
+                });
+            }
         }
 
         // Initialize the map when the window loads

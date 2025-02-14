@@ -34,3 +34,6 @@ MAIL_FROM_NAME="${APP_NAME}"
     //8. Implement email templates features with segmentation as per businesses, meaning that businesses can add something to the email templates, mainly  welcome email for now but should be able to add more in the future
     7. Verification system for businesses. Admin should be able to dynamically add verification documents for each business 
     8. Load testing before deploying
+
+
+    News ko location (state id , city id, )

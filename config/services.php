@@ -33,5 +33,13 @@ return [
     'rapidapi' => [
         'key' => env('RAPID_API_LOCATION_KEY'),
         'host' => env('RAPID_API_LOCATION_HOST')
+    ],
+    'google' => [
+        'places' => [
+            'api_key' => env('GOOGLE_PLACES_API_KEY'),
+        ],
+        'maps' => [
+            'api_key' => env('GOOGLE_MAPS_API_KEY'),
+        ],
     ]
 ];

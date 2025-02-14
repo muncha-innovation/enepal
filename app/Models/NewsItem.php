@@ -80,4 +80,16 @@ class NewsItem extends Model
     {
         return $this->belongsToMany(AgeGroup::class, 'news_item_age_group');
     }
+
+    public function getFormattedLocationsAttribute()
+    {
+        $locations = $this->locations->map(function($location) {
+            return [
+                'id' => $location->place_id ?: $location->name,
+                'text' => $location->name,
+                'selected' => true
+            ];
+        })->toArray();
+        return $locations;
+    }
 }

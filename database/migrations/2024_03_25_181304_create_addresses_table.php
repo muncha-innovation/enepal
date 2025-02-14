@@ -27,9 +27,9 @@ class CreateAddressesTable extends Migration
             $table->string('town')->nullable();
             $table->string('street')->nullable();
             $table->string('building')->nullable();
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
-            $table->string('address_type')->default('primary')->enum(['primary', 'secondary', 'birth', 'current', 'branch', 'other']);
+            $table->point('location')->nullable();
+            $table->enum('address_type', ['primary', 'secondary', 'birth', 'current', 'branch', 'other'])
+            ->default('primary');
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
             $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
             $table->timestamps();

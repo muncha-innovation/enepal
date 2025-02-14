@@ -53,8 +53,7 @@ class StoreBusinessRequest extends FormRequest
             'address.prefecture' => ['sometimes'],
             'address.town' => ['sometimes'],
             'address.building' => ['sometimes'],
-            'address.latitude' => ['sometimes'],
-            'address.longitude' => ['sometimes'],
+            'address.location' => ['sometimes', 'string'], // Validates POINT string format
             'settings' => ['sometimes'],
             'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
@@ -94,8 +93,10 @@ class StoreBusinessRequest extends FormRequest
             SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
         ];
         $data['settings'] = isset($data['settings']) ? $data['settings'] : $default_settings;
+        
         if ($this->isMethod('post')) {
             $data['created_by'] = auth()->id();
+
         }
         return $data;
     }

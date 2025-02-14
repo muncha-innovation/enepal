@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Country;
 use Illuminate\Database\Seeder;
-
+use Grimzy\LaravelMysqlSpatial\Types\Point as Point;
 class CountriesTableSeeder extends Seeder
 {
 
@@ -25,18 +25,20 @@ class CountriesTableSeeder extends Seeder
 
     private function seedAll()
  {
+    Country::truncate();
     $JSON_countries = Country::allJSON();
         foreach ($JSON_countries as $country) {
             $c = Country::firstOrCreate([
                 'name'           => ((isset($country['name'])) ? $country['name'] : null),
-                'dial_code'              => ((isset($country['phone_code'])) ? $country['phone_code'] : null),
-                'code'   => ((isset($country['iso3'])) ? $country['iso3'] : null),
+                'dial_code'              => ((isset($country['phonecode'])) ? $country['phonecode'] : null),
+                'code'   => ((isset($country['iso2'])) ? $country['iso2'] : null),
                 'flag'   => ((isset($country['iso2'])) ? $country['iso2'].'.png' : null),
                 'currency_name'   => ((isset($country['currency_name'])) ? $country['currency_name'] : null),
                 'currency_code'   => ((isset($country['currency'])) ? $country['currency'] : null),
                 'currency_symbol'   => ((isset($country['currency_symbol'])) ? $country['currency_symbol'] : null),
                 'dial_min_length'   => ((isset($country['minLength'])) ? $country['minLength'] : 6),
                 'dial_max_length'   => ((isset($country['maxLength'])) ? $country['maxLength'] : 13),
+                'location' => new Point($country['latitude'], $country['longitude']),
             ]);
             // assign states and cities
             if(isset($country['states'])){
@@ -44,6 +46,7 @@ class CountriesTableSeeder extends Seeder
                     $c->states()->firstOrCreate([
                         'name'           => ((isset($state['name'])) ? $state['name'] : null),
                         'code'   => ((isset($state['state_code'])) ? $state['state_code'] : null),
+                        'location' => new Point($state['latitude'], $state['longitude']),
                     ]);
                 }
             }
@@ -57,12 +60,9 @@ class CountriesTableSeeder extends Seeder
                 ['name' => 'Gandaki', 'state_code' => 'GA'],
                 ['name' => 'Karnali', 'state_code' => 'KA'],
                 ['name' => 'Lumbini', 'state_code' => 'LU'],
-                ['name' => 'Province No. 1', 'state_code' => '1'],
-                ['name' => 'Province No. 2', 'state_code' => '2'],
+                ['name' => 'Koshi', 'state_code' => 'KO'],
+                ['name' => 'Sagarmatha', 'state_code' => 'SA'],
                 ['name' => 'Sudurpashchim', 'state_code' => 'SU'],
-                ['name' => 'State No. 3', 'state_code' => '3'],
-                ['name' => 'State No. 4', 'state_code' => '4'],
-                ['name' => 'State No. 5', 'state_code' => '5'],
             ]        ];
         $c = Country::firstOrCreate([
             'name'           => 'Nepal',

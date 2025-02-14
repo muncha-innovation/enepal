@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -34,6 +33,7 @@ class User extends Authenticatable
         'active',
         'created_by',
     ];
+    
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
     use LogsActivity;
     /**
