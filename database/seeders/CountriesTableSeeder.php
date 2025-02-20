@@ -32,34 +32,34 @@ class CountriesTableSeeder extends Seeder
     }
 
     private function seedAll()
- {
-    $JSON_countries = Country::allJSON();
+    {
+        $JSON_countries = Country::allJSON();
         foreach ($JSON_countries as $country) {
             $c = Country::firstOrCreate([
-                'name'           => ((isset($country['name'])) ? $country['name'] : null),
-                'dial_code'              => ((isset($country['phonecode'])) ? $country['phonecode'] : null),
-                'code'   => ((isset($country['iso2'])) ? $country['iso2'] : null),
-                'flag'   => ((isset($country['iso2'])) ? $country['iso2'].'.png' : null),
-                'currency_name'   => ((isset($country['currency_name'])) ? $country['currency_name'] : null),
-                'currency_code'   => ((isset($country['currency'])) ? $country['currency'] : null),
-                'currency_symbol'   => ((isset($country['currency_symbol'])) ? $country['currency_symbol'] : null),
-                'dial_min_length'   => ((isset($country['minLength'])) ? $country['minLength'] : 6),
-                'dial_max_length'   => ((isset($country['maxLength'])) ? $country['maxLength'] : 13),
-                'location' => new Point($country['latitude'], $country['longitude']),
+                'name'             => (isset($country['name']) ? $country['name'] : null),
+                'dial_code'        => (isset($country['phonecode']) ? $country['phonecode'] : null),
+                'code'             => (isset($country['iso2']) ? $country['iso2'] : null),
+                'flag'             => (isset($country['iso2']) ? $country['iso2'].'.png' : null),
+                'currency_name'    => (isset($country['currency_name']) ? $country['currency_name'] : null),
+                'currency_code'    => (isset($country['currency']) ? $country['currency'] : null),
+                'currency_symbol'  => (isset($country['currency_symbol']) ? $country['currency_symbol'] : null),
+                'dial_min_length'  => (isset($country['minLength']) ? $country['minLength'] : 6),
+                'dial_max_length'  => (isset($country['maxLength']) ? $country['maxLength'] : 13),
+                'location'         => new Point((float)$country['latitude'], (float)$country['longitude']),
             ]);
             // assign states and cities
             if(isset($country['states'])){
                 foreach ($country['states'] as $state) {
                     $c->states()->firstOrCreate([
-                        'name'           => ((isset($state['name'])) ? $state['name'] : null),
-                        'code'   => ((isset($state['state_code'])) ? $state['state_code'] : null),
-                        'location' => new Point($state['latitude'], $state['longitude']),
+                        'name'     => (isset($state['name']) ? $state['name'] : null),
+                        'code'     => (isset($state['state_code']) ? $state['state_code'] : null),
+                        'location' => new Point((float)$state['latitude'], (float)$state['longitude']),
                     ]);
                 }
             }
         }
+    }
 
- }
     private function seedNepal() {
         $country = [
             'states' => [
@@ -70,24 +70,24 @@ class CountriesTableSeeder extends Seeder
                 ['name' => 'Koshi', 'state_code' => 'KO'],
                 ['name' => 'Sagarmatha', 'state_code' => 'SA'],
                 ['name' => 'Sudurpashchim', 'state_code' => 'SU'],
-            ]        ];
+            ]
+        ];
         $c = Country::firstOrCreate([
-            'name'           => 'Nepal',
-            'dial_code'              => '+977',
-            'code'   => 'NP',
-            'flag'   => 'NP.png',
+            'name'            => 'Nepal',
+            'dial_code'       => '+977',
+            'code'            => 'NP',
+            'flag'            => 'NP.png',
             'currency_name'   => 'NPR',
             'currency_code'   => 'RS',
-            'currency_symbol'   => 'NPR',
-            'dial_min_length'   => 9,
-            'dial_max_length'   => 10,
+            'currency_symbol' => 'NPR',
+            'dial_min_length' => 9,
+            'dial_max_length' => 10,
         ]);
-        // assign states and cities
         if(isset($country['states'])){
             foreach ($country['states'] as $state) {
                 $c->states()->firstOrCreate([
-                    'name'           => ((isset($state['name'])) ? $state['name'] : null),
-                    'code'   => ((isset($state['state_code'])) ? $state['state_code'] : null),
+                    'name' => (isset($state['name']) ? $state['name'] : null),
+                    'code' => (isset($state['state_code']) ? $state['state_code'] : null),
                 ]);
             }
         }
