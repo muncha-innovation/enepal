@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Base\Slug\HasSlug;
 use App\Models\Traits\HasActive;
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Country extends Model
 {
-    use  HasActive;
+    use  HasActive, SpatialTrait;
 
     /**
      * The table associated with the model.
@@ -24,7 +25,7 @@ class Country extends Model
      * @var bool
      */
     public $timestamps = false;
-
+    protected $spatialFields = ['location'];
     /**
      * The attributes that are mass assignable.
      *

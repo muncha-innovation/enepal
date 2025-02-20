@@ -17,7 +17,7 @@ class CreateStatesTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('country_id');
             $table->string('name');
-            $table->string('code');
+            $table->string('code')->nullable();
             $table->point('location')->nullable();
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
             

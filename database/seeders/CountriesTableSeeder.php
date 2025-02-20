@@ -20,7 +20,7 @@ class CountriesTableSeeder extends Seeder
             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             Country::truncate();
             \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            $this->seedNepal();
+            $this->seedAll();
         } else {
             // Disable foreign key checks before truncate
             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -35,6 +35,8 @@ class CountriesTableSeeder extends Seeder
     {
         $JSON_countries = Country::allJSON();
         foreach ($JSON_countries as $country) {
+            // dd($country['latitude']);
+            // dd(new Point((float)$country['latitude'], (float)$country['longitude']));
             $c = Country::firstOrCreate([
                 'name'             => (isset($country['name']) ? $country['name'] : null),
                 'dial_code'        => (isset($country['phonecode']) ? $country['phonecode'] : null),
