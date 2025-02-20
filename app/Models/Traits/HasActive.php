@@ -12,7 +12,7 @@ trait HasActive
      */
     public function scopeActive($query)
     {
-        return $query->where('active', true);
+        return $query->where('is_active', true);
     }
 
     /**
@@ -23,7 +23,7 @@ trait HasActive
      */
     public function scopeInactive($query)
     {
-        return $query->where('active', false);
+        return $query->where('is_active', false);
     }
 
     /**
@@ -33,6 +33,6 @@ trait HasActive
      */
     public function isActive()
     {
-        return (bool) $this->active;
+        return (bool) $this->is_active;
     }
 }

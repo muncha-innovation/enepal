@@ -30,7 +30,7 @@ class User extends Authenticatable
         'last_password_updated',
         'fcm_token',
         'fcm_token_updated_at',
-        'active',
+        'is_active',
         'created_by',
     ];
     
@@ -62,7 +62,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'dob' => 'datetime',
         'has_passport' => 'boolean',
-        'active' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     const SuperAdmin = 'super-admin';
@@ -111,6 +111,10 @@ class User extends Authenticatable
     public function primaryAddress(): MorphOne
     {
         return $this->morphOne(related: Address::class, name: 'addressable')->where(column: 'address_type', operator: 'primary');
+    }
+    public function birthAddress(): MorphOne
+    {
+        return $this->morphOne(related: Address::class, name: 'addressable')->where(column: 'address_type', operator: 'birth');
     }
     public function getNameAttribute(): string
     {

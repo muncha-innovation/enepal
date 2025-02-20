@@ -20,7 +20,7 @@ class CreateNoticesTable extends Migration
             $table->string('image')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('business_id');
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->boolean('is_private')->default(true);
             $table->boolean('is_verified')->default(false);
             $table->unsignedBigInteger('verified_by')->nullable();

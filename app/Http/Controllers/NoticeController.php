@@ -61,7 +61,7 @@ class NoticeController extends Controller
         $notice->setTranslation('content', 'en', $data['content']['en'])
             ->setTranslation('content', 'np', $data['content']['np']);
         $notice->business_id = $business->id;
-        $notice->active = $data['active'];
+        $notice->is_active = $data['is_active'];
         $notice->is_private = $data['is_private'];
         if ($notice->is_private) {
             $notice->is_verified = true;
@@ -130,7 +130,7 @@ class NoticeController extends Controller
         $notice->setTranslation('content', 'en', $data['content']['en'])
             ->setTranslation('content', 'np', $data['content']['np']);
         $notice->business_id = $business->id;
-        $notice->active = $data['active'];
+        $notice->is_active = $data['is_active'];
         $notice->is_private = $data['is_private'];
         $notice->user_id = auth()->id();
         if ($notice->is_private) {
@@ -141,7 +141,7 @@ class NoticeController extends Controller
             $notice->image = upload('notices/', 'png', $image);
         }
         $notice->save();
-        if ($notice->is_private && !$notice->is_sent && $notice->active) {
+        if ($notice->is_private && !$notice->is_sent && $notice->is_active) {
             event(new NoticeCreated($business, $notice));
             $notice->is_sent = true;
             $notice->sent_at = now();
@@ -175,7 +175,7 @@ class NoticeController extends Controller
             event(new NoticeCreated($business, $notice));
             $notice->is_sent = true;
             $notice->sent_at = now();
-            $notice->active = true;
+            $notice->is_active = true;
         }
         $notice->save();
         return back()->with('success', 'Notification verified successfully');

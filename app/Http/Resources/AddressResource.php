@@ -21,10 +21,9 @@ class AddressResource extends JsonResource
             'postal_code' => $this->postal_code,
             'address_line_1' => $this->address_line_1,
             'address_line_2' => $this->address_line_2,
-            'latitude' => $this->lat,
-            'longitude' => $this->lng,
+            'latitude' => $this->location?->getLat(),
+            'longitude' => $this->location?->getLng(),
             'type' => $this->address_type
-            
         ];
     }
 }

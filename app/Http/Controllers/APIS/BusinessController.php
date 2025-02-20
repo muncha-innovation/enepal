@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BusinessResource;
 use App\Models\Business;
 use App\Models\BusinessType;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
 
 class BusinessController extends Controller
@@ -18,14 +19,58 @@ class BusinessController extends Controller
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
         $offset = ($page - 1) * $limit;
+        $nearby = $request->get('nearby') === 'true';
+        
         $businesses = Business::query();
+        
+        if ($nearby) {
+            $lat = null;
+            $lng = null;
+            
+            // Case 1: If lat and lng provided in request
+            if ($request->has('lat') && $request->has('lng')) {
+                $lat = $request->lat;
+                $lng = $request->lng;
+            }
+            // Case 2: If authenticated user with primary address
+            else if (auth()->check()) {
+                $user = auth()->user();
+                $primaryAddress = $user->addresses()->where('address_type', 'primary')->first();
+                
+                if ($primaryAddress && $primaryAddress->location) {
+                    $lat = $primaryAddress->location->getLat();
+                    $lng = $primaryAddress->location->getLng();
+                }
+            }
+
+            if ($lat && $lng) {
+                // Haversine formula to calculate distance
+                $businesses->whereHas('location')
+                    ->selectRaw("*, 
+                        (6371 * acos(
+                            cos(radians(?)) * cos(radians(ST_X(location))) 
+                            * cos(radians(ST_Y(location)) - radians(?)) 
+                            + sin(radians(?)) * sin(radians(ST_X(location)))
+                        )) AS distance", [$lat, $lng, $lat])
+                    ->orderBy('distance');
+            } else {
+                // Case 3: If no location available, return random businesses
+                $businesses->inRandomOrder();
+            }
+        }
+
         if ($typeId) {
             $businesses->where('type_id', $typeId);
         }
         if ($featured) {
             $businesses->where('is_featured', true);
         }
-        $businesses = $businesses->with(['address', 'type'])->limit($limit)->offset($offset)->get();
+        
+        $businesses = $businesses->with(['address', 'type'])
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+            
         return BusinessResource::collection($businesses);
     }
 

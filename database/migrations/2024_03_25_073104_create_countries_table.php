@@ -25,7 +25,7 @@ class CreateCountriesTable extends Migration
             $table->string('currency_code')->nullable();
             $table->string('currency_symbol')->nullable();
             $table->string('flag', 255)->nullable();
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

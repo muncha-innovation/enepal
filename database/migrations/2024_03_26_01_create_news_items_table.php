@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->string('language', 4)->default('np');
             $table->timestamp('published_at')->nullable();
+            $table->integer('views_count')->default(0);
             $table->timestamps();
         });
     }

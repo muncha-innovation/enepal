@@ -16,6 +16,7 @@ use App\Http\Controllers\APIS\ProductsController;
 use App\Http\Controllers\APIS\UsersController;
 use App\Http\Controllers\APIS\NewsApiController;
 use App\Http\Controllers\APIS\NewsRecommendationController;
+use App\Http\Controllers\APIS\SearchController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
@@ -24,7 +25,7 @@ Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::get('business/types', [BusinessTypesController::class, 'index']);
 
 Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
-
+Route::get('posts/nearby', [PostsController::class, 'nearby']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UsersController::class, 'user']);
     Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
@@ -36,7 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::post('/comments/add', [PostsController::class, 'addComment']);
-    
+
     Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);
     Route::post('/news-preferences/toggle/{category}', [UsersController::class, 'toggleNewsPreference']);
 
@@ -61,13 +62,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
     });
-    Route::group(['prefix' => 'address/preferences'], function() {
+    Route::group(['prefix' => 'address/preferences'], function () {
         Route::get('fetch', [AddressPreferencesController::class, 'fetch']);
         Route::post('update', [AddressPreferencesController::class, 'update']);
         Route::post(uri: 'address/update', action: [AddressPreferencesController::class, 'updateAddress']);
     });
-
-
 });
 
 Route::get('countries', [CountryController::class, 'index']);
@@ -76,9 +75,18 @@ Route::get('countries/{country}/states', [CountryController::class, 'states']);
 Route::prefix('v1')->group(function () {
     Route::prefix('news')->group(function () {
         Route::get('recommendations', [NewsRecommendationController::class, 'index']);
+        Route::get('primary', [NewsApiController::class, 'primary']);
+        Route::get('secondary', [NewsApiController::class, 'secondary']);
         Route::get('/', [NewsApiController::class, 'index']);
         Route::get('categories/{category}', [NewsApiController::class, 'category']);
         Route::get('tags/{tag}', [NewsApiController::class, 'tag']);
         Route::get('{newsItem}', [NewsApiController::class, 'show']);
     });
+});
+
+Route::prefix('search')->group(function () {
+    Route::get('/', [SearchController::class, 'search']);
+    Route::get('/posts', [SearchController::class, 'searchPosts']);
+    Route::get('/news', [SearchController::class, 'searchNews']); 
+    Route::get('/businesses', [SearchController::class, 'searchBusinesses']);
 });

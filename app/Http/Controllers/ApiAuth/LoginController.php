@@ -31,7 +31,7 @@ class LoginController extends Controller
                 'message' => trans('User not found', [], $lang)
             ], 400);
         }
-        if (!$user->active) {
+        if (!$user->is_active) {
             return response()->json([
                 'message' => trans('User is not active', [], $lang)
             ], 400);

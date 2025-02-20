@@ -34,7 +34,7 @@ class StorePostRequest extends FormRequest
             'short_description' => ['required'],
             'image' => $imageValidation,
             'business_id' => ['required'],
-            'active' => ['required']
+            'is_active' => ['required']
         ];
     }
 
@@ -48,7 +48,7 @@ class StorePostRequest extends FormRequest
             'image.image' => 'Post image must be an image',
             'image.max' => 'Post image must be less than 2MB',
             'business_id.required' => 'Business is required',
-            'active.required' => 'Post status is required'
+            'is_active.required' => 'Post status is required'
             
         ];
     }

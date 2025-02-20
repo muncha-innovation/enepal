@@ -44,7 +44,7 @@
             @foreach ($products as $product)
             <tr>
               <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $product->name }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $product->active?'Active':'Inactive' }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $product->is_active?'Active':'Inactive' }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 @if($product->image)
                 <img src="{{ getImage($product->image, 'products/') }}" alt="Product Image" class="w-10 h-10 rounded-lg">

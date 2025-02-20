@@ -25,7 +25,7 @@ class CreatePostsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
 
             $table->timestamps();
         });

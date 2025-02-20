@@ -49,7 +49,7 @@ class ProductController extends Controller
         $product->price = $data['price'];
         $product->currency = $data['currency'];
         $product->business_id = $business->id;
-        $product->active = $data['active'];
+        $product->is_active = $data['is_active'];
         $product->created_by = auth()->id();
         $product->slug = $data['slug'];
         if($request->hasFile('image')) {
@@ -103,7 +103,7 @@ class ProductController extends Controller
         $product->price = $data['price'];
         $product->currency = $data['currency'];
         $product->business_id = $business->id;
-        $product->active = $data['active'];
+        $product->is_active = $data['is_active'];
         $product->created_by = auth()->id();
         if($request->hasFile('image')) {
             $product->image = upload('products/', 'png', $data['image']);

@@ -10,7 +10,7 @@ class BusinessMember extends Model
     use HasFactory;
     static $ROLES = ['owner', 'admin', 'member'];
     protected $table = 'business_user';
-    protected $fillable = ['business_id', 'user_id', 'role', 'position', 'active','has_joined'];
+    protected $fillable = ['business_id', 'user_id', 'role', 'position', 'is_active','has_joined'];
 
 
 }

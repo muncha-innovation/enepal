@@ -38,9 +38,12 @@ class NewsResource extends JsonResource
                 return [
                     'id' => $location->id,
                     'name' => $location->name,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude,
-                    'radius' => $location->radius,
+                    'coordinates' => [
+                        'lat' => $location->location ? $location->location->getLat() : null,
+                        'lng' => $location->location ? $location->location->getLng() : null,
+                    ],
+                    'country' => $location->country?->name,
+                    'state' => $location->state?->name,
                 ];
             }),
             'subnews' => NewsResource::collection($this->whenLoaded('childNews')),
@@ -48,4 +51,4 @@ class NewsResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
     }
-} 
+}

@@ -9,7 +9,7 @@ use Spatie\Translatable\HasTranslations;
 class Post extends Model
 {
     use HasFactory, HasTranslations;
-    protected $fillable = ['title','short_description', 'content','image','slug', 'active'];
+    protected $fillable = ['title','short_description', 'content','image','slug', 'is_active'];
     protected $translatable = ['title','short_description', 'content'];
     public function user() {
         return $this->belongsTo(User::class);

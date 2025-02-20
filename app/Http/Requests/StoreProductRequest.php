@@ -34,7 +34,7 @@ class StoreProductRequest extends FormRequest
             'currency' => ['required'],
             'price' => ['required'],
             'image' => $imageValidation,
-            'active' => ['required'],
+            'is_active' => ['required'],
             'business_id' => ['required','exists:businesses,id']
         ];
     }
@@ -56,7 +56,7 @@ class StoreProductRequest extends FormRequest
             'image.required' => 'Product image is required',
             'image.image' => 'Product image must be an image',
             'image.max' => 'Product image must be less than 2MB',
-            'active.required' => 'Product status is required'
+            'is_active.required' => 'Product status is required'
         ];
     }
 

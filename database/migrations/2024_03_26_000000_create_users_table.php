@@ -29,7 +29,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('last_password_updated')->nullable();
             $table->string('fcm_token')->nullable();
             $table->timestamp('fcm_token_updated_at')->nullable();
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->rememberToken();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');

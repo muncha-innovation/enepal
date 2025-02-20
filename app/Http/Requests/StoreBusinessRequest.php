@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\SettingKeys;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBusinessRequest extends FormRequest
@@ -23,8 +24,7 @@ class StoreBusinessRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
-        // cover_image and logo required only during create and not edit
+    {   // cover_image and logo required only during create and not edit
         if ($this->isMethod('post')) {
             $coverImageValidation = 'required|image|max:1999';
             $logoValidation = 'required|image|max:1999';
@@ -37,7 +37,7 @@ class StoreBusinessRequest extends FormRequest
             'email' => ['required', 'email'],
             'type_id' => ['required'],
             'phone_1' => ['required'],
-            'active' => ['required'],
+            'is_active' => ['required'],
             'description' => ['array', 'sometimes'],
             'cover_image' => $coverImageValidation,
             'logo' => $logoValidation,
@@ -53,7 +53,7 @@ class StoreBusinessRequest extends FormRequest
             'address.prefecture' => ['sometimes'],
             'address.town' => ['sometimes'],
             'address.building' => ['sometimes'],
-            'address.location' => ['sometimes', 'string'], // Validates POINT string format
+            'address.location' => ['sometimes', 'string'],
             'settings' => ['sometimes'],
             'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
@@ -67,7 +67,29 @@ class StoreBusinessRequest extends FormRequest
             'destinations' => ['nullable', 'array'],
             'destinations.*.country_id' => ['required_with:destinations', 'exists:countries,id'],
             'destinations.*.num_people_sent' => ['nullable', 'numeric', 'min:0'],
+            'location' => ['sometimes', 'string'], // Validates POINT string format
+            'hours' => 'sometimes|array',
+            'hours.*' => 'array',
+            'hours.*.is_open' => 'sometimes|boolean',
+            'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+            'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $hours = $this->input('hours', []);
+        $cleanedHours = [];
+        
+        foreach ($hours as $day => $schedule) {
+            if (isset($schedule['is_open']) && $schedule['is_open']) {
+                $cleanedHours[$day] = $schedule;
+            }
+        }
+        
+        if (!empty($cleanedHours)) {
+            $this->merge(['hours' => $cleanedHours]);
+        }
     }
 
     public function messages()
@@ -77,7 +99,7 @@ class StoreBusinessRequest extends FormRequest
             'email.required' => 'Business email is required',
             'type_id.required' => 'Business type is required',
             'phone_1.required' => 'Business phone number is required',
-            'active.required' => 'Business status is required',
+            'is_active.required' => 'Business status is required',
             'cover_image.required' => 'Business cover image is required',
             'logo.required' => 'Business logo is required',
             'address.country_id.required' => 'Country is required',
@@ -98,6 +120,16 @@ class StoreBusinessRequest extends FormRequest
             $data['created_by'] = auth()->id();
 
         }
+
+        // Convert location string to Point if provided
+        if (isset($data['location']) && is_string($data['location'])) {
+            preg_match('/POINT\((.*?)\)/', $data['location'], $matches);
+            if (isset($matches[1])) {
+                list($lng, $lat) = explode(' ', $matches[1]);
+                $data['location'] = new Point($lat, $lng);
+            }
+        }
+
         return $data;
     }
 }

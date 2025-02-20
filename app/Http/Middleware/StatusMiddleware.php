@@ -15,7 +15,7 @@ class StatusMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!$request->user()->active) {
+        if (!$request->user()->is_active) {
             // return response(trans('Your status is set to inactive. Please contact admin for further details'), 403);
             return response()->view('auth.inactive');
         }

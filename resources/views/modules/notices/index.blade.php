@@ -59,7 +59,7 @@
                                     <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">
                                         {{ $notice->title }}</td>
                                     <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
-                                        {{ $notice->active ? 'Active' : 'Inactive' }}</td>
+                                        {{ $notice->is_active ? 'Active' : 'Inactive' }}</td>
                                     <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                                         @if ($notice->image)
                                             <img src="{{ getImage($notice->image, 'notices/') }}" alt="Notice Image"

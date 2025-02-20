@@ -44,7 +44,7 @@
             @foreach ($posts as $post)
             <tr>
               <td class="pl-4 pr-3 py-3.5 text-sm font-medium text-gray-900 sm:pl-6">{{ $post->title }}</td>
-              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->active?'Active':'Inactive' }}</td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->is_active?'Active':'Inactive' }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
                 @if($post->image)
                 <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" class="w-10 h-10 rounded-lg">

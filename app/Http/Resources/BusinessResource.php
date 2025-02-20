@@ -36,7 +36,9 @@ class BusinessResource extends JsonResource
             'address' => new AddressResource($this->whenLoaded('address')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'type' => BusinessTypesResource::make($this->whenLoaded('type')),
-            
+            'distance' => $this->when(isset($this->distance), function() {
+                return round($this->distance, 2); // Returns distance in kilometers, rounded to 2 decimal places
+            }),
         ];
     }
 }

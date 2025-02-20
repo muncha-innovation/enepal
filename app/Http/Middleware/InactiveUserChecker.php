@@ -10,7 +10,7 @@ class InactiveUserChecker
     public function handle(Request $request, Closure $next)
     {
         // Check if user is inactive
-        if ($request->user() && !$request->user()->active) {
+        if ($request->user() && !$request->user()->is_active) {
             return redirect()->route('profile.update');
         }
 

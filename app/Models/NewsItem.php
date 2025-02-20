@@ -92,4 +92,27 @@ class NewsItem extends Model
         })->toArray();
         return $locations;
     }
+
+    public function scopeInCountry($query, $countryId)
+    {
+        return $query->whereHas('locations', function ($q) use ($countryId) {
+            $q->where('country_id', $countryId);
+        });
+    }
+
+    public function scopeInState($query, $stateId)
+    {
+        return $query->whereHas('locations', function ($q) use ($stateId) {
+            $q->where('state_id', $stateId);
+        });
+    }
+
+    public function scopeNepalNews($query)
+    {
+        return $query->whereHas('locations', function ($q) {
+            $q->whereHas('country', function ($query) {
+                $query->where('code', 'np');
+            });
+        });
+    }
 }

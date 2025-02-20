@@ -14,7 +14,7 @@ class PostResource extends JsonResource
      */
     public function toArray($request)
     {
-        $lang = $request->query('lang');
+        $lang = $request->query('lang')??'en';
         return [
             'id' => $this->id,
             'title' => $this->getTranslation('title', $lang),

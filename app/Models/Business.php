@@ -13,7 +13,7 @@ class Business extends Model
 {
     use SoftDeletes;
     use HasFactory, HasTranslations;
-    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message', 'established_year'];
+    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message', 'established_year', 'email', 'phone_1', 'phone_2', 'website', 'logo', 'cover_image', 'social_media'];
     protected $translatable = ['description'];
     protected $dates = ['deleted_at'];
 
@@ -105,6 +105,11 @@ class Business extends Model
         return $this->hasMany(Gallery::class);
     }
 
+    public function hours()
+    {
+        return $this->hasMany(BusinessHours::class);
+    }
+
     public function getHasFollowedAttribute() {
         
         $user = $this->users()->where('user_id', auth()->id())->first();
@@ -137,5 +142,59 @@ class Business extends Model
             }
         }
         return true;
+    }
+
+    public function getFormattedHoursAttribute()
+    {
+        $shortDays = ['Monday' => 'Mon','Tuesday' => 'Tue','Wednesday' => 'Wed','Thursday' => 'Thu','Friday' => 'Fri','Saturday' => 'Sat','Sunday' => 'Sun'];
+        $orderedDays = array_keys($shortDays);
+
+        $allHours = $this->hours()
+            ->where('is_open', true)
+            ->get()
+            ->sortBy(function($item) use ($orderedDays) {
+                return array_search($item->day, $orderedDays);
+            });
+
+        // Helper to format times
+        $fmt = function($time) { return \Carbon\Carbon::parse($time)->format('g:ia'); };
+
+        $groups = [];
+        foreach ($allHours as $hour) {
+            $key = $hour->open_time.'_'.$hour->close_time;
+            if (! isset($groups[$key])) {
+                $groups[$key] = ['days' => [], 'open' => $hour->open_time, 'close' => $hour->close_time];
+            }
+            $groups[$key]['days'][] = $hour->day;
+        }
+
+        // Merge consecutive days
+        $formatted = [];
+        foreach ($groups as $group) {
+            $days = $group['days'];
+            $finalRanges = [];
+            $rangeStart = $days[0];
+            $prev = $rangeStart;
+
+            for ($i = 1; $i < count($days); $i++) {
+                $current = $days[$i];
+                $prevIndex = array_search($prev, $orderedDays);
+                $currentIndex = array_search($current, $orderedDays);
+                
+                // If consecutive in the day list, continue. Otherwise close that range
+                if ($currentIndex !== $prevIndex + 1) {
+                    $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart].'-'.$shortDays[$prev]);
+                    $rangeStart = $current;
+                }
+                $prev = $current;
+            }
+            // Close final range
+            $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart].'-'.$shortDays[$prev]);
+
+            // Example: Mon-Fri 1:00pm to 3:00pm
+            $formatted[] = implode(', ', $finalRanges).' '.$fmt($group['open']).' to '.$fmt($group['close']);
+        }
+
+        return implode('; ', $formatted);
     }
 }

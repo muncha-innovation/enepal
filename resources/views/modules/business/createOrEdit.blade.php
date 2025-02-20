@@ -233,11 +233,11 @@
                     <label for="active"
                         class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.status') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <select name="active" id="active"
+                        <select name="is_active" id="active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="1" @if ($business->active) selected @endif>{{ __('business.active') }}
+                            <option value="1" @if ($business->is_active) selected @endif>{{ __('business.active') }}
                             </option>
-                            <option value="0" @if (!$business->active) selected @endif>{{ __('business.inactive') }}
+                            <option value="0" @if (!$business->is_active) selected @endif>{{ __('business.inactive') }}
                             </option>
                         </select>
                     </div>
@@ -293,6 +293,8 @@
                     @endif
                 @endrole
 
+                @include('modules.business.components.opening_closing', ['business' => $business])
+
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"
@@ -325,6 +327,8 @@
                     lat: parseFloat(lat),
                     lng: parseFloat(lng)
                 };
+                // Initialize hidden location input with existing coordinates
+                document.getElementById('location').value = `POINT(${lng} ${lat})`;
             }
 
             // Initialize map
@@ -347,8 +351,10 @@
 
             // Update location function
             function updateLocation(latlng) {
-                document.getElementById('coordinates').value = latlng.lat() + ',' + latlng.lng();
-                document.getElementById('location').value = `POINT(${latlng.lng()} ${latlng.lat()})`;
+                const lat = latlng.lat();
+                const lng = latlng.lng();
+                document.getElementById('coordinates').value = `${lat},${lng}`;
+                document.getElementById('location').value = `POINT(${lng} ${lat})`;
             }
 
             // Search box event listener

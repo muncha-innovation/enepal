@@ -53,7 +53,7 @@ class PostController extends Controller
             ->setTranslation('content', 'np', $data['content']['np']);
         $post->user_id = auth()->id();
         $post->business_id = $data['business_id'];
-        $post->active = $data['active'];
+        $post->is_active = $data['is_active'];
 
         $data['image'] = upload('posts/', 'png', $data['image']);
         $post->image = $data['image'];
@@ -108,7 +108,7 @@ class PostController extends Controller
         if($request->hasFile('image')) {
             $post->image = upload('posts/', 'png', $data['image']);
         }
-        $post->active = $data['active'];
+        $post->is_active = $data['is_active'];
         
         $post->save();
         return redirect()->route('posts.index', $business)->with('success', 'Post updated successfully');

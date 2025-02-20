@@ -9,9 +9,9 @@ use Spatie\Translatable\HasTranslations;
 class Notice extends Model
 {
     use HasFactory, HasTranslations;
-    protected $fillable = ['title', 'content', 'image', 'active', 'is_private', 'user_id', 'business_id', 'is_verified'];
+    protected $fillable = ['title', 'content', 'image', 'is_active', 'is_private', 'user_id', 'business_id', 'is_verified'];
     protected $casts = [
-        'active' => 'boolean',
+        'is_active' => 'boolean',
         'is_private' => 'boolean'
     ];
     protected $translatable = ['title', 'content'];

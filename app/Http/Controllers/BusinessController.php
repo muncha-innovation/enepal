@@ -82,10 +82,10 @@ class BusinessController extends Controller
 
         $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         $data['logo'] = upload('business/logo', 'png', $data['logo']);
-        // dd($data);
+        
         $business = Business::create(
             collect($data)
-                ->except(['address', 'settings', 'facilities', 'languages', 'destinations'])
+                ->except(['address', 'settings', 'facilities', 'languages', 'destinations','hours'])
                 ->toArray(),
         );
         $business->setTranslation('description', 'en', $data['description']['en'])->setTranslation('description', 'np', $data['description']['np']);
@@ -132,6 +132,10 @@ class BusinessController extends Controller
             }
         }
 
+        if ($request->has('hours')) {
+            $this->updateBusinessHours($business, $request->hours);
+        }
+
         return redirect()->route('business.index')->with('success', 'Business Created Successfully');
     }
 
@@ -174,16 +178,17 @@ class BusinessController extends Controller
     public function update(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
-
+        // dd($data);
         if (isset($data['address']['location'])) {
             // Convert POINT string to Point object
             preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
             if (isset($matches[1])) {
+                dump('matches[1]', $matches[1]);
                 list($lng, $lat) = explode(' ', $matches[1]);
                 $data['address']['location'] = new Point($lat, $lng);
+                dump($data);
             }
         }
-
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = upload('business/cover_image', 'png', $data['cover_image']);
         }
@@ -192,7 +197,7 @@ class BusinessController extends Controller
         }
         $business->update(
             collect($data)
-                ->except(['address', 'settings', 'facilities', 'languages','destinations'])
+                ->except(['address', 'settings', 'facilities', 'languages','destinations','hours'])
                 ->toArray(),
         );
         $address = $business->address;
@@ -249,6 +254,10 @@ class BusinessController extends Controller
             // If business type changed from education to non-education, remove related data
             $business->taughtLanguages()->detach();
             $business->destinations()->detach();
+        }
+
+        if ($request->has('hours')) {
+            $this->updateBusinessHours($business, $request->hours);
         }
 
         return back()->with('success', 'Business Updated Successfully');
@@ -351,5 +360,29 @@ class BusinessController extends Controller
             'index' => $index,
             'countries' => \App\Models\Country::all(),
         ])->render();
+    }
+
+    private function updateBusinessHours($business, $hoursData)
+    {
+        if (!$hoursData) return;
+
+        // First, mark all existing hours as closed
+        $business->hours()->update(['is_open' => false]);
+
+        // Then update or create new hours
+        foreach ($hoursData as $day => $schedule) {
+            if (!isset($schedule['is_open']) || !$schedule['is_open']) {
+                continue;
+            }
+            
+            $business->hours()->updateOrCreate(
+                ['day' => $day],
+                [
+                    'is_open' => true,
+                    'open_time' => $schedule['open_time'],
+                    'close_time' => $schedule['close_time'],
+                ]
+            );
+        }
     }
 }

@@ -19,7 +19,7 @@ class BusinessUserTable extends Migration
             $table->unsignedBigInteger('business_id');
             $table->unsignedBigInteger('user_id');
             $table->string('role')->default('member');
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->string('position')->nullable();
             $table->string('department')->nullable();
             $table->boolean('has_joined')->default(false);

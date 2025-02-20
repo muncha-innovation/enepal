@@ -59,7 +59,7 @@
                     </div>
                 @endif
 
-                @if (!auth()->user()->active)
+                @if (!auth()->user()->is_active)
                     <div class="bg-red-50 border-l-4 border-red-400 p-4 my-4">
                         <div class="flex">
                             <div class="flex-shrink-0">

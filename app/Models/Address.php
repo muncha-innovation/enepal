@@ -23,6 +23,6 @@ class Address extends Model
         return $this->belongsTo(State::class, 'state_id');
     }
     public function getCoordinatesAttribute() {
-        return $this->latitude . ',' . $this->longitude;
+        return $this->location?->getLat() . ',' . $this->location?->getLng();
     }
 }

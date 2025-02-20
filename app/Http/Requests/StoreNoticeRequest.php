@@ -28,7 +28,7 @@ class StoreNoticeRequest extends FormRequest
             'title' => ['required'],
             'content' => ['required'],
             'image' => $imageValidation,
-            'active' => ['required'],
+            'is_active' => ['required'],
             'is_private' => ['required'],
             'business_id' => ['required','exists:businesses,id']
         ];
@@ -47,7 +47,7 @@ class StoreNoticeRequest extends FormRequest
             'image.required' => 'Notice image is required',
             'image.image' => 'Notice image must be an image',
             'image.max' => 'Notice image must be less than 2MB',
-            'active.required' => 'Notice status is required'
+            'is_active.required' => 'Notice status is required'
         ];
     }
 

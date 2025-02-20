@@ -5,8 +5,11 @@ namespace App\Http\Controllers\APIS;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostResource;
+use App\Models\Business;
 use App\Models\Post;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostsController extends Controller
 {
@@ -70,5 +73,38 @@ class PostsController extends Controller
         $offset = ($page - 1) * $limit;
         $comments = $post->comments()->latest()->offset($offset)->limit($limit)->get();
         return CommentResource::collection($comments);
+    }
+
+    public function nearby(Request $request) {
+        $limit = $request->get('limit', 10);
+        $query = Post::with(['user', 'business', 'business.address'])
+            ->select('posts.*')
+            ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+            ->join('addresses', function($join) {
+                $join->on('businesses.id', '=', 'addresses.addressable_id')
+                    ->where('addresses.addressable_type', '=', Business::class);
+            })
+            ->whereNotNull('addresses.location');
+
+        // Case 1: Request has lat/lng parameters
+        if ($request->has(['lat', 'lng'])) {
+            $point = new Point($request->lat, $request->lng);
+            $query->orderByDistance('addresses.location', $point);
+        }
+        // Case 2: Authenticated user with primary address
+        elseif (Auth::check() && Auth::user()->primaryAddress?->location) {
+            $userLocation = Auth::user()->primaryAddress->location;
+            $query->orderByDistance('addresses.location', $userLocation);
+        }
+        // Case 3: Fallback to recent posts
+        else {
+            $query->inRandomOrder();
+        }
+
+        $posts = $query->latest()
+            ->limit($limit)
+            ->get();
+
+        return PostResource::collection($posts);
     }
 }

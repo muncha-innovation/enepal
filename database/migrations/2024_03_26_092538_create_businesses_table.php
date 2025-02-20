@@ -24,12 +24,10 @@ class CreateBusinessesTable extends Migration
             $table->string('logo')->nullable();
             $table->string('cover_image')->nullable();
             $table->text('description')->nullable();
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
             $table->json('social_media')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_featured')->default(false);
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('contact_person_id')->nullable();
             $table->integer('established_year')->nullable();

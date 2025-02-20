@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('name', 255);
             $table->text('description')->nullable();
             $table->string('image')->nullable();
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->string('currency')->nullable();
             $table->string('price')->nullable();
             $table->string('slug', 255)->unique();
