@@ -16,8 +16,16 @@ class CountriesTableSeeder extends Seeder
     public function run()
     {        
         if(config('app.env') == 'local'){
+            // Disable foreign key checks before truncate
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            Country::truncate();
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             $this->seedNepal();
         } else {
+            // Disable foreign key checks before truncate
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            Country::truncate();
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             $this->seedAll();   
         }
         
@@ -25,7 +33,6 @@ class CountriesTableSeeder extends Seeder
 
     private function seedAll()
  {
-    Country::truncate();
     $JSON_countries = Country::allJSON();
         foreach ($JSON_countries as $country) {
             $c = Country::firstOrCreate([
