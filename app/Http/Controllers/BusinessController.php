@@ -57,7 +57,9 @@ class BusinessController extends Controller
 
         $countries = Country::all();
         $languages = Language::all();
-        return view('modules.business.createOrEdit', compact('businessTypes', 'countries', 'languages'));
+        $socialNetworks = \App\Models\SocialNetwork::all();
+
+        return view('modules.business.createOrEdit', compact('businessTypes', 'countries', 'languages', 'socialNetworks'));
     }
 
     /**
@@ -85,7 +87,7 @@ class BusinessController extends Controller
         
         $business = Business::create(
             collect($data)
-                ->except(['address', 'settings', 'facilities', 'languages', 'destinations','hours'])
+                ->except(['address', 'settings', 'facilities', 'languages', 'destinations','hours','social_networks'])
                 ->toArray(),
         );
         $business->setTranslation('description', 'en', $data['description']['en'])->setTranslation('description', 'np', $data['description']['np']);
@@ -136,6 +138,11 @@ class BusinessController extends Controller
             $this->updateBusinessHours($business, $request->hours);
         }
 
+        // Handle social networks
+        if (isset($data['social_networks'])) {
+            $business->socialNetworks()->sync($data['social_networks']);
+        }
+
         return redirect()->route('business.index')->with('success', 'Business Created Successfully');
     }
 
@@ -165,7 +172,8 @@ class BusinessController extends Controller
         $languages = Language::all();
         $business->load(['address', 'settings', 'taughtLanguages', 'destinations']);
         $facilities = $business->facilities;
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages']));
+        $socialNetworks = \App\Models\SocialNetwork::all();
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages', 'socialNetworks']));
     }
 
     /**
@@ -196,7 +204,7 @@ class BusinessController extends Controller
         }
         $business->update(
             collect($data)
-                ->except(['address', 'settings', 'facilities', 'languages','destinations','hours'])
+                ->except(['address', 'settings', 'facilities', 'languages','destinations','hours','social_networks'])
                 ->toArray(),
         );
         $address = $business->address;
@@ -259,6 +267,11 @@ class BusinessController extends Controller
             $this->updateBusinessHours($business, $request->hours);
         }
 
+        // Handle social networks
+        if (isset($data['social_networks'])) {
+            $business->socialNetworks()->sync($data['social_networks']);
+        }
+
         return back()->with('success', 'Business Updated Successfully');
     }
 
@@ -301,7 +314,8 @@ class BusinessController extends Controller
         $languages = Language::all();
 
         $showSettings = true;
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings','languages']));
+        $socialNetworks = \App\Models\SocialNetwork::all();
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings','languages','socialNetworks']));
     }
     public function verify(Business $business)
     {

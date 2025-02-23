@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBusinessHoursTable extends Migration
+class CreateBusinessSocialNetworksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateBusinessHoursTable extends Migration
      */
     public function up()
     {
-        Schema::create('business_hours', function (Blueprint $table) {
+        Schema::create('business_social_networks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('business_id')->constrained('businesses')->onDelete('cascade');
-            $table->string('day', 20); // Monday, Tuesday, etc.
-            $table->time('open_time')->nullable();
-            $table->time('close_time')->nullable();
-            $table->boolean('is_open')->default(true);
+            $table->foreignId('social_network_id')->constrained('social_networks')->onDelete('cascade');
+            $table->string('url');
+            $table->unique(['business_id', 'social_network_id']);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ class CreateBusinessHoursTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('business_hours');
+        Schema::dropIfExists('business_social_networks');
     }
 }

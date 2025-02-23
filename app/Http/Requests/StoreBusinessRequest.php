@@ -24,7 +24,8 @@ class StoreBusinessRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {   // cover_image and logo required only during create and not edit
+    {   
+        // cover_image and logo required only during create and not edit
         if ($this->isMethod('post')) {
             $coverImageValidation = 'required|image|max:1999';
             $logoValidation = 'required|image|max:1999';
@@ -32,6 +33,7 @@ class StoreBusinessRequest extends FormRequest
             $coverImageValidation = 'sometimes|image|max:1999';
             $logoValidation = 'sometimes|image|max:1999';
         }
+        
         return [
             'name' => ['required'],
             'email' => ['required', 'email'],
@@ -73,6 +75,10 @@ class StoreBusinessRequest extends FormRequest
             'hours.*.is_open' => 'sometimes|boolean',
             'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
             'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+            'social_networks' => 'sometimes|array',
+            'social_networks.*.network_id' => 'required|exists:social_networks,id',
+            'social_networks.*.url' => 'required|url',
+            'social_networks.*.is_active' => 'sometimes|boolean',
         ];
     }
 
@@ -128,6 +134,16 @@ class StoreBusinessRequest extends FormRequest
                 list($lng, $lat) = explode(' ', $matches[1]);
                 $data['location'] = new Point($lat, $lng);
             }
+        }
+
+        // Format social networks data if present
+        if (isset($data['social_networks'])) {
+            $data['social_networks'] = collect($data['social_networks'])->mapWithKeys(function ($item) {
+                return [$item['network_id'] => [
+                    'url' => $item['url'],
+                    'is_active' => $item['is_active'] ?? true
+                ]];
+            })->all();
         }
 
         return $data;

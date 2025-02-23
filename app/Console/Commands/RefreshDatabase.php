@@ -56,6 +56,7 @@ class RefreshDatabase extends Command
         $this->call('seed:language');
         $this->call('seed:gender');
         $this->call('db:seed');
+        
         return 0;
     }
 }

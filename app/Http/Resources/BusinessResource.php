@@ -14,10 +14,32 @@ class BusinessResource extends JsonResource
      */
     public function toArray($request)
     {
-        $lang = $request->query('lang')??'en';
+        $lang = $request->query('lang') ?? 'en';
         
+        // Process facilities based on name/input_type
+        $facilities = [];
+        $socialLinks = [
+            'facebook' => null,
+            'instagram' => null,
+            'home page' => $this->website ?? null,
+        ];
+
+        foreach ($this->facilities as $facility) {
+            // Check facility name for social media links
+            if (in_array(strtolower($facility->name), ['facebook', 'instagram','home page'])) {
+                $socialLinks[strtolower($facility->name)] = $facility->pivot->value;
+            } else {
+                $facilities[] = [
+                    'id' => $facility->id,
+                    'name' => $facility->name,
+                    'icon' => getImage($facility->icon),
+                    'type' => $facility->input_type,
+                    'value' => $facility->pivot->value
+                ];
+            }
+        }
+
         return [
-            
             'id' => $this->id,
             'title' => $this->name,
             'description' => $this->getTranslation('description', $lang),
@@ -28,20 +50,33 @@ class BusinessResource extends JsonResource
             'website' => $this->website,
             'has_followed' => $this->has_followed,
             'is_admin' => $this->is_admin || $this->is_owner,
-            'facilities' => $this->facilities->map(function($facility) {
-                return [
-                    'id' => $facility->id,
-                    'title' => $facility->title,
-                    'icon' => getImage($facility->icon)
-                ];
+            
+            // Regular facilities with their icons and values
+            'facilities' => $facilities,
+            
+            // Social media links (from both direct fields and facilities)
+            'social_links' => $socialLinks,
+            
+            // Hours formatting
+            'formatted_hours' => $this->formatted_hours,
+            'hours' => $this->whenLoaded('hours', function() {
+                return $this->hours->map(function($hour) {
+                    return [
+                        'day' => $hour->day,
+                        'is_open' => $hour->is_open,
+                        'open_time' => $hour->open_time ? \Carbon\Carbon::parse($hour->open_time)->format('H:i') : null,
+                        'close_time' => $hour->close_time ? \Carbon\Carbon::parse($hour->close_time)->format('H:i') : null,
+                    ];
+                });
             }),
+            
+            // Relationships and other fields
             'address' => new AddressResource($this->whenLoaded('address')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'type' => BusinessTypesResource::make($this->whenLoaded('type')),
             'distance' => $this->when(isset($this->distance), function() {
                 return round($this->distance, 2);
             }),
-            
         ];
     }
 }

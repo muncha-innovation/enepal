@@ -293,6 +293,11 @@
                     @endif
                 @endrole
 
+                @include('modules.business.components.social_networks', [
+                    'business' => $business,
+                    'socialNetworks' => $socialNetworks
+                ])
+
                 @include('modules.business.components.opening_closing', ['business' => $business])
 
                 <div class="flex justify-end w-full">

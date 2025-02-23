@@ -13,7 +13,7 @@ class Business extends Model
 {
     use SoftDeletes;
     use HasFactory, HasTranslations;
-    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message', 'established_year', 'email', 'phone_1', 'phone_2', 'website', 'logo', 'cover_image', 'social_media'];
+    protected $fillable = ['name', 'description', 'type_id', 'created_by', 'contact_person_id', 'is_verified', 'is_featured', 'is_active', 'custom_email_message', 'established_year', 'email', 'phone_1', 'phone_2', 'website', 'logo', 'cover_image',];
     protected $translatable = ['description'];
     protected $dates = ['deleted_at'];
 
@@ -108,6 +108,13 @@ class Business extends Model
     public function hours()
     {
         return $this->hasMany(BusinessHours::class);
+    }
+
+    public function socialNetworks()
+    {
+        return $this->belongsToMany(SocialNetwork::class, 'business_social_networks')
+            ->withPivot(['url', 'is_active'])
+            ->withTimestamps();
     }
 
     public function getHasFollowedAttribute() {
