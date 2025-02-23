@@ -183,10 +183,9 @@ class BusinessController extends Controller
             // Convert POINT string to Point object
             preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
             if (isset($matches[1])) {
-                dump('matches[1]', $matches[1]);
                 list($lng, $lat) = explode(' ', $matches[1]);
                 $data['address']['location'] = new Point($lat, $lng);
-                dump($data);
+                
             }
         }
         if ($request->hasFile('cover_image')) {

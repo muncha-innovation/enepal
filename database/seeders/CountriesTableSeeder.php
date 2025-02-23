@@ -20,7 +20,7 @@ class CountriesTableSeeder extends Seeder
             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             Country::truncate();
             \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            $this->seedAll();
+            $this->seedNepal();
         } else {
             // Disable foreign key checks before truncate
             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');

@@ -15,7 +15,9 @@ class BusinessResource extends JsonResource
     public function toArray($request)
     {
         $lang = $request->query('lang')??'en';
+        
         return [
+            
             'id' => $this->id,
             'title' => $this->name,
             'description' => $this->getTranslation('description', $lang),
@@ -37,8 +39,9 @@ class BusinessResource extends JsonResource
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'type' => BusinessTypesResource::make($this->whenLoaded('type')),
             'distance' => $this->when(isset($this->distance), function() {
-                return round($this->distance, 2); // Returns distance in kilometers, rounded to 2 decimal places
+                return round($this->distance, 2);
             }),
+            
         ];
     }
 }

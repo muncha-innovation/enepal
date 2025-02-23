@@ -14,64 +14,112 @@ class BusinessController extends Controller
 
     public function getBusinesses(Request $request)
     {
+        $query = Business::query()
+            ->select('businesses.*') // Explicitly select all columns from businesses table
+            ->with(['address', 'type']);
+        $perPage = $request->get('per_page', 10);
         $typeId = $request->get('type_id');
         $featured = $request->get('featured');
-        $limit = $request->get('limit', 10);
-        $page = $request->get('page', 1);
-        $offset = ($page - 1) * $limit;
-        $nearby = $request->get('nearby') === 'true';
+        $keyword = $request->get('query');
+        $filter = $request->get('filter', 'latest');
         
-        $businesses = Business::query();
+        // Handle location and distance calculation
+        $lat = $request->header('Latitude');
+        $lng = $request->header('Longitude');
         
-        if ($nearby) {
-            $lat = null;
-            $lng = null;
-            
-            // Case 1: If lat and lng provided in request
-            if ($request->has('lat') && $request->has('lng')) {
-                $lat = $request->lat;
-                $lng = $request->lng;
-            }
-            // Case 2: If authenticated user with primary address
-            else if (auth()->check()) {
-                $user = auth()->user();
-                $primaryAddress = $user->addresses()->where('address_type', 'primary')->first();
+        if ($lat && $lng) {
+            $query->leftJoin('addresses', function($join) {
+                $join->on('addresses.addressable_id', '=', 'businesses.id')
+                     ->where('addresses.addressable_type', '=', Business::class);
+            })
+            ->selectRaw("
+                ROUND(
+                    ST_Distance_Sphere(
+                        point(?, ?),
+                        addresses.location
+                    ) / 1000, 
+                2) as distance", 
+                [$lng, $lat]
+            )
+            ->whereNotNull('addresses.location');
+        } elseif (auth()->check()) {
+            // Use authenticated user's primary address
+            $primaryAddress = auth()->user()->addresses()
+                ->where('address_type', 'primary')
+                ->first();
+
+            if ($primaryAddress && $primaryAddress->location) {
+                $userLat = $primaryAddress->location->getLat();
+                $userLng = $primaryAddress->location->getLng();
                 
-                if ($primaryAddress && $primaryAddress->location) {
-                    $lat = $primaryAddress->location->getLat();
-                    $lng = $primaryAddress->location->getLng();
-                }
-            }
-
-            if ($lat && $lng) {
-                // Haversine formula to calculate distance
-                $businesses->whereHas('location')
-                    ->selectRaw("*, 
-                        (6371 * acos(
-                            cos(radians(?)) * cos(radians(ST_X(location))) 
-                            * cos(radians(ST_Y(location)) - radians(?)) 
-                            + sin(radians(?)) * sin(radians(ST_X(location)))
-                        )) AS distance", [$lat, $lng, $lat])
-                    ->orderBy('distance');
-            } else {
-                // Case 3: If no location available, return random businesses
-                $businesses->inRandomOrder();
+                $query->leftJoin('addresses', function($join) {
+                    $join->on('addresses.addressable_id', '=', 'businesses.id')
+                         ->where('addresses.addressable_type', '=', Business::class);
+                })
+                ->selectRaw("
+                    ROUND(
+                        ST_Distance_Sphere(
+                            point(?, ?),
+                            addresses.location
+                        ) / 1000, 
+                    2) as distance", 
+                    [$userLng, $userLat]
+                )
+                ->whereNotNull('addresses.location');
             }
         }
 
+        // Apply other filters
         if ($typeId) {
-            $businesses->where('type_id', $typeId);
+            $query->where('type_id', $typeId);
         }
+
         if ($featured) {
-            $businesses->where('is_featured', true);
+            $query->where('is_featured', true);
         }
-        
-        $businesses = $businesses->with(['address', 'type'])
-            ->limit($limit)
-            ->offset($offset)
-            ->get();
-            
-        return BusinessResource::collection($businesses);
+
+        if ($keyword) {
+            $query->where(function($q) use ($keyword) {
+                $q->where('name', 'LIKE', "%{$keyword}%")
+                  ->orWhere('description', 'LIKE', "%{$keyword}%")
+                  ->orWhereHas('type', function($q) use ($keyword) {
+                      $q->where('name', 'LIKE', "%{$keyword}%");
+                  });
+            });
+        }
+
+        // Apply sorting based on filter
+        switch ($filter) {
+            case 'popular':
+                $query->withCount('users as followers_count')
+                      ->orderBy('followers_count', 'desc');
+                break;
+                
+            case 'nearyou':
+                if (isset($lat, $lng) || (auth()->check() && $primaryAddress && $primaryAddress->location)) {
+                    $query->orderBy('distance', 'asc');
+                } else {
+                    $query->orderBy('businesses.created_at', 'desc'); // Specify table name
+                }
+                break;
+                
+            case 'latest':
+            default:
+                $query->orderBy('businesses.created_at', 'desc'); // Specify table name
+                break;
+        }
+
+        $businesses = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => BusinessResource::collection($businesses),
+            'meta' => [
+                'current_page' => $businesses->currentPage(),
+                'last_page' => $businesses->lastPage(),
+                'per_page' => $businesses->perPage(),
+                'total' => $businesses->total()
+            ]
+        ]);
     }
 
     public function getBusinessType(Request $request)
