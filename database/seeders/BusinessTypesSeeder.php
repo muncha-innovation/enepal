@@ -19,7 +19,7 @@ class BusinessTypesSeeder extends Seeder
         if(sizeof($types)==0){
             $types = [
                 ['title' => 'Restaurant', 'slug' => 'restaurant', 'icon' => asset('images/business/restaurant.png')],
-                ['title' => 'Shop', 'slug' => 'shop', 'icon' => asset('images/business/shop.png')],
+                ['title' => 'Shop', 'slug' => 'shop', 'icon' => asset('images/business/shop.jpg')],
 
                 ['title' => 'Travel Agencies', 'slug' => 'travel-agency', 'icon' => asset('images/business/travel-agency.png')],
 
