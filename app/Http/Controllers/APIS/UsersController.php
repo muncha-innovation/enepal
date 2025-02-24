@@ -10,6 +10,7 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
@@ -119,5 +120,35 @@ class UsersController extends Controller
 
         // Return updated user data
         return UserResource::make($user->load('addresses'));
+    }
+
+    public function updatePassword(Request $request) {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        $user = auth()->user();
+
+        // Check if current password matches
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect',
+                'errors' => [
+                    'current_password' => ['The provided password does not match our records.']
+                ]
+            ], 422);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->password);
+        $user->last_password_updated = now();
+        $user->force_update_password = false;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password updated successfully',
+            'data' => new UserResource($user)
+        ]);
     }
 }
