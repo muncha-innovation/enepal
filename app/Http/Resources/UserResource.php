@@ -24,6 +24,8 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'image' => getImage($this->image, 'profile/'),
+            'primaryAddress' => AddressResource::make($this->primaryAddress),
+            'birthAddress' => AddressResource::make($this->birthAddress),
             'addresses' => AddressResource::collection($this->addresses),
         ];
     }

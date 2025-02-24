@@ -37,6 +37,34 @@ class ProductsController extends Controller
 
     public function getById(Request $request, $id)
     {
-        return new ProductResource(Product::with(['user', 'user.addresses', 'business', 'business.address'])->findOrFail($id));
+        $product = Product::with(['user', 'user.addresses', 'business', 'business.address'])
+            ->findOrFail($id);
+
+        // Get similar products based on business type and product title
+        $similarProducts = Product::where('id', '!=', $id)
+            ->where(function($query) use ($product) {
+                // Match by business type
+                $query->whereHas('business', function($q) use ($product) {
+                    $q->where('type_id', $product->business->type_id);
+                });
+                
+                // Or match by similar title (using LIKE)
+                $query->orWhere(function($q) use ($product) {
+                    $words = explode(' ', $product->getTranslation('name', 'en'));
+                    foreach ($words as $word) {
+                        if (strlen($word) > 3) { // Only use words longer than 3 characters
+                            $q->orWhereRaw('LOWER(JSON_EXTRACT(name, "$.en")) LIKE ?', ['%' . strtolower($word) . '%']);
+                        }
+                    }
+                });
+            })
+            ->limit(10)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'product' => new ProductResource($product),
+            'similar_products' => ProductResource::collection($similarProducts)
+        ]);
     }
 }

@@ -38,6 +38,19 @@
                 </div>
 
                 <div class="mb-2">
+                    <label for="icon" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Icon') }}</label>
+                    <div class="mt-2 rounded-md shadow-sm">
+                        <input type="file" name="icon" id="icon" accept="image/*"
+                            class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                    </div>
+                    @if($facility->icon)
+                        <div class="mt-2">
+                            <img src="{{ getImage($facility->icon, 'facilities') }}" alt="Facility Icon" class="h-12 w-12 object-contain">
+                        </div>
+                    @endif
+                </div>
+
+                <div class="mb-2">
                     <label for="input_type" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Input Type') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="input_type" id="input_type"

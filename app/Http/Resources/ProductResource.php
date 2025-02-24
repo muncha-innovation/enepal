@@ -14,7 +14,8 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        $lang = $request->query('lang')??'en';
+        $lang = $request->query('lang') ?? 'en';
+
 
         return [
             'id' => $this->id,

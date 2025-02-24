@@ -11,6 +11,8 @@ class Product extends Model
     use HasFactory, HasTranslations;
     protected $fillable = ['name', 'description', 'price', 'currency', 'image', 'slug', 'is_active'];
     protected $translatable = ['name', 'description'];
+
+
     public function business()
     {
         return $this->belongsTo(Business::class);

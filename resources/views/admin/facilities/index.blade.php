@@ -36,6 +36,9 @@
                             <tr>
                                 <th scope="col"
                                     class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                    {{ __('Icon') }}</th>
+                                <th scope="col"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                     {{ __('Name') }}</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                     {{ __('Business Types') }}</th>
@@ -49,8 +52,14 @@
                             @foreach ($facilities as $facility)
                                 <tr>
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                        @if($facility->icon)
+                                            <img src="{{ getImage($facility->icon, 'facilities') }}" alt="{{ $facility->name }}" class="h-8 w-8 object-contain">
+                                        @else
+                                            <span class="text-gray-400">{{ __('No icon') }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                         {{ $facility->name }}</td>
-
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                         @foreach ($facility->businessTypes as $businessType)
                                             <span

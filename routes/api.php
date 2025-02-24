@@ -28,6 +28,7 @@ Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
 Route::get('posts/nearby', [PostsController::class, 'nearby']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UsersController::class, 'user']);
+    Route::post('/user/update', [UsersController::class, 'update']);
     Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
     Route::get('posts/{id}', [PostsController::class, 'getById']);
     Route::get('business/{id}', [BusinessController::class, 'getById']);

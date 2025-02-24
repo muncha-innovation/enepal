@@ -185,7 +185,7 @@ class BusinessController extends Controller
     }
     public function getById($id)
     {
-        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'notices'])->findOrFail($id));
+        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'notices', 'galleries'])->findOrFail($id));
     }
 
     public function followUnfollow($businessId)
