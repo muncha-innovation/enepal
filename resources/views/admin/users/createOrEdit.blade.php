@@ -2,11 +2,11 @@
 @php
     if (isset($user)) {
         $isEdit = true;
-        $title = 'Edit User';
+        $title = __('Edit User');
         $action = route('admin.users.update', [$user]);
     } else {
         $isEdit = false;
-        $title = 'Add User';
+        $title = __('Add User');
         $user = new App\Models\User();
         $action = route('admin.users.store');
     }
@@ -14,7 +14,7 @@
 @section('content')
     <section>
         <div class="bg-white p-4 shadow rounded">
-            <form class="space-y-6" action="{{ $action }}" method="POST" enctype="multipart/form-data">
+            <form class="space-y-6" action="{{ $action }}" method="POST" enctype="multipart/form-data" id="userForm" novalidate>
                 @csrf
                 @if ($isEdit)
                     @method('PUT')
@@ -22,31 +22,11 @@
                 @include('modules.shared.success_error')
                 {{-- choose role --}}
                 <div class="mb-2">
-                    <label for="role" class="block text-sm font-medium leading-6 text-gray-900">Role</label>
-                    <div class="mt-2 rounded-md shadow-sm">
-                        <select name="role" id="role"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            @foreach ($roles as $role)
-                                <option value="{{ $role?->id }}" @if ($role?->id == $user->roles->first()?->id) selected @endif>
-                                    {{ $role?->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="mb-2">
-                        <label for="dob"
-                            class="block text-sm font-medium leading-6 text-gray-900">{{ __('Date of Birth') }}</label>
-                        <div class="mt-2">
-                @include('modules.shared.success_error')
-                {{-- choose role --}}
-                <div class="mb-2">
-                    <label for="role" class="block text-sm font-medium leading-6 text-gray-900 required">Role</label>
+                    <label for="role" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('Role') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="role" id="role" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option value="">{{ __('Select Role') }}</option>
                             @foreach ($roles as $role)
                                 <option value="{{ $role?->id }}" @if ($role?->id == $user->roles->first()?->id) selected @endif>
                                     {{ $role?->name }}
@@ -74,28 +54,26 @@
                         <div class="mt-2">
                             <select name="has_passport" id="has_passport"
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300">
-                                <option value="1" @if ($isEdit && $user->has_passport) selected @endif>Yes</option>
-                                <option value="0" @if ($isEdit && !$user->has_passport) selected @endif>No</option>
+                                <option value="1" @if ($isEdit && $user->has_passport) selected @endif>{{ __('Yes') }}</option>
+                                <option value="0" @if ($isEdit && !$user->has_passport) selected @endif>{{ __('No') }}</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-2 mt-2">
-                    <label for="first_name"
-                        class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('First Name') }}</label>
+                    <label for="first_name" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('First Name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="first_name" id="first_name" placeholder="Eg. John" required
+                        <input type="text" name="first_name" id="first_name" placeholder="{{ __('Eg. John') }}" required
                             value="{{ $user->first_name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <div class="validation-error" id="first_name-error">{{ __('First name is required') }}</div>
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="last_name"
-                        class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('Last Name') }}</label>
+                    <label for="last_name" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('Last Name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="last_name" id="last_name" placeholder="Eg. Doe" required
+                        <input type="text" name="last_name" id="last_name" placeholder="{{ __('Eg. Doe') }}" required
                             value="{{ $user->last_name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <div class="validation-error" id="last_name-error">{{ __('Last name is required') }}</div>
@@ -103,7 +81,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="address[country_id]" class="block text-sm font-medium text-gray-700 required">
+                        <label for="address[country_id]" class="block text-sm font-medium text-gray-700">
                             {{ __('Country') }}</label>
                         <div class="mt-1">
                             <select id="country" name="address[country_id]" required
@@ -114,7 +92,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="validation-error" id="country-error">{{ __('Country is required') }}</div>
                         </div>
                     </div>
                     <div>
@@ -135,31 +112,31 @@
                 </div>
 
                 <div class="mb-2">
-                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900">City</label>
+                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('City') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
-                        <input type="text" name="address[city]" id="city"
+                        <input type="text" name="address[city]" id="city" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="Eg. Kathmandu" value="{{ $user->primaryAddress?->city }}">
+                            placeholder="{{ __('Eg. Kathmandu') }}" value="{{ $user->primaryAddress?->city }}">
                     </div>
                 </div>
 
                 <div class="mb-2">
-                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900 required">Email</label>
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('Email') }}</label>
                     <input type="email" name="email" id="email" required
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="Eg. abc@gmail.com" value="{{ $user->email }}">
-                    <div class="validation-error" id="email-error">{{ __('Valid email is required') }}</div>
+                        placeholder="{{ __('Eg. abc@gmail.com') }}" value="{{ $user->email }}">
+                    <div class="validation-error" id="email-error">{{ __('Valid email address is required') }}</div>
                 </div>
                 {{-- image --}}
                 <div class="mb-2">
-                    <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Image</label>
+                    <label for="image" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Image') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="file" name="image" id="image"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     </div>
                     @if ($isEdit && isset($user->profile_picture))
                         <div class="mt-2">
-                            <img src="{{ getImage($user->profile_picture, 'profile/') }}" alt="user image"
+                            <img src="{{ getImage($user->profile_picture, 'profile/') }}" alt="{{ __('user image') }}"
                                 class="w-20 h-20 rounded-md">
                     @endif
                 </div>
@@ -170,17 +147,19 @@
                         <input id="phone" name="phone" type="text" value="{{ $user->phone }}" required
                             minLength="6" maxLength="15"
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <div class="validation-error" id="phone-error">{{ __('Phone number is required (min 6, max 15 digits)') }}</div>
+                        <div class="validation-error" id="phone-error">{{ __('Phone number is required') }}</div>
                     </div>
                 </div>
 
+
+
                 <div class="mb-2">
-                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                    <label for="active" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Status') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="is_active" id="active"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="1" @if ($user->is_active) selected @endif>Active</option>
-                            <option value="0" @if (!$user->is_active) selected @endif>Inactive</option>
+                            <option value="1" @if ($user->is_active) selected @endif>{{ __('Active') }}</option>
+                            <option value="0" @if (!$user->is_active) selected @endif>{{ __('Inactive') }}</option>
                         </select>
                     </div>
                 </div>
@@ -211,44 +190,45 @@
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Type') }}</label>
-                                        <select name="education[{{ $index }}][type]" required
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Type') }}</label>
+                                        <select name="education[{{ $index }}][type]"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                            @foreach (['under_slc' => 'Under SLC', 'slc' => 'SLC', 'plus_two' => '+2', 'bachelors' => 'Bachelors', 'masters' => 'Masters', 'phd' => 'PhD', 'training' => 'Training'] as $value => $label)
+                                            @foreach (['under_slc' => __('Under SLC'), 'slc' => __('SLC'), 'plus_two' => __('+2'), 'bachelors' => __('Bachelors'), 'masters' => __('Masters'), 'phd' => __('PhD'), 'training' => __('Training')] as $value => $label)
                                                 <option value="{{ $value }}"
                                                     @if ($education->type === $value) selected @endif>
                                                     {{ $label }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        <div class="validation-error" id="education-{{ $index }}-type-error">{{ __('Education type is required') }}</div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('Degree/Course') }}</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('Degree/Course') }}</label>
                                         <input type="text" name="education[{{ $index }}][degree]"
                                             value="{{ $education->degree }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                                     </div>
 
                                     <div class="col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Institution') }}</label>
-                                        <input type="text" name="education[{{ $index }}][institution]" required
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('Institution') }}</label>
+                                        <input type="text" name="education[{{ $index }}][institution]"
                                             value="{{ $education->institution }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        <div class="validation-error" id="education-{{ $index }}-institution-error">{{ __('Institution is required') }}</div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Start Date') }}</label>
-                                        <input type="date" name="education[{{ $index }}][start_date]" required
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                                        <input type="date" name="education[{{ $index }}][start_date]"
                                             value="{{ $education->start_date ? $education->start_date->format('Y-m-d') : '' }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        <div class="validation-error" id="education-{{ $index }}-start_date-error">{{ __('Start date is required') }}</div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
                                         <input type="date" name="education[{{ $index }}][end_date]"
                                             value="{{ $education->end_date ? $education->end_date->format('Y-m-d') : '' }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -288,31 +268,31 @@
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Job Title') }}</label>
-                                        <input type="text" name="experience[{{ $index }}][job_title]" required
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('Job Title') }}</label>
+                                        <input type="text" name="experience[{{ $index }}][job_title]"
                                             value="{{ $experience->job_title }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        <div class="validation-error" id="experience-{{ $index }}-job_title-error">{{ __('Job title is required') }}</div>
                                     </div>
 
                                     <div class="col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Company') }}</label>
-                                        <input type="text" name="experience[{{ $index }}][company]" required
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('Company') }}</label>
+                                        <input type="text" name="experience[{{ $index }}][company]"
                                             value="{{ $experience->company }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        <div class="validation-error" id="experience-{{ $index }}-company-error">{{ __('Company is required') }}</div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 required">{{ __('Start Date') }}</label>
-                                        <input type="date" name="experience[{{ $index }}][start_date]" required
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                                        <input type="date" name="experience[{{ $index }}][start_date]"
                                             value="{{ old("experience.{$index}.start_date", optional($experience->start_date)->format('Y-m-d')) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                        <div class="validation-error" id="experience-{{ $index }}-start_date-error">{{ __('Start date is required') }}</div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
+                                        <label
+                                            class="block text-sm font-medium text-gray-700">{{ __('End Date') }}</label>
                                         <input type="date" name="experience[{{ $index }}][end_date]"
                                             value="{{ old("experience.{$index}.end_date", optional($experience->end_date)->format('Y-m-d')) }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -371,13 +351,44 @@
                 <div class="flex justify-end w-full">
                     <div>
                         <button type="submit"
-                            class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+                            class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{{ __('Save') }}</button>
                     </div>
                 </div>
             </form>
         </div>
     </section>
 @endsection
+
+@push('css')
+<style>
+    .required::after {
+        content: "*";
+        color: #e53e3e;
+        margin-left: 2px;
+    }
+    
+    .validation-error {
+        color: #e53e3e;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .error-border {
+        border-color: #e53e3e !important;
+    }
+
+    .error-shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+</style>
+@endpush
 
 @push('js')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -400,18 +411,17 @@
         </button>
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 required">Type</label>
-                <select name="education[${index}][type]" required
+                <label class="block text-sm font-medium text-gray-700">Type</label>
+                <select name="education[${index}][type]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="under_slc">Under SLC</option>
-                    <option value="slc">SLC</option>
-                    <option value="plus_two">+2</option>
-                    <option value="bachelors">Bachelors</option>
-                    <option value="masters">Masters</option>
-                    <option value="phd">PhD</option>
-                    <option value="training">Training</option>
+                    <option value="under_slc">{{ __('Under SLC') }}</option>
+                    <option value="slc">{{ __('SLC') }}</option>
+                    <option value="plus_two">{{ __('+2') }}</option>
+                    <option value="bachelors">{{ __('Bachelors') }}</option>
+                    <option value="masters">{{ __('Masters') }}</option>
+                    <option value="phd">{{ __('PhD') }}</option>
+                    <option value="training">{{ __('Training') }}</option>
                 </select>
-                <div class="validation-error" id="education-${index}-type-error">{{ __('Education type is required') }}</div>
             </div>
             
             <div>
@@ -421,17 +431,15 @@
             </div>
             
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 required">{{ __('Institution') }}</label>
-                <input type="text" name="education[${index}][institution]" required
+                <label class="block text-sm font-medium text-gray-700">{{ __('Institution') }}</label>
+                <input type="text" name="education[${index}][institution]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="validation-error" id="education-${index}-institution-error">{{ __('Institution is required') }}</div>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 required">{{ __('Start Date') }}</label>
-                <input type="date" name="education[${index}][start_date]" required
+                <label class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                <input type="date" name="education[${index}][start_date]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="validation-error" id="education-${index}-start_date-error">{{ __('Start date is required') }}</div>
             </div>
             
             <div>
@@ -454,24 +462,21 @@
         
         <div class="grid grid-cols-2 gap-4">
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 required">{{ __('Job Title') }}</label>
-                <input type="text" name="experience[${index}][job_title]" required
+                <label class="block text-sm font-medium text-gray-700">{{ __('Job Title') }}</label>
+                <input type="text" name="experience[${index}][job_title]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="validation-error" id="experience-${index}-job_title-error">{{ __('Job title is required') }}</div>
             </div>
             
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 required">{{ __('Company') }}</label>
-                <input type="text" name="experience[${index}][company]" required
+                <label class="block text-sm font-medium text-gray-700">{{ __('Company') }}</label>
+                <input type="text" name="experience[${index}][company]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="validation-error" id="experience-${index}-company-error">{{ __('Company is required') }}</div>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 required">{{ __('Start Date') }}</label>
-                <input type="date" name="experience[${index}][start_date]" required
+                <label class="block text-sm font-medium text-gray-700">{{ __('Start Date') }}</label>
+                <input type="date" name="experience[${index}][start_date]" 
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="validation-error" id="experience-${index}-start_date-error">{{ __('Start date is required') }}</div>
             </div>
             
             <div>
@@ -506,6 +511,127 @@
                     if (confirm('Are you sure you want to remove this entry?')) {
                         e.target.closest('.education-entry, .experience-entry').remove();
                     }
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('userForm');
+            
+            // Validation rules for each field
+            const validationRules = {
+                role: {
+                    required: true,
+                    message: 'Role is required'
+                },
+                first_name: {
+                    required: true,
+                    message: 'First name is required'
+                },
+                last_name: {
+                    required: true,
+                    message: 'Last name is required'
+                },
+                email: {
+                    required: true,
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Valid email address is required'
+                },
+                phone: {
+                    required: true,
+                    minLength: 6,
+                    maxLength: 15,
+                    pattern: /^\d+$/,
+                    message: 'Phone number must be between 6 and 15 digits'
+                }
+            };
+
+            // Validate single field
+            function validateField(field) {
+                const rules = validationRules[field.id];
+                if (!rules) return true;
+
+                let isValid = true;
+                const errorElement = document.getElementById(`${field.id}-error`);
+                
+                // Required check
+                if (rules.required && !field.value.trim()) {
+                    isValid = false;
+                }
+                
+                // Pattern check
+                if (rules.pattern && field.value.trim() && !rules.pattern.test(field.value.trim())) {
+                    isValid = false;
+                }
+                
+                // Length checks
+                if (rules.minLength && field.value.trim().length < rules.minLength) {
+                    isValid = false;
+                }
+                if (rules.maxLength && field.value.trim().length > rules.maxLength) {
+                    isValid = false;
+                }
+
+                // Show/hide error
+                if (errorElement) {
+                    errorElement.style.display = isValid ? 'none' : 'block';
+                    field.classList.toggle('error-border', !isValid);
+                }
+
+                return isValid;
+            }
+
+            // Validate all fields
+            function validateForm() {
+                let isValid = true;
+                let firstError = null;
+
+                // Reset previous errors
+                document.querySelectorAll('.validation-error').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.querySelectorAll('.error-border').forEach(el => {
+                    el.classList.remove('error-border');
+                });
+
+                // Validate each field
+                Object.keys(validationRules).forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        const fieldValid = validateField(field);
+                        if (!fieldValid && !firstError) {
+                            firstError = field;
+                        }
+                        isValid = isValid && fieldValid;
+                    }
+                });
+
+                // Scroll to first error
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.classList.add('error-shake');
+                    setTimeout(() => firstError.classList.remove('error-shake'), 500);
+                }
+
+                return isValid;
+            }
+
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                }
+            });
+
+            // Real-time validation
+            Object.keys(validationRules).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', () => validateField(field));
+                    field.addEventListener('input', () => {
+                        field.classList.remove('error-border');
+                        document.getElementById(`${fieldId}-error`).style.display = 'none';
+                    });
                 }
             });
         });
