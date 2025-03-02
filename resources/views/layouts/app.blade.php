@@ -46,3 +46,4 @@
     @yield('js')
     @stack('js')
 @endsection
+

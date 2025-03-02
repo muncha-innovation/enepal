@@ -208,7 +208,7 @@
                         <input id="phone_1" name="phone_1" type="text" value="{{ $business->phone_1 }}" required
                             minLength="6" maxLength="15" placeholder={{__("Eg:9812312323")}}
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <div class="validation-error" id="phone_1-error">{{ __('Phone number is required (min 6, max 15 digits)') }}</div>
+                        <div class="validation-error" id="phone_1-error">{{ __('Phone number is required') }}</div>
                     </div>
                 </div>
                 <div class="mb-2">
