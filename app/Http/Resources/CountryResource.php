@@ -17,7 +17,7 @@ class CountryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'code' => $this->iso2,
+            'code' => $this->code,
             'states' => StateResource::collection($this->states),
         ];
     }

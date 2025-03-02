@@ -14,11 +14,11 @@
                 </div>
                 
                 <div class="flex-1">
-                    <input type="url" 
+                    <input type="text" 
                            name="social_networks[{{ $loop->index }}][url]" 
                            class="form-input rounded-md shadow-sm mt-1 block w-full"
                            value="{{ $businessNetwork->pivot->url ?? '' }}"
-                           placeholder="https://{{ strtolower($network->name) }}.com/your-profile">
+                           placeholder="{{ __('Username / URL') }}">
                     <input type="hidden" 
                            name="social_networks[{{ $loop->index }}][network_id]" 
                            value="{{ $network->id }}">
@@ -31,7 +31,7 @@
                                class="form-checkbox" 
                                value="1"
                                {{ !isset($businessNetwork) || $businessNetwork->pivot->is_active ? 'checked' : '' }}>
-                        <span class="ml-2">Active</span>
+                        <span class="ml-2">{{__('Active')}}</span>
                     </label>
                 </div>
             </div>

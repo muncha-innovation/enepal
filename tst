@@ -21,7 +21,7 @@ MAIL_FROM_ADDRESS="info@daishinsyu.muncha.org"
 MAIL_FROM_NAME="${APP_NAME}"
 
 %yD21od8
-
+Zx*7x449g
 # Todos:
     // 1. Implement image compression for images :
     // 2. Add title to images

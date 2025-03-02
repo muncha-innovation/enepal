@@ -55,18 +55,15 @@ class UsersController extends Controller
             'email' => 'required|email',
             'phone' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'primaryAddress' => 'required|array',
-            'primaryAddress.country_id' => 'required',
-            'primaryAddress.state_id' => 'required',
-            'primaryAddress.city' => 'required|string',
-            'primaryAddress.latitude' => 'required|numeric',
-            'primaryAddress.longitude' => 'required|numeric',
-            'birthAddress' => 'nullable|array',
-            'birthAddress.country_id' => 'nullable|required_with:birthAddress',
-            'birthAddress.state_id' => 'nullable|required_with:birthAddress',
-            'birthAddress.city' => 'nullable|required_with:birthAddress',
-            'birthAddress.latitude' => 'nullable|numeric',
-            'birthAddress.longitude' => 'nullable|numeric',
+            'addresses' => 'required|array',
+            'addresses.*.address_type' => 'required|in:primary,birth',
+            'addresses.*.country_id' => 'required|exists:countries,id',
+            'addresses.*.state_id' => 'required|exists:states,id',
+            'addresses.*.city' => 'nullable|string',
+            'addresses.*.address_line_1' => 'nullable|string',
+            'addresses.*.address_line_2' => 'nullable|string',
+            'addresses.*.latitude' => 'required_with:addresses.*.longitude|nullable|numeric',
+            'addresses.*.longitude' => 'required_with:addresses.*.latitude|nullable|numeric',
         ]);
 
         $user = auth()->user();
@@ -81,40 +78,10 @@ class UsersController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
+        
         if($request->hasFile('image')) {
             $user->update([
                 'profile_picture' => upload('profile/', 'png', $request->file('image'))
-            ]);
-        }
-
-        // Delete existing addresses
-        $user->addresses()->delete();
-
-        // Create primary address
-        if ($request->has('primaryAddress')) {
-            $primaryAddress = $request->primaryAddress;
-            $user->addresses()->create([
-                'country_id' => $primaryAddress['country_id'],
-                'state_id' => $primaryAddress['state_id'],
-                'city' => $primaryAddress['city'],
-                'address_line_1' => $primaryAddress['address_line_1'] ?? null,
-                'address_line_2' => $primaryAddress['address_line_2'] ?? null,
-                'address_type' => 'primary',
-                'location' => \DB::raw("POINT({$primaryAddress['longitude']}, {$primaryAddress['latitude']})"),
-            ]);
-        }
-
-        // Create birth address if provided
-        if ($request->has('birthAddress')) {
-            $birthAddress = $request->birthAddress;
-            $user->addresses()->create([
-                'country_id' => $birthAddress['country_id'],
-                'state_id' => $birthAddress['state_id'],
-                'city' => $birthAddress['city'],
-                'address_line_1' => $birthAddress['address_line_1'] ?? null,
-                'address_line_2' => $birthAddress['address_line_2'] ?? null,
-                'address_type' => 'birth',
-                'location' => \DB::raw("POINT({$birthAddress['longitude']}, {$birthAddress['latitude']})"),
             ]);
         }
 

@@ -98,20 +98,33 @@ class SearchService
     public function searchNews($keyword, $locality = 'all', $filter = 'latest', $point = null, $user = null, $page = 1, $perPage = 10)
     {
         $query = NewsItem::query()
-            ->where('news_items.is_active', true) // Qualified is_active
-            ->select([
-                'news_items.*',
-                DB::raw('MIN(ST_Distance_Sphere(news_locations.location, ST_GeomFromText(?))) as distance')
-            ])
-            ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select')
-            ->join('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
-            ->where(function($q) use ($keyword) {
-                $q->where('news_items.title', 'like', "%{$keyword}%")
-                    ->orWhere('news_items.description', 'like', "%{$keyword}%");
-            })
-            ->groupBy('news_items.id'); // Group only by news_items.id
-
-        switch ($locality) {
+    ->where('news_items.is_active', true)
+    ->select([
+        'news_items.id',
+        'news_items.title',
+        'news_items.description',
+        'news_items.published_at',
+        'news_items.views_count',
+        'news_items.sourceable_type',
+        'news_items.sourceable_id',
+        \DB::raw('MIN(ST_Distance_Sphere(news_locations.location, ST_GeomFromText(?))) as distance')
+    ])
+    ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select')
+    ->join('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
+    ->where(function($q) use ($keyword) {
+        $q->where('news_items.title', 'like', "%{$keyword}%")
+            ->orWhere('news_items.description', 'like', "%{$keyword}%");
+    })
+    ->groupBy([
+        'news_items.id',
+        'news_items.title',
+        'news_items.description',
+        'news_items.published_at',
+        'news_items.views_count',
+        'news_items.sourceable_type',
+        'news_items.sourceable_id'
+    ]);
+    switch ($locality) {
             case 'nepal':
                 $query->join('countries', 'news_locations.country_id', '=', 'countries.id')
                     ->whereRaw('LOWER(countries.code) = ?', ['np']);

@@ -15,11 +15,11 @@ class AddressResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'country' => $this->country?->name,
+            'country' => CountryResource::make($this->country),
             'city' => $this->city,
             'country_id'=> $this->country?->id,
             'state_id' => $this->state?->id,
-            'state' => $this->state?->name,
+            'state' => StateResource::make($this->state),
             'postal_code' => $this->postal_code,
             'address_line_1' => $this->address_line_1,
             'address_line_2' => $this->address_line_2,

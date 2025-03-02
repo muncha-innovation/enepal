@@ -29,6 +29,24 @@
             border: 1px solid #ccc;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
+        
+        /* Required field indicator and validation styles */
+        .required::after {
+            content: "*";
+            color: #e53e3e;
+            margin-left: 2px;
+        }
+        
+        .validation-error {
+            color: #e53e3e;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .error-border {
+            border-color: #e53e3e !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -39,7 +57,7 @@
     @endif
     <section>
         <div class="bg-white p-4 shadow rounded">
-            <form action="{{ $action }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ $action }}" method="POST" enctype="multipart/form-data" id="businessForm" novalidate>
                 @csrf
                 @if ($isEdit)
                     <input type="hidden" id="business_id" name="business_id" value="{{ $business->id }}">
@@ -47,17 +65,16 @@
                 @endif
                 @include('modules.shared.success_error')
                 <div class="mb-2">
-                    <label for="name"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.business_name') }}</label>
+                    <label for="name" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.business_name') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input required type="text" name="name" id="name" value="{{ $business->name }}"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="Eg. Nepalese Association of Houston">
+                        <div class="validation-error" id="name-error">{{ __('Business name is required') }}</div>
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="type_id"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.type') }}</label>
+                    <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.type') }}</label>
                     <select required id="type_id" name="type_id"
                         class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         @foreach ($businessTypes as $type)
@@ -65,6 +82,7 @@
                                 {{ $type->title }}</option>
                         @endforeach
                     </select>
+                    <div class="validation-error" id="type_id-error">{{ __('Business type is required') }}</div>
                 </div>
                 <div id="facilities-section" class="mt-4">
                     <h2 class="text-lg font-semibold text-gray-700">{{ __('business.facilities') }}</h2>
@@ -89,7 +107,7 @@
                 <p class="text-sm mb-2 mt-4">{{ __('business.business_address') }}</p>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="address[country_id]" class="block text-sm font-medium text-gray-700">
+                        <label for="address[country_id]" class="block text-sm font-medium text-gray-700 required">
                             {{ __('business.country') }}</label>
                         <div class="mt-1">
                             <select id="country" name="address[country_id]" id="address[country_id]" required
@@ -100,6 +118,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="validation-error" id="country-error">{{ __('Country is required') }}</div>
                         </div>
                     </div>
                     <div>
@@ -120,11 +139,12 @@
                 </div>
 
                 <div class="mb-2">
-                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.city') }}</label>
+                    <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.city') }}</label>
                     <div class="mt-2 rounded-md shadow-sm">
                         <input type="text" name="address[city]" id="city" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             placeholder="Eg. Kathmandu" value="{{ $business->address?->city }}">
+                        <div class="validation-error" id="city-error">{{ __('City is required') }}</div>
                     </div>
                 </div>
 
@@ -175,19 +195,20 @@
                     <input id="pac-input" class="controls" type="text" placeholder="{{ __('business.search_box') }}">
                 </div>
                 <div class="mb-2">
-                    <label for="email"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.email') }}</label>
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.email') }}</label>
                     <input required type="email" name="email" id="email" value="{{ $business->email }}"
                         placeholder="Eg. abc@gmail.com"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    <div class="validation-error" id="email-error">{{ __('Valid email is required') }}</div>
                 </div>
                 <div>
-                    <label for="phone_1" class="block text-sm font-medium text-gray-700">
+                    <label for="phone_1" class="block text-sm font-medium text-gray-700 required">
                         {{ __('business.phone_number') }}</label>
                     <div class="mt-1">
                         <input id="phone_1" name="phone_1" type="text" value="{{ $business->phone_1 }}" required
                             minLength="6" maxLength="15" placeholder={{__("Eg:9812312323")}}
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <div class="validation-error" id="phone_1-error">{{ __('Phone number is required (min 6, max 15 digits)') }}</div>
                     </div>
                 </div>
                 <div class="mb-2">
@@ -243,22 +264,22 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <label for="logo"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.logo') }}</label>
-                    <input type="file" @if (!$isEdit) required @endif name="logo" id="logo"
+                    <label for="logo" class="block text-sm font-medium leading-6 text-gray-900 {{ !$isEdit ? 'required' : '' }}">{{ __('business.logo') }}</label>
+                    <input type="file" {{ !$isEdit ? 'required' : '' }} name="logo" id="logo"
                         accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                    <div class="validation-error" id="logo-error">{{ __('Logo image is required') }}</div>
                     @if ($isEdit)
                         <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo"
                             class="w-20 h-20 mt-2">
                     @endif
                 </div>
                 <div class="mb-2">
-                    <label for="cover_image"
-                        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.cover_image') }}</label>
-                    <input type="file" @if (!$isEdit) required @endif name="cover_image"
+                    <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900 {{ !$isEdit ? 'required' : '' }}">{{ __('business.cover_image') }}</label>
+                    <input type="file" {{ !$isEdit ? 'required' : '' }} name="cover_image"
                         id="cover_image" accept="image/*"
                         class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                    <div class="validation-error" id="cover_image-error">{{ __('Cover image is required') }}</div>
                     @if ($isEdit)
                         <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="logo"
                             class="w-20 h-20 mt-2">
@@ -300,7 +321,7 @@
 
                 @include('modules.business.components.opening_closing', ['business' => $business])
 
-                <div class="flex justify-end w-full">
+                <div class="flex justify-end w-full mt-6">
                     <div>
                         <button type="submit"
                             class="inline-block w-full px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{{ __('business.save') }}</button>
@@ -409,6 +430,164 @@
 
         // Initialize the map when the window loads
         google.maps.event.addDomListener(window, 'load', initMap);
+        
+        // Form validation code
+        document.addEventListener('DOMContentLoaded', function() {
+            const businessForm = document.getElementById('businessForm');
+            const isEdit = {{ $isEdit ? 'true' : 'false' }};
+            
+            // Validation rules for each field
+            const validationRules = {
+                'name': {
+                    required: true,
+                    message: '{{ __("Business name is required") }}'
+                },
+                'type_id': {
+                    required: true,
+                    message: '{{ __("Business type is required") }}'
+                },
+                'email': {
+                    required: true,
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: '{{ __("Valid email is required") }}'
+                },
+                'phone_1': {
+                    required: true,
+                    minLength: 6,
+                    maxLength: 15,
+                    message: '{{ __("Phone number is required") }}'
+                },
+                'logo': {
+                    required: !isEdit,
+                    message: '{{ __("Logo image is required") }}'
+                },
+                'cover_image': {
+                    required: !isEdit,
+                    message: '{{ __("Cover image is required") }}'
+                },
+                'country': {
+                    required: true,
+                    message: '{{ __("Country is required") }}'
+                },
+                'city': {
+                    required: true,
+                    message: '{{ __("City is required") }}'
+                }
+            };
+            
+            // Validate all fields and show errors
+            function validateForm() {
+                let isValid = true;
+                let firstErrorField = null;
+                
+                // Reset all error states
+                document.querySelectorAll('.validation-error').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.querySelectorAll('.error-border').forEach(el => {
+                    el.classList.remove('error-border');
+                });
+                
+                // Check each field against its validation rules
+                for (const [fieldId, rules] of Object.entries(validationRules)) {
+                    const field = document.getElementById(fieldId);
+                    let fieldValid = true;
+                    
+                    if (!field) continue;
+                    
+                    // Required validation
+                    if (rules.required && (
+                        (field.type === 'file' && field.files.length === 0) ||
+                        (field.type !== 'file' && !field.value.trim())
+                    )) {
+                        fieldValid = false;
+                    }
+                    
+                    // Pattern validation (e.g., email)
+                    if (rules.pattern && field.value.trim() && !rules.pattern.test(field.value.trim())) {
+                        fieldValid = false;
+                    }
+                    
+                    // Min length validation
+                    if (rules.minLength && field.value.trim().length < rules.minLength) {
+                        fieldValid = false;
+                    }
+                    
+                    // Max length validation
+                    if (rules.maxLength && field.value.trim().length > rules.maxLength) {
+                        fieldValid = false;
+                    }
+                    
+                    // Show error if validation failed
+                    if (!fieldValid) {
+                        const errorElement = document.getElementById(`${fieldId}-error`);
+                        if (errorElement) {
+                            errorElement.style.display = 'block';
+                            field.classList.add('error-border');
+                            isValid = false;
+                            
+                            // Track the first error field for scrolling
+                            if (!firstErrorField) {
+                                firstErrorField = field;
+                            }
+                        }
+                    }
+                }
+                
+                // Scroll to the first error
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                return isValid;
+            }
+            
+            // Form submission handler
+            businessForm.addEventListener('submit', function(event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                }
+            });
+            
+            // Real-time validation as user types
+            Object.keys(validationRules).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', function() {
+                        const rules = validationRules[fieldId];
+                        let fieldValid = true;
+                        
+                        // Required validation
+                        if (rules.required && (
+                            (field.type === 'file' && field.files.length === 0) ||
+                            (field.type !== 'file' && !field.value.trim())
+                        )) {
+                            fieldValid = false;
+                        }
+                        
+                        // Pattern validation
+                        if (rules.pattern && field.value.trim() && !rules.pattern.test(field.value.trim())) {
+                            fieldValid = false;
+                        }
+                        
+                        // Min/max length validation
+                        if (rules.minLength && field.value.trim().length < rules.minLength) {
+                            fieldValid = false;
+                        }
+                        if (rules.maxLength && field.value.trim().length > rules.maxLength) {
+                            fieldValid = false;
+                        }
+                        
+                        // Update error display
+                        const errorElement = document.getElementById(`${fieldId}-error`);
+                        if (errorElement) {
+                            errorElement.style.display = fieldValid ? 'none' : 'block';
+                            field.classList.toggle('error-border', !fieldValid);
+                        }
+                    });
+                }
+            });
+        });
     </script>
 
     <script>
