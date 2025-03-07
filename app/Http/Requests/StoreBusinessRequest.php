@@ -77,7 +77,7 @@ class StoreBusinessRequest extends FormRequest
             'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
             'social_networks' => 'sometimes|array',
             'social_networks.*.network_id' => 'required|exists:social_networks,id',
-            'social_networks.*.url' => 'required|url',
+            'social_networks.*.url' => 'required|string',
             'social_networks.*.is_active' => 'sometimes|boolean',
         ];
     }

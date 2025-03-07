@@ -9,17 +9,20 @@ use App\Models\NewsTag;
 use App\Http\Resources\NewsResource;
 use Illuminate\Support\Facades\Auth;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
+use Illuminate\Support\Facades\Request;
 
 class NewsApiController extends Controller
 {
-    public function index()
-    {
-        $news = NewsItem::with(['categories', 'tags', 'source'])
-            ->where('is_active', true)
-            ->latest('published_at')
-            ->paginate(20);
-
-        return NewsResource::collection($news);
+    public function getNews(Request $request) {
+        $request->validate([
+            'query' => 'nullable|string|min:2',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:50',
+            'locality' => 'nullable|string',
+            'lang' => 'nullable|string',
+            'filter' => 'nullable|string',
+            'reverse_language' => 'boolean'
+        ]);
     }
 
     public function show(NewsItem $newsItem)

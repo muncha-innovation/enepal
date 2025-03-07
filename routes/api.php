@@ -38,6 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
+    Route::get('businesses/me', [BusinessController::class, 'getMyBusinesses']);
     Route::post('/comments/add', [PostsController::class, 'addComment']);
 
     Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);
@@ -76,7 +77,6 @@ Route::get('countries/{country}/states', [CountryController::class, 'states']);
 
 Route::prefix('v1')->group(function () {
     Route::prefix('news')->group(function () {
-        Route::get('recommendations', [NewsRecommendationController::class, 'index']);
         Route::get('primary', [NewsApiController::class, 'primary']);
         Route::get('secondary', [NewsApiController::class, 'secondary']);
         Route::get('/', [NewsApiController::class, 'index']);

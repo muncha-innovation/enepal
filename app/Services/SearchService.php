@@ -17,12 +17,13 @@ class SearchService
         $point = ($lat && $lng) ? new Point($lat, $lng) : null;
         $user = auth()->user();
         $keyword = $request->get('query');
+        $language = $request->get('language', $request->get('lang', 'en')); // Get language from request
         
         return [
             'posts' => $this->searchPosts($keyword, 'all', $page, $perPage),
             'businesses' => $this->searchBusinesses($keyword, 'all', $point, $page, $perPage),
-            'localNews' => $this->searchNews($keyword, 'local', 'forYou', $point, $user, $page, $perPage),
-            'nepalNews' => $this->searchNews($keyword, 'nepal', 'latest', $point, $user, $page, $perPage)
+            'localNews' => $this->searchNews($keyword, 'local', 'forYou', $point, $user, $page, $perPage, $language),
+            'nepalNews' => $this->searchNews($keyword, 'nepal', 'latest', $point, $user, $page, $perPage, $language)
         ];
     }
 
@@ -95,36 +96,70 @@ class SearchService
         return $query->paginate($perPage);
     }
 
-    public function searchNews($keyword, $locality = 'all', $filter = 'latest', $point = null, $user = null, $page = 1, $perPage = 10)
+    public function searchNews($keyword, $locality = 'all', $filter = 'latest', $point = null, $user = null, $page = 1, $perPage = 10, $language = 'en')
     {
         $query = NewsItem::query()
-    ->where('news_items.is_active', true)
-    ->select([
-        'news_items.id',
-        'news_items.title',
-        'news_items.description',
-        'news_items.published_at',
-        'news_items.views_count',
-        'news_items.sourceable_type',
-        'news_items.sourceable_id',
-        \DB::raw('MIN(ST_Distance_Sphere(news_locations.location, ST_GeomFromText(?))) as distance')
-    ])
-    ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select')
-    ->join('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
-    ->where(function($q) use ($keyword) {
-        $q->where('news_items.title', 'like', "%{$keyword}%")
-            ->orWhere('news_items.description', 'like', "%{$keyword}%");
-    })
-    ->groupBy([
-        'news_items.id',
-        'news_items.title',
-        'news_items.description',
-        'news_items.published_at',
-        'news_items.views_count',
-        'news_items.sourceable_type',
-        'news_items.sourceable_id'
-    ]);
-    switch ($locality) {
+            ->where('news_items.is_active', true)
+            ->where('news_items.language', $language);
+            
+        // Only apply keyword filter if the keyword is provided and not empty
+        if (!empty($keyword)) {
+            $query->where(function($q) use ($keyword) {
+                $q->where('news_items.title', 'like', "%{$keyword}%")
+                    ->orWhere('news_items.description', 'like', "%{$keyword}%");
+            });
+        }
+        
+        // Select fields based on whether point is available
+        if ($point) {
+            $query->select([
+                'news_items.id',
+                'news_items.title',
+                'news_items.description',
+                'news_items.published_at',
+                'news_items.views_count',
+                'news_items.sourceable_type',
+                'news_items.sourceable_id',
+                \DB::raw('MIN(ST_Distance_Sphere(news_locations.location, ST_GeomFromText(?))) as distance'),
+
+                'news_items.is_active',
+                'news_items.language',
+                'news_items.image',
+                'news_items.url',
+                'news_items.created_at',
+                'news_items.updated_at'
+            ])
+            ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select');
+        } else {
+            $query->select([
+                'news_items.id',
+                'news_items.title',
+                'news_items.description',
+                'news_items.published_at',
+                'news_items.views_count',
+                'news_items.sourceable_type',
+                'news_items.sourceable_id',
+                'news_items.is_active',
+                'news_items.language',
+                'news_items.image',
+                'news_items.url',
+                'news_items.created_at',
+                'news_items.updated_at'
+            ]);
+        }
+        
+        $query->join('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
+            ->groupBy([
+                'news_items.id',
+                'news_items.title',
+                'news_items.description',
+                'news_items.published_at',
+                'news_items.views_count',
+                'news_items.sourceable_type',
+                'news_items.sourceable_id'
+            ]);
+        
+        switch ($locality) {
             case 'nepal':
                 $query->join('countries', 'news_locations.country_id', '=', 'countries.id')
                     ->whereRaw('LOWER(countries.code) = ?', ['np']);

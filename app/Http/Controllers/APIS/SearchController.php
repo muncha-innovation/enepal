@@ -120,16 +120,25 @@ class SearchController extends Controller
     public function searchNews(Request $request)
     {
         $request->validate([
-            'query' => 'required|string|min:2',
+            'query' => 'nullable|string|min:2',
             'page' => 'nullable|integer|min:1',
             'per_page' => 'nullable|integer|min:1|max:50',
             'locality' => 'nullable|string|in:all,local,nepal',
             'filter' => 'nullable|string|in:forYou,latest,trending',
+            'lang' => 'nullable|string|in:en,np',
+            'reverse_language' => 'required|string|in:yes,no'
         ]);
 
         try {
             $point = $this->getPointFromRequest($request);
-            
+            $language= $request->get('lang', 'en');
+            if($request->get('reverse_language')=='yes') {
+                if($language=='en') {
+                    $language = 'np';
+                } else {
+                    $language = 'en';
+                }
+            }
             $results = $this->searchService->searchNews(
                 $request->get('query'),
                 $request->get('locality', 'all'),
@@ -137,7 +146,8 @@ class SearchController extends Controller
                 $point,
                 auth()->user(),
                 $request->input('page', 1),
-                $request->input('per_page', 10)
+                $request->input('per_page', 10),
+                $language
             );
 
             return response()->json([
