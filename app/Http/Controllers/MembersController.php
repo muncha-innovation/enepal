@@ -42,7 +42,6 @@ class MembersController extends Controller
             $business->users()->detach($user->id);
             $business->users()->attach($user->id, ['role' => $request->role, 'position' => $request->position, 'has_joined' => false]);
             
-            // event(new MemberAddedToBusiness($user, $business, $password, $request->role));
             
             $notify = new NotifyProcess();
             $notify->setTemplate(SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)

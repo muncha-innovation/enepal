@@ -29,6 +29,7 @@ Route::get('posts/nearby', [PostsController::class, 'nearby']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UsersController::class, 'user']);
     Route::post('/user/update', [UsersController::class, 'update']);
+    Route::post('/user/image/update', [UsersController::class, 'updateImage']);
     Route::post('/user/password/update', [UsersController::class, 'updatePassword']);
     Route::get('business/types/{id}', [BusinessTypesController::class, 'getById']);
     Route::get('posts/{id}', [PostsController::class, 'getById']);
@@ -39,6 +40,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('posts/{id}/like', [PostsController::class, 'likeUnlike']);
     Route::get('businesses', [BusinessController::class, 'getBusinesses']);
     Route::get('businesses/me', [BusinessController::class, 'getMyBusinesses']);
+    Route::post('business/add', [BusinessController::class, 'addBusiness']);
+    Route::post('business/member/add', [BusinessController::class, 'addMember']);
     Route::post('/comments/add', [PostsController::class, 'addComment']);
 
     Route::post('/fcm/update', [UsersController::class, 'updateFcmToken']);

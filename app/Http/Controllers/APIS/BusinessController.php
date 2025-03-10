@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\APIS;
 
+use App\Enums\SettingKeys;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BusinessResource;
+use App\Http\Resources\UserResource;
 use App\Models\Business;
 use App\Models\BusinessType;
+use App\Models\User;
+use App\Notify\NotifyProcess;
+use Exception;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BusinessController extends Controller
 {
@@ -22,26 +28,27 @@ class BusinessController extends Controller
         $featured = $request->get('featured');
         $keyword = $request->get('query');
         $filter = $request->get('filter', 'latest');
-        
+
         // Handle location and distance calculation
         $lat = $request->header('Latitude');
         $lng = $request->header('Longitude');
-        
+
         if ($lat && $lng) {
-            $query->leftJoin('addresses', function($join) {
+            $query->leftJoin('addresses', function ($join) {
                 $join->on('addresses.addressable_id', '=', 'businesses.id')
-                     ->where('addresses.addressable_type', '=', Business::class);
+                    ->where('addresses.addressable_type', '=', Business::class);
             })
-            ->selectRaw("
+                ->selectRaw(
+                    "
                 ROUND(
                     ST_Distance_Sphere(
                         point(?, ?),
                         addresses.location
                     ) / 1000, 
-                2) as distance", 
-                [$lng, $lat]
-            )
-            ->whereNotNull('addresses.location');
+                2) as distance",
+                    [$lng, $lat]
+                )
+                ->whereNotNull('addresses.location');
         } elseif (auth()->check()) {
             // Use authenticated user's primary address
             $primaryAddress = auth()->user()->addresses()
@@ -51,21 +58,22 @@ class BusinessController extends Controller
             if ($primaryAddress && $primaryAddress->location) {
                 $userLat = $primaryAddress->location->getLat();
                 $userLng = $primaryAddress->location->getLng();
-                
-                $query->leftJoin('addresses', function($join) {
+
+                $query->leftJoin('addresses', function ($join) {
                     $join->on('addresses.addressable_id', '=', 'businesses.id')
-                         ->where('addresses.addressable_type', '=', Business::class);
+                        ->where('addresses.addressable_type', '=', Business::class);
                 })
-                ->selectRaw("
+                    ->selectRaw(
+                        "
                     ROUND(
                         ST_Distance_Sphere(
                             point(?, ?),
                             addresses.location
                         ) / 1000, 
-                    2) as distance", 
-                    [$userLng, $userLat]
-                )
-                ->whereNotNull('addresses.location');
+                    2) as distance",
+                        [$userLng, $userLat]
+                    )
+                    ->whereNotNull('addresses.location');
             }
         }
 
@@ -79,12 +87,12 @@ class BusinessController extends Controller
         }
 
         if ($keyword) {
-            $query->where(function($q) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('name', 'LIKE', "%{$keyword}%")
-                  ->orWhere('description', 'LIKE', "%{$keyword}%")
-                  ->orWhereHas('type', function($q) use ($keyword) {
-                      $q->where('name', 'LIKE', "%{$keyword}%");
-                  });
+                    ->orWhere('description', 'LIKE', "%{$keyword}%")
+                    ->orWhereHas('type', function ($q) use ($keyword) {
+                        $q->where('name', 'LIKE', "%{$keyword}%");
+                    });
             });
         }
 
@@ -92,9 +100,9 @@ class BusinessController extends Controller
         switch ($filter) {
             case 'popular':
                 $query->withCount('users as followers_count')
-                      ->orderBy('followers_count', 'desc');
+                    ->orderBy('followers_count', 'desc');
                 break;
-                
+
             case 'nearyou':
                 if (isset($lat, $lng) || (auth()->check() && $primaryAddress && $primaryAddress->location)) {
                     $query->orderBy('distance', 'asc');
@@ -102,7 +110,7 @@ class BusinessController extends Controller
                     $query->orderBy('businesses.created_at', 'desc'); // Specify table name
                 }
                 break;
-                
+
             case 'latest':
             default:
                 $query->orderBy('businesses.created_at', 'desc'); // Specify table name
@@ -132,7 +140,7 @@ class BusinessController extends Controller
         return response()->json($type);
     }
 
-    
+
     public function products(Request $request)
     {
         $request->validate([
@@ -201,7 +209,7 @@ class BusinessController extends Controller
                 'message' => 'Business followed successfully'
             ]);
         } else {
-            if($user->pivot->role=='member') {
+            if ($user->pivot->role == 'member') {
                 $business->users()->detach(auth()->id());
                 return response()->json([
                     'message' => 'Business unfollowed successfully'
@@ -214,11 +222,12 @@ class BusinessController extends Controller
         }
     }
 
-    public function following() {
-        $businesses = Business::whereHas('users', function($query) {
+    public function following()
+    {
+        $businesses = Business::whereHas('users', function ($query) {
             $query->where('user_id', auth()->id());
         })->with(['type'])->get();
-        
+
         return BusinessResource::collection($businesses);
     }
 
@@ -226,13 +235,13 @@ class BusinessController extends Controller
     {
         $query = Business::query()
             ->select('businesses.*')
-            ->join('business_user', function($join) {
+            ->join('business_user', function ($join) {
                 $join->on('businesses.id', '=', 'business_user.business_id')
                     ->where('business_user.user_id', '=', auth()->id())
                     ->where('business_user.role', '=', 'owner');
             })
             ->with(['address', 'type']);
-            
+
         $perPage = $request->get('per_page', 10);
         $businesses = $query->paginate($perPage);
 
@@ -244,6 +253,110 @@ class BusinessController extends Controller
                 'per_page' => $businesses->perPage(),
                 'total' => $businesses->total()
             ]
+        ]);
+    }
+
+    public function addBusiness(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'type_id' => 'required|integer|exists:business_types,id',
+        ]);
+        $business = Business::create([
+            'name' => $request->name,
+            'type_id' => $request->type_id,
+            'created_by' => auth()->id()
+        ]);
+
+        return response()->json([
+            'message' => trans('Business added successfully', [], $request->get('lang', 'en')),
+            'data' => new BusinessResource($business)
+        ]);
+    }
+
+    public function addMember(Request $request)
+    {
+        $request->validate([
+            'business_id' => 'required|integer|exists:businesses,id',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'email' => 'required|email',
+            'phone_number' => 'required|string',
+            'role' => 'required|string|in:member,admin',
+        ]);
+
+        $business = Business::findOrFail($request->business_id);
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $existingUser = $business->users()->where('user_id', $user->id)->first();
+            if ($existingUser) {
+                return response()->json([
+                    'message' => 'User is already a member of this business'
+                ], 400);
+            }
+            $business->users()->detach($user->id);
+            $business->users()->attach($user->id, [
+                'role' => $request->role,
+                'has_joined' => true,
+            ]);
+
+            $notify = new NotifyProcess();
+            $notify->setTemplate(SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+                ->setUser($user)
+                ->withShortCodes([
+                    'role' => $request->role,
+                    'business_name' => $business->name,
+                    'site_name' => config('app.name'),
+                    'business_message' => $business->custom_email_message,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                ]);
+            $notify->send();
+            return response()->json([
+                'message' => 'Member added successfully',
+                'member' => UserResource::make($user),
+            ]);
+        }
+        else {
+            $password = \Str::random(8);
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'phone' => $request->phone_number,
+                'password' => bcrypt($password),
+                'force_update_password' => true,
+            ]);
+            $user->assignRole(User::User);
+
+            $business->users()->attach($user->id, [
+                'role' => $request->role,
+                'has_joined' => false,
+            ]);
+            try {
+                $notify = new NotifyProcess();
+                $notify->setTemplate(SettingKeys::NEW_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
+                    ->setUser($user)
+                    ->withShortCodes([
+                        'role' => $request->role,
+                        'business_name' => $business->name,
+                        'site_name' => config('app.name'),
+                        'password' => $password,
+                        'business_message' => $business->custom_email_message,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                    ]);
+                $notify->send();
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'message' => 'Member added successfully',
+            'member' => UserResource::make($user),
         ]);
     }
 }

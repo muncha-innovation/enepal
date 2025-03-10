@@ -23,7 +23,7 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'image' => getImage($this->image, 'profile/'),
+            'image' => getImage($this->profile_picture, 'profile/'),
             'primaryAddress' => AddressResource::make($this->primaryAddress),
             'birthAddress' => AddressResource::make($this->birthAddress),
             'addresses' => AddressResource::collection($this->addresses),

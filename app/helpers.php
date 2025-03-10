@@ -64,7 +64,7 @@ if (!function_exists('file_path')) {
 }
 
 if (!function_exists('getImage')) {
-    function getImage(string $fileName = null, string $dir = null)
+    function getImage(?string $fileName, string $dir = null)
     {
         if ($fileName == null) {
             return asset('images/profile/default.png');
@@ -130,24 +130,4 @@ if (!function_exists('menuActive')) {
             return $class;
         }
     }
-}
-
-function gs($key = null)
-{
-    $general = Cache::get('GeneralSetting');
-    if (!$general) {
-        $general = GeneralSetting::first();
-        Cache::put('GeneralSetting', $general);
-    }
-    if (Arr::has([
-        'mail_config',
-        'sms_config',
-        'global_placeholders' => 'object',
-        'socialite_credentials',
-        'firebase_config',
-    ], $key)) {
-        return (object) @$general->$key;
-    }
-    if ($key) return @$general->$key;
-    return $general;
 }

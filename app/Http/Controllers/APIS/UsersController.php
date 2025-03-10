@@ -31,7 +31,7 @@ class UsersController extends Controller
 
     //     $user = auth()->user();
     //     $user->toggleNewsPreference($category->id);
-    //     return response()->json([
+//     return response()->json([
     //         'success' => true
     //     ]);
     // }
@@ -54,7 +54,6 @@ class UsersController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'addresses' => 'required|array',
             'addresses.*.address_type' => 'required|in:primary,birth',
             'addresses.*.country_id' => 'required|exists:countries,id',
@@ -67,10 +66,6 @@ class UsersController extends Controller
         ]);
 
         $user = auth()->user();
-        return response()->json([
-            'data' => $request->all(),
-            'file'=> $request->file('file')
-        ]);
         // Update basic user info
         $user->update([
             'first_name' => $request->first_name,
@@ -79,14 +74,35 @@ class UsersController extends Controller
             'phone' => $request->phone,
         ]);
         
-        if($request->hasFile('image')) {
-            $user->update([
-                'profile_picture' => upload('profile/', 'png', $request->file('image'))
-            ]);
+        // Update addresses
+        foreach ($request->addresses as $addressInput) {
+            $addressType = $addressInput['address_type'];
+            
+            $addressData = [
+                'country_id' => $addressInput['country_id'],
+                'state_id' => $addressInput['state_id'],
+                'city' => $addressInput['city'] ?? null,
+                'address_line_1' => $addressInput['address_line_1'] ?? null,
+                'address_line_2' => $addressInput['address_line_2'] ?? null,
+            ];
+            
+            // Add location point if latitude and longitude are provided
+            if (!empty($addressInput['latitude']) && !empty($addressInput['longitude'])) {
+                $addressData['location'] = new \Grimzy\LaravelMysqlSpatial\Types\Point(
+                    $addressInput['latitude'],
+                    $addressInput['longitude']
+                );
+            }
+            
+            // Use updateOrCreate for each address type
+            $user->addresses()->updateOrCreate(
+                ['address_type' => $addressType],
+                $addressData
+            );
         }
 
-        // Return updated user data
-        return UserResource::make($user->load('addresses'));
+        // Return updated user data with addresses
+        return UserResource::make($user->fresh('addresses'));
     }
 
     public function updatePassword(Request $request) {
@@ -117,5 +133,22 @@ class UsersController extends Controller
             'message' => 'Password updated successfully',
             'data' => new UserResource($user)
         ]);
+    }
+
+    public function updateImage(Request $request) {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = auth()->user();
+        $path = upload('profile/', 'png', $request->file('image'));
+        
+        $user->update([
+            'profile_picture' => $path
+        ]);
+        
+        $user->load('addresses');
+
+        return UserResource::make($user);
     }
 }
