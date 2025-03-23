@@ -153,6 +153,7 @@ class SearchService
             ->groupBy([
                 'news_items.id',
                 'news_items.title',
+                'news_items.is_active',
                 'news_items.description',
                 'news_items.published_at',
                 'news_items.views_count',
