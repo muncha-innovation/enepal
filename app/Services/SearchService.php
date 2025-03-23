@@ -158,7 +158,12 @@ class SearchService
                 'news_items.published_at',
                 'news_items.views_count',
                 'news_items.sourceable_type',
-                'news_items.sourceable_id'
+                'news_items.sourceable_id',
+                'news_items.language',
+                'news_items.image',
+                'news_items.url',
+                'news_items.created_at',
+                'news_items.updated_at'
             ]);
         
         switch ($locality) {
