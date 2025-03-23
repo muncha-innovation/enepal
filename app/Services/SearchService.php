@@ -122,8 +122,6 @@ class SearchService
                 'news_items.sourceable_id',
                 'news_items.is_active',
                 \DB::raw('MIN(ST_Distance_Sphere(news_locations.location, ST_GeomFromText(?))) as distance'),
-
-                'news_items.is_active',
                 'news_items.language',
                 'news_items.image',
                 'news_items.url',
