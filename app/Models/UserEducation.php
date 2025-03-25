@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserEducation extends Model
 {
-    protected $fillable = ['user_id', 'degree', 'institution', 'start_date','end_date', 'type'];
-
+    protected $table = 'user_education';
+    
+    protected $fillable = ['user_id', 'degree', 'institution', 'start_date', 'end_date', 'type'];
 
     protected $casts = [
         'start_date' => 'datetime',
@@ -17,6 +18,7 @@ class UserEducation extends Model
 
     use HasFactory;
 
+    // Inverse Relationship: Education → User
     public function user()
     {
         return $this->belongsTo(User::class);

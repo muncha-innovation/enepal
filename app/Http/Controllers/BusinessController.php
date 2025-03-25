@@ -138,8 +138,8 @@ class BusinessController extends Controller
             $this->updateBusinessHours($business, $request->hours);
         }
 
-        // Handle social networks
-        if (isset($data['social_networks'])) {
+        // Handle social networks only if provided
+        if (!empty($data['social_networks'])) {
             $business->socialNetworks()->sync($data['social_networks']);
         }
 
@@ -267,9 +267,12 @@ class BusinessController extends Controller
             $this->updateBusinessHours($business, $request->hours);
         }
 
-        // Handle social networks
+        // Handle social networks - sync will remove any networks not in the array
         if (isset($data['social_networks'])) {
             $business->socialNetworks()->sync($data['social_networks']);
+        } else {
+            // If no social networks provided, remove all existing ones
+            $business->socialNetworks()->detach();
         }
 
         return back()->with('success', 'Business Updated Successfully');

@@ -59,7 +59,7 @@ class StoreBusinessRequest extends FormRequest
             'settings' => ['sometimes'],
             'facilities' => ['sometimes', 'array'],
             'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
-            'custom_email_message' => ['sometimes', 'string', 'max:1000'],
+            'custom_email_message' => ['nullable', 'string', 'max:1000'],
             'languages' => ['nullable', 'array'],
             'languages.*.id' => ['required_with:languages', 'exists:languages,id'],
             'languages.*.price' => ['required_with:languages', 'numeric', 'min:0'],
@@ -75,10 +75,10 @@ class StoreBusinessRequest extends FormRequest
             'hours.*.is_open' => 'sometimes|boolean',
             'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
             'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
-            'social_networks' => 'sometimes|array',
-            'social_networks.*.network_id' => 'required|exists:social_networks,id',
-            'social_networks.*.url' => 'required|string',
-            'social_networks.*.is_active' => 'sometimes|boolean',
+            'social_networks' => 'nullable|array',
+            'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
+            'social_networks.*.url' => 'nullable|string',
+            'social_networks.*.is_active' => 'boolean',
         ];
     }
 
@@ -138,14 +138,85 @@ class StoreBusinessRequest extends FormRequest
 
         // Format social networks data if present
         if (isset($data['social_networks'])) {
-            $data['social_networks'] = collect($data['social_networks'])->mapWithKeys(function ($item) {
-                return [$item['network_id'] => [
-                    'url' => $item['url'],
-                    'is_active' => $item['is_active'] ?? true
-                ]];
-            })->all();
+            $data['social_networks'] = collect($data['social_networks'])
+                ->filter(function ($item) {
+                    // Only include items that have both network_id and url
+                    return !empty($item['url']) && isset($item['network_id']);
+                })
+                ->mapWithKeys(function ($item) {
+                    return [$item['network_id'] => [
+                        'url' => $this->normalizeUrl($item['url'], $item['network_id']),
+                        'is_active' => $item['is_active'] ?? true
+                    ]];
+                })->all();
         }
 
         return $data;
+    }
+
+    /**
+     * Normalize social media URL based on network
+     */
+    protected function normalizeUrl($url, $networkId)
+    {
+        // Remove whitespace and convert to lowercase
+        $url = trim(strtolower($url));
+        
+        // Get network info from database
+        $network = \App\Models\SocialNetwork::find($networkId);
+        if (!$network) return $url;
+
+        switch ($network->name) {
+            case 'Facebook':
+                // Handle Facebook URLs
+                if (preg_match('/^@/', $url)) {
+                    // Handle @username format
+                    $username = ltrim($url, '@');
+                    return "https://www.facebook.com/{$username}";
+                }
+                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+                    // Add https:// if not present
+                    $url = "https://" . ltrim($url, '/');
+                }
+                // Ensure www.facebook.com format
+                $url = preg_replace('~^(?:https?://)?(?:www\.)?facebook\.com~i', 'https://www.facebook.com', $url);
+                break;
+
+            case 'Twitter':
+                // Handle Twitter URLs
+                if (preg_match('/^@/', $url)) {
+                    $username = ltrim($url, '@');
+                    return "https://twitter.com/{$username}";
+                }
+                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+                    $url = "https://" . ltrim($url, '/');
+                }
+                $url = preg_replace('~^(?:https?://)?(?:www\.)?twitter\.com~i', 'https://twitter.com', $url);
+                break;
+
+            case 'Instagram':
+                // Handle Instagram URLs
+                if (preg_match('/^@/', $url)) {
+                    $username = ltrim($url, '@');
+                    return "https://www.instagram.com/{$username}";
+                }
+                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+                    $url = "https://" . ltrim($url, '/');
+                }
+                $url = preg_replace('~^(?:https?://)?(?:www\.)?instagram\.com~i', 'https://www.instagram.com', $url);
+                break;
+
+            case 'LinkedIn':
+                // Handle LinkedIn URLs
+                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+                    $url = "https://" . ltrim($url, '/');
+                }
+                $url = preg_replace('~^(?:https?://)?(?:www\.)?linkedin\.com~i', 'https://www.linkedin.com', $url);
+                break;
+
+            // Add more cases for other networks as needed
+        }
+
+        return $url;
     }
 }

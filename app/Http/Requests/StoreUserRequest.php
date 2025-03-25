@@ -42,11 +42,14 @@ class StoreUserRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:191'],
             'first_name' => ['required', 'string', 'max:191'],
             'phone' => ['nullable', 'string', 'max:191'],
-            'address.country_id' => 'required',
-            'address.city' => 'nullable | string| max: 50',
+            'address.country_id' => ['required'],
+            'address.state_id' => ['nullable', 'exists:states,id'],
+            'address.city' => ['required', 'string', 'max:50'],
+            'address.address_line_1' => ['nullable', 'string', 'max:255'],
+            'address.address_line_2' => ['nullable', 'string', 'max:255'],
+            'address.postal_code' => ['nullable', 'string', 'max:50'],
             'address.prefecture' => ['nullable', 'string', 'max:50'],
             'address.town' => ['nullable', 'string', 'max:50'],
-            'address.postal_code' => ['nullable', 'string', 'max:50'],
             'address.state' => ['nullable', 'string', 'max:50'],
             'address.street' => ['nullable', 'string', 'max:50'],
             'address.building' => ['nullable', 'string', 'max:50'],
@@ -77,8 +80,6 @@ class StoreUserRequest extends FormRequest
             'preferences.app_language' => ['nullable', 'string', 'max:255'],
         ]);
     }
-
-
 
     protected function passedValidation()
     {
@@ -117,8 +118,16 @@ class StoreUserRequest extends FormRequest
         return [
             'role.exists' => 'The selected role is invalid.',
             'address.country_id.required' => 'The country field is required.',
+            'address.state_id.exists' => 'The selected state is invalid.',
+            'address.city.required' => 'The city field is required.',
             'address.city.string' => 'The city must be a string.',
             'address.city.max' => 'The city may not be greater than 50 characters.',
+            'address.address_line_1.string' => 'The address line 1 must be a string.',
+            'address.address_line_1.max' => 'The address line 1 may not be greater than 255 characters.',
+            'address.address_line_2.string' => 'The address line 2 must be a string.',
+            'address.address_line_2.max' => 'The address line 2 may not be greater than 255 characters.',
+            'address.postal_code.string' => 'The postal code must be a string.',
+            'address.postal_code.max' => 'The postal code may not be greater than 50 characters.',
             'address.prefecture.string' => 'The prefecture must be a string.',
             'address.prefecture.max' => 'The prefecture may not be greater than 50 characters.',
             'address.town.string' => 'The town must be a string.',

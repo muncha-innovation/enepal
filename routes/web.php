@@ -107,6 +107,8 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     Route::resource('galleryImage', GalleryImageController::class);
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    // Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     // Logs Route
     // Route::get('logs/all', [LogsController::class, 'getAllLogs'])->name('logs.all');
     // Route::match(['get', 'post'], 'logs/{userId}', [LogsController::class, 'getLogsByUser'])->name('user.logs');
@@ -115,6 +117,18 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 
     // Route::post('logs/add', [LogsController::class, 'store'])->name('logs.store');
 
+});
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/profile/work-experience', [ProfileController::class, 'getWorkExperience'])->name('profile.workExperience');
+    Route::get('/profile/work-experience/{id}', [ProfileController::class, 'getWorkExperienceItem'])->name('profile.workExperience.show');
+    Route::post('/profile/work-experience', [ProfileController::class, 'updateWorkExperience'])->name('profile.workExperience.update');
+    Route::delete('/profile/work-experience/{id}', [ProfileController::class, 'deleteWorkExperience'])->name('profile.workExperience.delete');
+
+    Route::get('/profile/education', [ProfileController::class, 'getEducation'])->name('profile.education');
+    Route::get('/profile/education/{id}', [ProfileController::class, 'getEducationItem'])->name('profile.education.show');
+    Route::post('/profile/education', [ProfileController::class, 'updateEducation'])->name('profile.education.update');
+    Route::delete('/profile/education/{id}', [ProfileController::class, 'deleteEducation'])->name('profile.education.delete');
 });
 
 Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');
