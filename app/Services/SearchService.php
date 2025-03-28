@@ -60,16 +60,23 @@ class SearchService
             ->join('addresses', function($join) {
                 $join->on('addresses.addressable_id', '=', 'businesses.id')
                      ->where('addresses.addressable_type', '=', 'App\Models\Business');
-            })
-            ->select([
+            });
+            
+        if ($point) {
+            $query->select([
                 'businesses.*',
                 DB::raw('ST_Distance_Sphere(addresses.location, ST_GeomFromText(?)) as distance')
             ])
-            ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select')
-            ->where(function($q) use ($keyword) {
+            ->addBinding("POINT({$point->getLng()} {$point->getLat()})", 'select');
+        } else {
+            $query->select('businesses.*');
+        }
+        
+        $query->where(function($q) use ($keyword) {
                 $q->where('businesses.name', 'like', "%{$keyword}%")
                   ->orWhere('businesses.description', 'like', "%{$keyword}%");
             });
+            
         if ($point) {
             switch ($filter) {
                 case 'nearYou':
@@ -79,10 +86,8 @@ class SearchService
                 case 'popular':
                     $query->withCount('users')
                         ->orderBy('users_count', 'desc');
-                    if ($point) {
-                        $query->whereNotNull('addresses.location')
-                            ->orderBy('distance', 'asc');
-                    }
+                    $query->whereNotNull('addresses.location')
+                        ->orderBy('distance', 'asc');
                     break;
                 default:
                     $query->whereNotNull('addresses.location')
