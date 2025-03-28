@@ -1,15 +1,12 @@
 @extends('layouts.app')
 @php
-    $isEdit = isset($business);
+    $isEdit = isset($business) && $business->id;
     if ($isEdit) {
         $title = 'Edit Business / Organization';
-        $action = route('business.update', $business);
     } else {
         $title = 'Create Business / Organization';
         $business = new \App\Models\Business();
-        $action = route('business.store');
     }
-
 @endphp
 @section('css')
     <style>
@@ -86,19 +83,21 @@
         </ul>
     </div>
 
+    @include('modules.shared.success_error')
+
     <!-- Tab Content -->
     <section>
         <div class="bg-white p-4 shadow rounded">
-            <form action="{{ $action }}" method="POST" enctype="multipart/form-data" id="businessForm" novalidate>
-                @csrf
-                @if ($isEdit)
-                    <input type="hidden" id="business_id" name="business_id" value="{{ $business->id }}">
-                    @method('PUT')
-                @endif
-                @include('modules.shared.success_error')
-                <div class="tab-content">
-                    <!-- General Tab -->
-                    <div id="general" class="tab-pane active">
+            <div class="tab-content">
+                <!-- General Tab -->
+                <div id="general" class="tab-pane active">
+                    <form action="{{ $isEdit ? route('business.saveGeneral.update', $business) : route('business.saveGeneral.create') }}" method="POST" id="generalForm">
+                        @csrf
+                        <input type="hidden" name="_section" value="general">
+                        @if ($isEdit)
+                            @method('PUT')
+                        @endif
+
                         <div class="mb-2">
                             <label for="name" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.business_name') }}</label>
                             <div class="mt-2 rounded-md shadow-sm">
@@ -127,64 +126,85 @@
                                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ trim($business->getTranslation('description', $locale)) }}</textarea>
                             </div>
                         @endforeach
-                        <div class="flex justify-end w-full mt-6">
+                        <div class="flex justify-between w-full mt-6">
+                            <button type="submit" class="px-8 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">{{ __('Save General') }}</button>
                             <button type="button" class="next-btn inline-block px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-next-tab="details">{{ __('Next') }}</button>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    <!-- Details Tab -->
-                    <div id="details" class="tab-pane hidden">
+                <!-- Details Tab -->
+                <div id="details" class="tab-pane hidden">
+                    @if($isEdit)
+                    <form action="{{ route('business.saveDetails', $business) }}" method="POST" enctype="multipart/form-data" id="detailsForm">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="_section" value="details">
+                        
                         <div class="mb-4">
-                            <label for="logo" class="block text-sm font-medium leading-6 text-gray-900 {{ !$isEdit ? 'required' : '' }}">{{ __('business.logo') }}</label>
-                            <input type="file" {{ !$isEdit ? 'required' : '' }} name="logo" id="logo"
+                            <label for="logo" class="block text-sm font-medium leading-6 text-gray-900 {{ !$business->logo ? 'required' : '' }}">{{ __('business.logo') }}</label>
+                            <input type="file" {{ !$business->logo ? 'required' : '' }} name="logo" id="logo"
                                 accept="image/*"
-                                class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                                class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                             <div class="validation-error" id="logo-error">{{ __('Logo image is required') }}</div>
-                            @if ($isEdit)
+                            @if ($business->logo)
                                 <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo"
                                     class="w-20 h-20 mt-2">
                             @endif
                         </div>
                         <div class="mb-4">
-                            <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900 {{ !$isEdit ? 'required' : '' }}">{{ __('business.cover_image') }}</label>
-                            <input type="file" {{ !$isEdit ? 'required' : '' }} name="cover_image"
+                            <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900 {{ !$business->cover_image ? 'required' : '' }}">{{ __('business.cover_image') }}</label>
+                            <input type="file" {{ !$business->cover_image ? 'required' : '' }} name="cover_image"
                                 id="cover_image" accept="image/*"
-                                class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                                class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
                             <div class="validation-error" id="cover_image-error">{{ __('Cover image is required') }}</div>
-                            @if ($isEdit)
-                                <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="logo"
+                            @if ($business->cover_image)
+                                <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="cover_image"
                                     class="w-20 h-20 mt-2">
                             @endif
                         </div>
                         <div id="facilities-section" class="mt-4">
                             <h2 class="text-lg font-semibold text-gray-700">{{ __('business.facilities') }}</h2>
                             <div id="facilities-container">
-                                @if ($isEdit)
-                                    @include('modules.business.components.existing_facilities', [
-                                        'business' => $business,
-                                    ])
-                                @endif
+                                @include('modules.business.components.type_facilities', [
+                                    'business' => $business,
+                                    'typeFacilities' => $typeFacilities
+                                ])
                             </div>
                         </div>
                         @include('modules.business.components.opening_closing', ['business' => $business])
                         <div class="flex justify-between w-full mt-6">
                             <button type="button" class="prev-btn inline-block px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400" data-prev-tab="general">{{ __('Previous') }}</button>
+                            <button type="submit" class="px-8 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">{{ __('Save Details') }}</button>
                             <button type="button" class="next-btn inline-block px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-next-tab="address">{{ __('Next') }}</button>
                         </div>
+                    </form>
+                    @else
+                    <div class="text-center py-8">
+                        <p class="text-gray-600">{{ __('Please save the General information first to continue.') }}</p>
+                        <button type="button" class="prev-btn mt-4 px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" data-prev-tab="general">{{ __('Back to General') }}</button>
                     </div>
+                    @endif
+                </div>
 
-                    <!-- Address Tab -->
-                    <div id="address" class="tab-pane hidden">
+                <!-- Address Tab -->
+                <div id="address" class="tab-pane hidden">
+                    @if($isEdit)
+                    <form action="{{ route('business.saveAddress', $business) }}" method="POST" id="addressForm">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="_section" value="address">
+                        
                         <p class="text-sm mb-2 mt-4">{{ __('business.business_address') }}</p>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="address[country_id]" class="block text-sm font-medium text-gray-700 required">
+                                <label for="country" class="block text-sm font-medium text-gray-700 required">
                                     {{ __('business.country') }}</label>
                                 <div class="mt-1">
-                                    <select id="country" name="address[country_id]" id="address[country_id]" required
+                                    <select id="country" name="address[country_id]" required
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                         @foreach ($countries as $country)
-                                            <option value="{{ $country->id }}" @if ($country->id == $business->address?->country->id) selected @endif>
+                                            <option value="{{ $country->id }}" @if ($country->id == $business->address?->country_id) selected @endif>
                                                 {{ $country->name }} ({{ $country->dial_code }})
                                             </option>
                                         @endforeach
@@ -193,7 +213,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label for="address[state_id]" class="block text-sm font-medium text-gray-700">
+                                <label for="state" class="block text-sm font-medium text-gray-700">
                                     {{ __('business.region_state') }}</label>
                                 <div class="mt-1">
                                     <select id="state" name="address[state_id]"
@@ -209,7 +229,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <label for="address[city]" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.city') }}</label>
+                            <label for="city" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.city') }}</label>
                             <div class="mt-2 rounded-md shadow-sm">
                                 <input type="text" name="address[city]" id="city" required
                                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -218,8 +238,9 @@
                             </div>
                         </div>
 
+                        <!-- Additional address fields -->
                         <div class="mb-2">
-                            <label for="address[address_line_1]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_1') }}</label>
+                            <label for="address_line_1" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_1') }}</label>
                             <div class="mt-2 rounded-md shadow-sm">
                                 <input type="text" value="{{ $business->address?->address_line_1 }}"
                                     name="address[address_line_1]" id="address_line_1"
@@ -229,7 +250,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <label for="address[address_line_2]" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_2') }}</label>
+                            <label for="address_line_2" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_2') }}</label>
                             <div class="mt-2 rounded-md shadow-sm">
                                 <input type="text" name="address[address_line_2]"
                                     value="{{ $business->address?->address_line_2 }}" id="address_line_2"
@@ -239,7 +260,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <label for="address[postal_code]"
+                            <label for="postal_code"
                                 class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.postal_code') }}</label>
                             <div class="mt-2 rounded-md shadow-sm">
                                 <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code }}"
@@ -263,12 +284,26 @@
                         </div>
                         <div class="flex justify-between w-full mt-6">
                             <button type="button" class="prev-btn inline-block px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400" data-prev-tab="details">{{ __('Previous') }}</button>
+                            <button type="submit" class="px-8 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">{{ __('Save Address') }}</button>
                             <button type="button" class="next-btn inline-block px-8 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-next-tab="contact">{{ __('Next') }}</button>
                         </div>
+                    </form>
+                    @else
+                    <div class="text-center py-8">
+                        <p class="text-gray-600">{{ __('Please save the General information first to continue.') }}</p>
+                        <button type="button" class="prev-btn mt-4 px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" data-prev-tab="general">{{ __('Back to General') }}</button>
                     </div>
+                    @endif
+                </div>
 
-                    <!-- Contact Tab -->
-                    <div id="contact" class="tab-pane hidden">
+                <!-- Contact Tab -->
+                <div id="contact" class="tab-pane hidden">
+                    @if($isEdit)
+                    <form action="{{ route('business.saveContact', $business) }}" method="POST" id="contactForm">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="_section" value="contact">
+                        
                         <div class="mb-2">
                             <label for="email" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.email') }}</label>
                             <input required type="email" name="email" id="email" value="{{ $business->email }}"
@@ -343,8 +378,7 @@
                                 @foreach ($business->settings as $setting)
                                     <div class="mb-2">
                                         <label for="settings[{{ $setting->key }}]"
-                                            class="block text
-                        -sm font-medium leading-6 text-gray-900">{{ __($setting->key) }}</label>
+                                            class="block text-sm font-medium leading-6 text-gray-900">{{ __($setting->key) }}</label>
                                         <input type="text" name="settings[{{ $setting->key }}]" id="{{ $setting->key }}"
                                             value="{{ $setting->value }}"
                                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -355,8 +389,7 @@
                                 @foreach (\App\Models\Business::$SETTINGS as $setting)
                                     <div class="mb-2">
                                         <label for="settings[{{ $setting }}]"
-                                            class="block text
-                        -sm font-medium leading-6 text-gray-900">{{ __($setting) }}</label>
+                                            class="block text-sm font-medium leading-6 text-gray-900">{{ __($setting) }}</label>
                                         <input type="text" name="settings[{{ $setting }}]" id="{{ $setting }}"
                                             value="{{ isset($business) && isset($business->settings) && $business->settings->isNotEmpty() ? $business?->settings?->$setting : '' }}"
                                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -373,16 +406,21 @@
                         
                         <div class="flex justify-between w-full mt-6">
                             <button type="button" class="prev-btn px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" data-prev-tab="address">{{ __('Previous') }}</button>
-                            <button type="submit" class="px-8 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">{{ __('business.save') }}</button>
+                            <button type="submit" class="px-8 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">{{ __('Save Contact Information') }}</button>
                         </div>
+                    </form>
+                    @else
+                    <div class="text-center py-8">
+                        <p class="text-gray-600">{{ __('Please save the General information first to continue.') }}</p>
+                        <button type="button" class="prev-btn mt-4 px-8 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" data-prev-tab="general">{{ __('Back to General') }}</button>
                     </div>
+                    @endif
                 </div>
-            </form>
+            </div>
         </div>
     </section>
 @endsection
 @push('js')
-    @include('modules.business._js_load_facilities')
     @include('modules.shared.state_prefill', ['entity' => $business, 'countries' => $countries])
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&libraries=places"></script>
 
@@ -392,8 +430,11 @@
             // Initialize map
             initMap();
             
-            // Initialize form validation and tab navigation
+            // Initialize section-specific form validation
             setupFormValidation();
+            
+            // Initialize tab navigation
+            setupTabNavigation();
             
             // Initialize business type dependent fields
             const typeSelect = document.getElementById('type_id');
@@ -401,6 +442,208 @@
                 toggleEducationFields(typeSelect.value);
             }
         });
+        
+        function setupTabNavigation() {
+            const tabs = ['general', 'details', 'address', 'contact'];
+            let currentTabIndex = 0;
+            
+            // Switch to a specific tab
+            function switchToTab(tabId) {
+                // Find the tab index
+                const targetTabIndex = tabs.indexOf(tabId);
+                if (targetTabIndex === -1) return;
+                
+                currentTabIndex = targetTabIndex;
+                
+                // Hide all tabs
+                document.querySelectorAll('.tab-pane').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+                
+                // Show the target tab
+                const targetTab = document.getElementById(tabId);
+                if (targetTab) {
+                    targetTab.classList.remove('hidden');
+                }
+                
+                // Update tab buttons
+                document.querySelectorAll('[data-tab]').forEach(btn => {
+                    btn.classList.remove('border-indigo-600', 'text-indigo-600');
+                    btn.classList.add('border-transparent');
+                    
+                    if (btn.dataset.tab === tabId) {
+                        btn.classList.add('border-indigo-600', 'text-indigo-600');
+                        btn.classList.remove('border-transparent');
+                    }
+                });
+                
+                // Make sure the map renders correctly when switching to address tab
+                if (tabId === 'address') {
+                    setTimeout(() => {
+                        google.maps.event.trigger(window, 'resize');
+                    }, 100);
+                }
+            }
+            
+            // Tab navigation handler
+            document.querySelectorAll('[data-tab]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    switchToTab(targetTab);
+                });
+            });
+            
+            // Next button click handler
+            document.querySelectorAll('.next-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const nextTab = this.dataset.nextTab;
+                    switchToTab(nextTab);
+                });
+            });
+            
+            // Previous button click handler
+            document.querySelectorAll('.prev-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const prevTab = this.dataset.prevTab;
+                    switchToTab(prevTab);
+                });
+            });
+            
+            // Initialize the form with the first tab
+            switchToTab('general');
+        }
+        
+        function setupFormValidation() {
+            const generalForm = document.getElementById('generalForm');
+            const detailsForm = document.getElementById('detailsForm');
+            const addressForm = document.getElementById('addressForm');
+            const contactForm = document.getElementById('contactForm');
+            
+            // Validation rules for form fields
+            const validationRules = {
+                'general': {
+                    'name': {
+                        required: true,
+                        message: '{{ __("Business name is required") }}'
+                    },
+                    'type_id': {
+                        required: true,
+                        message: '{{ __("Business type is required") }}'
+                    }
+                },
+                'details': {
+                    'logo': {
+                        required: false,
+                        message: '{{ __("Logo image is required") }}'
+                    },
+                    'cover_image': {
+                        required: false,
+                        message: '{{ __("Cover image is required") }}'
+                    }
+                },
+                'address': {
+                    'country': {
+                        required: true,
+                        message: '{{ __("Country is required") }}'
+                    },
+                    'city': {
+                        required: true,
+                        message: '{{ __("City is required") }}'
+                    }
+                },
+                'contact': {
+                    'email': {
+                        required: true,
+                        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: '{{ __("Valid email is required") }}'
+                    },
+                    'phone_1': {
+                        required: true,
+                        minLength: 6,
+                        maxLength: 15,
+                        message: '{{ __("Phone number is required") }}'
+                    }
+                }
+            };
+            
+            // Form submission handlers
+            if (generalForm) {
+                generalForm.addEventListener('submit', function(e) {
+                    if (!validateForm('general')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            if (detailsForm) {
+                detailsForm.addEventListener('submit', function(e) {
+                    if (!validateForm('details')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            if (addressForm) {
+                addressForm.addEventListener('submit', function(e) {
+                    if (!validateForm('address')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    if (!validateForm('contact')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            // Validate form fields for a specific section
+            function validateForm(section) {
+                let isValid = true;
+                const rules = validationRules[section];
+                
+                for (const [fieldId, rule] of Object.entries(rules)) {
+                    const field = document.getElementById(fieldId);
+                    const errorElement = document.getElementById(`${fieldId}-error`);
+                    
+                    if (!field) continue;
+                    
+                    field.classList.remove('error-border');
+                    if (errorElement) errorElement.style.display = 'none';
+                    
+                    let fieldValid = true;
+                    
+                    // Skip validation for file inputs in edit mode
+                    if (field.type === 'file' && !rule.required) {
+                        continue;
+                    }
+                    
+                    // Required validation
+                    if (rule.required && !field.value.trim()) {
+                        fieldValid = false;
+                    }
+                    
+                    // Pattern validation
+                    if (fieldValid && rule.pattern && field.value.trim() && !rule.pattern.test(field.value.trim())) {
+                        fieldValid = false;
+                    }
+                    
+                    if (!fieldValid) {
+                        isValid = false;
+                        
+                        if (errorElement) {
+                            errorElement.style.display = 'block';
+                            field.classList.add('error-border');
+                            field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }
+                
+                return isValid;
+            }
+        }
         
         async function initMap() {
             // Default center
@@ -490,291 +733,6 @@
                     updateLocation(new google.maps.LatLng(pos.lat, pos.lng));
                 });
             }
-        }
-        
-        function setupFormValidation() {
-            const businessForm = document.getElementById('businessForm');
-            const isEdit = {{ $isEdit ? 'true' : 'false' }};
-            const tabs = ['general', 'details', 'address', 'contact'];
-            let currentTabIndex = 0;
-            
-            // Validation rules for fields by tab
-            const validationRulesByTab = {
-                'general': {
-                    'name': {
-                        required: true,
-                        message: '{{ __("Business name is required") }}'
-                    },
-                    'type_id': {
-                        required: true,
-                        message: '{{ __("Business type is required") }}'
-                    }
-                },
-                'details': {
-                    'logo': {
-                        required: !isEdit,
-                        message: '{{ __("Logo image is required") }}'
-                    },
-                    'cover_image': {
-                        required: !isEdit,
-                        message: '{{ __("Cover image is required") }}'
-                    }
-                },
-                'address': {
-                    'country': {
-                        required: true,
-                        message: '{{ __("Country is required") }}'
-                    },
-                    'city': {
-                        required: true,
-                        message: '{{ __("City is required") }}'
-                    }
-                },
-                'contact': {
-                    'email': {
-                        required: true,
-                        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: '{{ __("Valid email is required") }}'
-                    },
-                    'phone_1': {
-                        required: true,
-                        minLength: 6,
-                        maxLength: 15,
-                        message: '{{ __("Phone number is required") }}'
-                    }
-                }
-            };
-            
-            // Flatten rules for whole-form validation
-            const allRules = {};
-            Object.entries(validationRulesByTab).forEach(([tab, rules]) => {
-                Object.entries(rules).forEach(([field, rule]) => {
-                    allRules[field] = rule;
-                });
-            });
-            
-            // Switch to a specific tab
-            function switchToTab(tabId) {
-                // Find the tab index
-                const targetTabIndex = tabs.indexOf(tabId);
-                if (targetTabIndex === -1) return;
-                
-                currentTabIndex = targetTabIndex;
-                
-                // Hide all tabs
-                document.querySelectorAll('.tab-pane').forEach(tab => {
-                    tab.classList.add('hidden');
-                });
-                
-                // Show the target tab
-                const targetTab = document.getElementById(tabId);
-                if (targetTab) {
-                    targetTab.classList.remove('hidden');
-                }
-                
-                // Update tab buttons
-                document.querySelectorAll('[data-tab]').forEach(btn => {
-                    btn.classList.remove('border-indigo-600', 'text-indigo-600');
-                    if (btn.dataset.tab === tabId) {
-                        btn.classList.add('border-indigo-600', 'text-indigo-600');
-                    }
-                });
-                
-                // Make sure the map renders correctly when switching to address tab
-                if (tabId === 'address') {
-                    setTimeout(() => {
-                        google.maps.event.trigger(window, 'resize');
-                    }, 100);
-                }
-            }
-            
-            // Validate specific tab's fields
-            function validateTab(tabId) {
-                let isValid = true;
-                let firstErrorField = null;
-                const tabRules = validationRulesByTab[tabId];
-                
-                // Check each field against its validation rules
-                for (const [fieldId, rules] of Object.entries(tabRules)) {
-                    const field = document.getElementById(fieldId);
-                    const errorElement = document.getElementById(`${fieldId}-error`);
-                    
-                    if (!field) continue;
-                    
-                    // Reset field styling
-                    field.classList.remove('error-border');
-                    if (errorElement) errorElement.style.display = 'none';
-                    
-                    let fieldValid = true;
-                    
-                    // Required validation
-                    if (rules.required) {
-                        if (field.type === 'file') {
-                            // For file inputs in edit mode, only validate if they're required
-                            if (!isEdit || (isEdit && rules.required)) {
-                                if (field.files.length === 0 && (!isEdit || !document.querySelector(`img[alt="${fieldId}"]`))) {
-                                    fieldValid = false;
-                                }
-                            }
-                        } else if (!field.value.trim()) {
-                            fieldValid = false;
-                        }
-                    }
-                    
-                    // Pattern validation (e.g., email)
-                    if (fieldValid && rules.pattern && field.value.trim() && !rules.pattern.test(field.value.trim())) {
-                        fieldValid = false;
-                    }
-                    
-                    // Min length validation
-                    if (fieldValid && rules.minLength && field.value.trim().length < rules.minLength) {
-                        fieldValid = false;
-                    }
-                    
-                    // Max length validation
-                    if (fieldValid && rules.maxLength && field.value.trim().length > rules.maxLength) {
-                        fieldValid = false;
-                    }
-                    
-                    // Show error if validation failed
-                    if (!fieldValid) {
-                        isValid = false;
-                        
-                        if (errorElement) {
-                            errorElement.style.display = 'block';
-                            field.classList.add('error-border');
-                            
-                            // Track the first error field for scrolling
-                            if (!firstErrorField) {
-                                firstErrorField = field;
-                            }
-                        }
-                    }
-                }
-                
-                // Scroll to the first error
-                if (firstErrorField) {
-                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                
-                return isValid;
-            }
-            
-            // Validate all fields across all tabs
-            function validateForm() {
-                let isValid = true;
-                
-                // Check each tab
-                for (const tabId of tabs) {
-                    if (!validateTab(tabId)) {
-                        // If a tab is invalid, switch to it
-                        switchToTab(tabId);
-                        isValid = false;
-                        break;
-                    }
-                }
-                
-                return isValid;
-            }
-            
-            // Form submission handler
-            businessForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Always prevent default first
-                
-                if (validateForm()) {
-                    // If validation passes, submit the form
-                    this.submit();
-                }
-            });
-            
-            // Next button click handler
-            document.querySelectorAll('.next-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const currentTab = this.closest('.tab-pane').id;
-                    const nextTab = this.dataset.nextTab;
-                    
-                    if (validateTab(currentTab)) {
-                        switchToTab(nextTab);
-                    }
-                });
-            });
-            
-            // Previous button click handler
-            document.querySelectorAll('.prev-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const prevTab = this.dataset.prevTab;
-                    switchToTab(prevTab);
-                });
-            });
-            
-            // Tab navigation handler
-            document.querySelectorAll('[data-tab]').forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.dataset.tab;
-                    const currentTab = tabs[currentTabIndex];
-                    
-                    // If moving forward, validate current tab
-                    if (tabs.indexOf(targetTab) > currentTabIndex) {
-                        // Validate all tabs up to the target
-                        let allValid = true;
-                        for (let i = 0; i <= tabs.indexOf(targetTab) - 1; i++) {
-                            if (!validateTab(tabs[i])) {
-                                switchToTab(tabs[i]);
-                                allValid = false;
-                                break;
-                            }
-                        }
-                        
-                        if (!allValid) return;
-                    }
-                    
-                    // If all validations pass or we're moving backward, switch to the tab
-                    switchToTab(targetTab);
-                });
-            });
-            
-            // Real-time validation for all fields
-            Object.entries(allRules).forEach(([fieldId, rules]) => {
-                const field = document.getElementById(fieldId);
-                if (!field) return;
-                
-                field.addEventListener('blur', function() {
-                    const errorElement = document.getElementById(`${fieldId}-error`);
-                    if (!errorElement) return;
-                    
-                    let fieldValid = true;
-                    
-                    // Required validation
-                    if (rules.required) {
-                        if (field.type === 'file') {
-                            // Skip validation for file inputs on blur
-                            return;
-                        } else if (!field.value.trim()) {
-                            fieldValid = false;
-                        }
-                    }
-                    
-                    // Pattern validation
-                    if (fieldValid && rules.pattern && field.value.trim() && !rules.pattern.test(field.value.trim())) {
-                        fieldValid = false;
-                    }
-                    
-                    // Min/max length validation
-                    if (fieldValid && rules.minLength && field.value.trim().length < rules.minLength) {
-                        fieldValid = false;
-                    }
-                    if (fieldValid && rules.maxLength && field.value.trim().length > rules.maxLength) {
-                        fieldValid = false;
-                    }
-                    
-                    // Update error display
-                    errorElement.style.display = fieldValid ? 'none' : 'block';
-                    field.classList.toggle('error-border', !fieldValid);
-                });
-            });
-            
-            // Initialize the form with the first tab
-            switchToTab('general');
         }
 
         // Add dynamic form handling for languages and destinations

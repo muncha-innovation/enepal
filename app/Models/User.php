@@ -144,12 +144,19 @@ class User extends Authenticatable
 
     public function preferredCategories()
     {
-        return $this->belongsToMany(Category::class, 'news_preferences');
+        return $this->belongsToMany(NewsCategory::class, 'user_news_preferences', 'user_id', 'category_id')
+                    ->select('news_categories.*'); // Specify table name to avoid ambiguous column references
     }
 
     public function toggleNewsPreference($category_id)
     {
-        $this->preferredCategories()->toggle($category_id);
+        $exists = $this->newsPreferences()->where('category_id', $category_id)->exists();
+        
+        if ($exists) {
+            $this->newsPreferences()->where('category_id', $category_id)->delete();
+        } else {
+            $this->newsPreferences()->create(['category_id' => $category_id]);
+        }
     }
 
     public function addresses()
@@ -171,5 +178,10 @@ class User extends Authenticatable
     }
     public function preference() {
         return $this->hasOne(UserPreference::class);
+    }
+
+    public function newsPreferences()
+    {
+        return $this->hasMany(UserNewsPreference::class);
     }
 }

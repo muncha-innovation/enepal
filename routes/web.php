@@ -42,11 +42,16 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     Route::post('/get-address-info', RapidApiController::class)->name('get.address.info');
     
     Route::post('image/upload', [BusinessController::class, 'uploadImage'])->name('image.upload');
-    Route::get('/businesses/facilities', [BusinessController::class, 'getFacilities']);
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::post('verify/{business}', [BusinessController::class, 'verify'])->name('verify');
 
+        // Section-specific save routes
+        Route::post('save-general', [BusinessController::class, 'saveGeneral'])->name('saveGeneral.create');
+        Route::put('{business}/save-general', [BusinessController::class, 'saveGeneral'])->name('saveGeneral.update');
+        Route::put('{business}/save-details', [BusinessController::class, 'saveDetails'])->name('saveDetails');
+        Route::put('{business}/save-address', [BusinessController::class, 'saveAddress'])->name('saveAddress');
+        Route::put('{business}/save-contact', [BusinessController::class, 'saveContact'])->name('saveContact');
     });
 
     Route::group(['prefix' => 'members', 'as' => 'members.'], function() {
@@ -116,6 +121,10 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 
 
     // Route::post('logs/add', [LogsController::class, 'store'])->name('logs.store');
+
+    // User preferences routes
+    Route::get('/profile/preferences', [ProfileController::class, 'preferences'])->name('profile.preferences');
+    Route::post('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences.update');
 
 });
 

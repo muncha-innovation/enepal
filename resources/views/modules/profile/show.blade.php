@@ -13,27 +13,33 @@
     <div class="border-b border-gray-200 mb-6">
         <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="profileTabs" role="tablist">
             <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 border-indigo-600 rounded-t-lg text-indigo-600" 
-                    id="general-tab" data-tab="general" type="button" role="tab" aria-selected="true">
+                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') != 'security' && session('active_profile_tab') != 'work-experience' && session('active_profile_tab') != 'education' && session('active_profile_tab') != 'preferences' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="general-tab" data-tab="general" type="button" role="tab" aria-selected="{{ session('active_profile_tab') ? 'false' : 'true' }}">
                     {{ __('General') }}
                 </button>
             </li>
             <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
-                    id="security-tab" data-tab="security" type="button" role="tab" aria-selected="false">
+                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') == 'security' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="security-tab" data-tab="security" type="button" role="tab" aria-selected="{{ session('active_profile_tab') == 'security' ? 'true' : 'false' }}">
                     {{ __('Security') }}
                 </button>
             </li>
             <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
-                    id="work-experience-tab" data-tab="work-experience" type="button" role="tab" aria-selected="false">
+                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') == 'work-experience' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="work-experience-tab" data-tab="work-experience" type="button" role="tab" aria-selected="{{ session('active_profile_tab') == 'work-experience' ? 'true' : 'false' }}">
                     {{ __('Work Experience') }}
                 </button>
             </li>
             <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
-                    id="education-tab" data-tab="education" type="button" role="tab" aria-selected="false">
+                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') == 'education' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="education-tab" data-tab="education" type="button" role="tab" aria-selected="{{ session('active_profile_tab') == 'education' ? 'true' : 'false' }}">
                     {{ __('Education') }}
+                </button>
+            </li>
+            <li class="mr-2" role="presentation">
+                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') == 'preferences' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="preferences-tab" data-tab="preferences" type="button" role="tab" aria-selected="{{ session('active_profile_tab') == 'preferences' ? 'true' : 'false' }}">
+                    {{ __('Preferences') }}
                 </button>
             </li>
         </ul>
@@ -42,23 +48,28 @@
     <!-- Tab Content -->
     <div class="tab-content">
         <!-- General Tab -->
-        <div id="general" class="tab-pane active">
+        <div id="general" class="tab-pane {{ session('active_profile_tab') ? 'hidden' : 'active' }}">
             @include('modules.profile.partials.general')
         </div>
 
         <!-- Security Tab -->
-        <div id="security" class="tab-pane hidden">
+        <div id="security" class="tab-pane {{ session('active_profile_tab') == 'security' ? 'active' : 'hidden' }}">
             @include('modules.profile.partials.security')
         </div>
 
         <!-- Work Experience Tab -->
-        <div id="work-experience" class="tab-pane hidden">
+        <div id="work-experience" class="tab-pane {{ session('active_profile_tab') == 'work-experience' ? 'active' : 'hidden' }}">
             @include('modules.profile.partials.work-experience')
         </div>
 
         <!-- Education Tab -->
-        <div id="education" class="tab-pane hidden">
+        <div id="education" class="tab-pane {{ session('active_profile_tab') == 'education' ? 'active' : 'hidden' }}">
             @include('modules.profile.partials.education')
+        </div>
+
+        <!-- Preferences Tab -->
+        <div id="preferences" class="tab-pane {{ session('active_profile_tab') == 'preferences' ? 'active' : 'hidden' }}">
+            @include('modules.profile.partials.preferences')
         </div>
     </div>
 

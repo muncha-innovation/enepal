@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\APIS\LanguageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiAuth\LoginController;
 use App\Http\Controllers\ApiAuth\RegistrationController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\APIS\UsersController;
 use App\Http\Controllers\APIS\NewsApiController;
 use App\Http\Controllers\APIS\NewsRecommendationController;
 use App\Http\Controllers\APIS\SearchController;
+use App\Http\Controllers\APIS\UserProfileController;
+use App\Http\Controllers\APIS\UserPreferenceController;
 
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
@@ -73,10 +76,36 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('update', [AddressPreferencesController::class, 'update']);
         Route::post(uri: 'address/update', action: [AddressPreferencesController::class, 'updateAddress']);
     });
+
+    // User profile - Education routes
+    Route::get('/profile/education', [UserProfileController::class, 'getEducations']);
+    Route::get('/profile/education/{id}', [UserProfileController::class, 'getEducationItem']);
+    Route::post('/profile/education', [UserProfileController::class, 'updateEducation']);
+    Route::delete('/profile/education/{id}', [UserProfileController::class, 'deleteEducation']);
+    
+    // User profile - Work experience routes
+    Route::get('/profile/work-experience', [UserProfileController::class, 'getWorkExperiences']);
+    Route::get('/profile/work-experience/{id}', [UserProfileController::class, 'getWorkExperienceItem']);
+    Route::post('/profile/work-experience', [UserProfileController::class, 'updateWorkExperience']);
+    Route::delete('/profile/work-experience/{id}', [UserProfileController::class, 'deleteWorkExperience']);
+
+    // User preferences API endpoints
+    Route::prefix('preferences')->group(function () {
+        Route::get('/', [UserPreferenceController::class, 'show']);
+        Route::post('/', [UserPreferenceController::class, 'update']);
+        Route::get('/news-categories', [UserPreferenceController::class, 'getNewsCategories']);
+        Route::post('/news', [UserPreferenceController::class, 'updateNewsPreferences']);
+        Route::post('/news/bulk', [UserPreferenceController::class, 'bulkUpdateNewsPreferences']);
+    });
+
+
+    Route::post('/profile/preferences', [UserProfileController::class, 'updatePreferences']);
 });
 
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
+
+Route::get('languages', [LanguageController::class, 'index']);
 
 Route::prefix('v1')->group(function () {
     Route::prefix('news')->group(function () {

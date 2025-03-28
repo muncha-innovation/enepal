@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Models\Country;
-use App\Models\State;
+use App\Models\UserPreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
-use App\Models\UserExperience;
-use App\Models\UserEducation;
 
 class ProfileController extends Controller
 {
@@ -17,6 +15,12 @@ class ProfileController extends Controller
     {
         $countries = Country::all();
         $user = auth()->user();
+        
+        // Always set active tab to general when directly accessing the profile page
+        if (request()->route()->getName() === 'profile') {
+            session()->forget('active_profile_tab');
+        }
+        
         return view('modules.profile.show', compact(['user', 'countries']));
     }
 
@@ -39,8 +43,12 @@ class ProfileController extends Controller
             $user->addresses()->create($data->get('address'));
         } else {
             $address->update($data->get('address'));
-}
-        return back()->with('success', 'Profile updated successfully');
+        }
+        
+        // Set active tab to general for redirect
+        session(['active_profile_tab' => 'general']);
+        
+        return redirect()->route('profile')->with('success', 'Profile updated successfully');
     }
 
     public function getWorkExperience()
@@ -68,6 +76,9 @@ class ProfileController extends Controller
             } else {
                 $user->workExperience()->create($data);
             }
+            
+            // Set active tab session
+            session(['active_profile_tab' => 'work-experience']);
 
             return response()->json(['success' => true, 'message' => 'Work experience updated successfully.']);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -116,6 +127,9 @@ class ProfileController extends Controller
             } else {
                 $user->education()->create($data);
             }
+            
+            // Set active tab session
+            session(['active_profile_tab' => 'education']);
 
             return response()->json(['success' => true, 'message' => 'Education updated successfully.']);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -156,6 +170,91 @@ class ProfileController extends Controller
             'force_update_password' => false,
         ]);
 
+        // Set active tab to security for redirect
+        session(['active_profile_tab' => 'security']);
+
         return back()->with('success', 'Password updated successfully');
+    }
+
+    /**
+     * Display the preferences page
+     */
+    public function preferences()
+    {
+        $user = auth()->user();
+        $countries = \App\Models\Country::all();
+        
+        // Instead of rendering just the partial, set a session variable to indicate active tab
+        session(['active_profile_tab' => 'preferences']);
+        
+        // Redirect to the main profile page which will show the preferences tab
+        return redirect()->route('profile');
+    }
+
+    /**
+     * Update user preferences
+     */
+    public function updatePreferences(Request $request)
+    {
+        $user = auth()->user();
+        
+        $validationRules = [
+            'user_type' => 'nullable|string|in:student,nrn,job_seeker',
+            'app_language' => 'nullable|string',
+            'known_languages' => 'nullable|array',
+            'countries' => 'nullable|array',
+            'has_passport' => 'nullable|boolean',
+            'passport_expiry' => 'nullable|date',
+            'departure_date' => 'nullable|date',
+            'receive_notifications' => 'nullable|boolean',
+            'show_personalized_content' => 'nullable|boolean',
+        ];
+        
+        // Add conditional validation only for study_field if user_type is student
+        if ($request->input('user_type') === 'student') {
+            $validationRules['study_field'] = 'nullable|string|max:255';
+        }
+        
+        $validated = $request->validate($validationRules);
+        
+        // Prepare the data for saving
+        $preferenceData = [
+            'user_type' => $validated['user_type'] ?? null,
+            'app_language' => $validated['app_language'] ?? 'en',
+            'has_passport' => $request->has('has_passport'),
+            'receive_notifications' => $request->has('receive_notifications'),
+            'show_personalized_content' => $request->has('show_personalized_content'),
+        ];
+        
+        // Only add these fields if user type is not NRN
+        if (!isset($validated['user_type']) || $validated['user_type'] !== 'nrn') {
+            $preferenceData['known_languages'] = $validated['known_languages'] ?? [];
+            $preferenceData['countries'] = $validated['countries'] ?? [];
+            
+            if (isset($validated['departure_date'])) {
+                $preferenceData['departure_date'] = $validated['departure_date'];
+            }
+        }
+        
+        // Add conditional fields
+        if (isset($validated['user_type']) && $validated['user_type'] === 'student') {
+            $preferenceData['study_field'] = $validated['study_field'] ?? null;
+        }
+        
+        if ($request->has('has_passport') && isset($validated['passport_expiry'])) {
+            $preferenceData['passport_expiry'] = $validated['passport_expiry'];
+        }
+        
+        // Update or create preferences
+        $user->preference()->updateOrCreate(
+            ['user_id' => $user->id],
+            $preferenceData
+        );
+        
+        // Keep the active tab as preferences
+        session(['active_profile_tab' => 'preferences']);
+        
+        // Redirect to the main profile page with success message
+        return redirect()->route('profile')->with('success', 'Preferences updated successfully');
     }
 }

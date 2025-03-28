@@ -24,7 +24,10 @@ class StoreBusinessRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {   
+    {
+        // Determine which section is being saved
+        $section = $this->input('_section', 'all');
+        
         // cover_image and logo required only during create and not edit
         if ($this->isMethod('post')) {
             $coverImageValidation = 'required|image|max:1999';
@@ -34,52 +37,126 @@ class StoreBusinessRequest extends FormRequest
             $logoValidation = 'sometimes|image|max:1999';
         }
         
-        return [
-            'name' => ['required'],
-            'email' => ['required', 'email'],
-            'type_id' => ['required'],
-            'phone_1' => ['required'],
-            'is_active' => ['required'],
-            'description' => ['array', 'sometimes'],
-            'cover_image' => $coverImageValidation,
-            'logo' => $logoValidation,
-            'established_year' => ['nullable', 'integer', 'min:1900', 'max:' . date('Y')],
-            'phone_2' => ['sometimes'],
-            'address.city' => ['sometimes'],
-            'address.state_id' => ['sometimes'],
-            'address.street' => ['sometimes'],
-            'address.postal_code' => ['sometimes'],
-            'address.address_line_1' => ['sometimes'],
-            'address.address_line_2' => ['sometimes'],
-            'address.country_id' => ['required'],
-            'address.prefecture' => ['sometimes'],
-            'address.town' => ['sometimes'],
-            'address.building' => ['sometimes'],
-            'address.location' => ['sometimes', 'string'],
-            'settings' => ['sometimes'],
-            'facilities' => ['sometimes', 'array'],
-            'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
-            'custom_email_message' => ['nullable', 'string', 'max:1000'],
-            'languages' => ['nullable', 'array'],
-            'languages.*.id' => ['required_with:languages', 'exists:languages,id'],
-            'languages.*.price' => ['required_with:languages', 'numeric', 'min:0'],
-            'languages.*.num_people_taught' => ['nullable', 'numeric', 'min:0'],
-            'languages.*.level' => ['nullable', 'in:beginner,intermediate,advanced'],
-            'languages.*.currency' => ['required_with:languages', 'string', 'size:3'],
-            'destinations' => ['nullable', 'array'],
-            'destinations.*.country_id' => ['required_with:destinations', 'exists:countries,id'],
-            'destinations.*.num_people_sent' => ['nullable', 'numeric', 'min:0'],
-            'location' => ['sometimes', 'string'], // Validates POINT string format
-            'hours' => 'sometimes|array',
-            'hours.*' => 'array',
-            'hours.*.is_open' => 'sometimes|boolean',
-            'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
-            'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
-            'social_networks' => 'nullable|array',
-            'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
-            'social_networks.*.url' => 'nullable|string',
-            'social_networks.*.is_active' => 'boolean',
-        ];
+        // Base rules that always apply
+        $rules = [];
+        
+        // Section-specific rules
+        switch ($section) {
+            case 'general':
+                $rules = [
+                    'name' => ['required'],
+                    'type_id' => ['required'],
+                    'description' => ['array', 'sometimes'],
+                ];
+                break;
+                
+            case 'details':
+                $rules = [
+                    'cover_image' => $this->isMethod('post') ? 'required|image|max:1999' : 'sometimes|image|max:1999',
+                    'logo' => $this->isMethod('post') ? 'required|image|max:1999' : 'sometimes|image|max:1999',
+                    'facilities' => ['sometimes', 'array'],
+                    'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
+                    'hours' => 'sometimes|array',
+                    'hours.*' => 'array',
+                    'hours.*.is_open' => 'sometimes|boolean',
+                    'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                    'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                ];
+                break;
+                
+            case 'address':
+                $rules = [
+                    'address.city' => ['required'],
+                    'address.state_id' => ['sometimes'],
+                    'address.street' => ['sometimes'],
+                    'address.postal_code' => ['sometimes'],
+                    'address.address_line_1' => ['sometimes'],
+                    'address.address_line_2' => ['sometimes'],
+                    'address.country_id' => ['required'],
+                    'address.prefecture' => ['sometimes'],
+                    'address.town' => ['sometimes'],
+                    'address.building' => ['sometimes'],
+                    'address.location' => ['sometimes', 'string'],
+                ];
+                break;
+                
+            case 'contact':
+                $rules = [
+                    'email' => ['required', 'email', 'unique:businesses,email,' . $this->route('business')],
+                    'phone_1' => ['required'],
+                    'phone_2' => ['sometimes'],
+                    'is_active' => ['required'],
+                    'established_year' => ['nullable', 'integer', 'min:1900', 'max:' . date('Y')],
+                    'custom_email_message' => ['nullable', 'string', 'max:1000'],
+                    'languages' => ['nullable', 'array'],
+                    'languages.*.id' => ['required_with:languages', 'exists:languages,id'],
+                    'languages.*.price' => ['required_with:languages', 'numeric', 'min:0'],
+                    'languages.*.num_people_taught' => ['nullable', 'numeric', 'min:0'],
+                    'languages.*.level' => ['nullable', 'in:beginner,intermediate,advanced'],
+                    'languages.*.currency' => ['required_with:languages', 'string', 'size:3'],
+                    'destinations' => ['nullable', 'array'],
+                    'destinations.*.country_id' => ['required_with:destinations', 'exists:countries,id'],
+                    'destinations.*.num_people_sent' => ['nullable', 'numeric', 'min:0'],
+                    'settings' => ['sometimes'],
+                    'social_networks' => 'nullable|array',
+                    'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
+                    'social_networks.*.url' => 'nullable|string',
+                    'social_networks.*.is_active' => 'boolean',
+                ];
+                break;
+                
+            default:
+                // If no section specified, use all rules for a complete form submission
+                $rules = [
+                    'name' => ['required'],
+                    'email' => ['required', 'email'],
+                    'type_id' => ['required'],
+                    'phone_1' => ['required'],
+                    'is_active' => ['required'],
+                    'description' => ['array', 'sometimes'],
+                    'cover_image' => $coverImageValidation,
+                    'logo' => $logoValidation,
+                    'established_year' => ['nullable', 'integer', 'min:1900', 'max:' . date('Y')],
+                    'phone_2' => ['sometimes'],
+                    'address.city' => ['sometimes'],
+                    'address.state_id' => ['sometimes'],
+                    'address.street' => ['sometimes'],
+                    'address.postal_code' => ['sometimes'],
+                    'address.address_line_1' => ['sometimes'],
+                    'address.address_line_2' => ['sometimes'],
+                    'address.country_id' => ['required'],
+                    'address.prefecture' => ['sometimes'],
+                    'address.town' => ['sometimes'],
+                    'address.building' => ['sometimes'],
+                    'address.location' => ['sometimes', 'string'],
+                    'settings' => ['sometimes'],
+                    'facilities' => ['sometimes', 'array'],
+                    'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
+                    'custom_email_message' => ['nullable', 'string', 'max:1000'],
+                    'languages' => ['nullable', 'array'],
+                    'languages.*.id' => ['required_with:languages', 'exists:languages,id'],
+                    'languages.*.price' => ['required_with:languages', 'numeric', 'min:0'],
+                    'languages.*.num_people_taught' => ['nullable', 'numeric', 'min:0'],
+                    'languages.*.level' => ['nullable', 'in:beginner,intermediate,advanced'],
+                    'languages.*.currency' => ['required_with:languages', 'string', 'size:3'],
+                    'destinations' => ['nullable', 'array'],
+                    'destinations.*.country_id' => ['required_with:destinations', 'exists:countries,id'],
+                    'destinations.*.num_people_sent' => ['nullable', 'numeric', 'min:0'],
+                    'location' => ['sometimes', 'string'],
+                    'hours' => 'sometimes|array',
+                    'hours.*' => 'array',
+                    'hours.*.is_open' => 'sometimes|boolean',
+                    'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                    'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                    'social_networks' => 'nullable|array',
+                    'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
+                    'social_networks.*.url' => 'nullable|string',
+                    'social_networks.*.is_active' => 'boolean',
+                ];
+                break;
+        }
+        
+        return $rules;
     }
 
     protected function prepareForValidation()

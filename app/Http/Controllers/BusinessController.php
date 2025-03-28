@@ -54,12 +54,15 @@ class BusinessController extends Controller
     {
         //
         $businessTypes = BusinessType::with(['facilities'])->get();
-
         $countries = Country::all();
         $languages = Language::all();
         $socialNetworks = \App\Models\SocialNetwork::all();
-
-        return view('modules.business.createOrEdit', compact('businessTypes', 'countries', 'languages', 'socialNetworks'));
+        
+        // Pass default business type facilities for new business
+        $defaultTypeId = $businessTypes->first()->id;
+        $typeFacilities = BusinessType::with('facilities')->find($defaultTypeId)->facilities;
+        
+        return view('modules.business.createOrEdit', compact('businessTypes', 'countries', 'languages', 'socialNetworks', 'typeFacilities'));
     }
 
     /**
@@ -171,9 +174,12 @@ class BusinessController extends Controller
         $countries = Country::all();
         $languages = Language::all();
         $business->load(['address', 'settings', 'taughtLanguages', 'destinations']);
-        $facilities = $business->facilities;
         $socialNetworks = \App\Models\SocialNetwork::all();
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages', 'socialNetworks']));
+        
+        // Get facilities for the current business type
+        $typeFacilities = BusinessType::with('facilities')->find($business->type_id)->facilities;
+        
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages', 'socialNetworks', 'typeFacilities']));
     }
 
     /**
@@ -315,10 +321,10 @@ class BusinessController extends Controller
         $countries = Country::all();
         $business->load(['address', 'settings','destinations','taughtLanguages']);
         $languages = Language::all();
-
+        $typeFacilities = BusinessType::with('facilities')->find($business->type_id)->facilities;
         $showSettings = true;
         $socialNetworks = \App\Models\SocialNetwork::all();
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings','languages','socialNetworks']));
+        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'showSettings','languages','socialNetworks', 'typeFacilities']));
     }
     public function verify(Business $business)
     {
@@ -351,16 +357,7 @@ class BusinessController extends Controller
 
         return response()->json(['url' => getImage($path, 'content/')]);
     }
-    public function getFacilities(Request $request)
-    {
-        $request->validate([
-            'type_id' => 'required|exists:business_types,id',
-        ]);
-        $typeId = $request->input('type_id');
-        $businessType = BusinessType::with('facilities')->findOrFail($typeId);
-
-        return response()->json(['facilities' => $businessType->facilities]);
-    }
+  
 
     public function getLanguageRow($index)
     {
@@ -400,5 +397,184 @@ class BusinessController extends Controller
                 ]
             );
         }
+    }
+
+    /**
+     * Save or update general business information
+     */
+    public function saveGeneral(StoreBusinessRequest $request, Business $business = null)
+    {
+        $data = $request->validated();
+        
+        // For new business creation
+        if (!$business) {
+            $business = Business::create([
+                'name' => $data['name'],
+                'type_id' => $data['type_id'],
+                'created_by' => auth()->id(),
+            ]);
+            
+            // Attach owner automatically
+            $business->users()->attach(auth()->id(), ['role' => 'owner']);
+            
+            // Add default settings
+            $defaultSettings = [
+                SettingKeys::MAX_NOTIFICATION_PER_DAY => 0,
+                SettingKeys::MAX_NOTIFICATION_PER_MONTH => 0,
+            ];
+            
+            foreach ($defaultSettings as $key => $value) {
+                BusinessSetting::create([
+                    'business_id' => $business->id,
+                    'key' => $key,
+                    'value' => $value,
+                ]);
+            }
+            
+            // Success message for new business
+            return redirect()->route('business.edit', $business)->with('success', 'Business created successfully! Please complete the other sections.');
+        } 
+        // For existing business update
+        else {
+            $business->update([
+                'name' => $data['name'],
+                'type_id' => $data['type_id'],
+            ]);
+            
+            // Handle description translations if present
+            if (isset($data['description'])) {
+                foreach ($data['description'] as $locale => $text) {
+                    $business->setTranslation('description', $locale, $text);
+                }
+                $business->save();
+            }
+            
+            return back()->with('success', 'General information updated successfully!');
+        }
+    }
+    
+    /**
+     * Save or update business details
+     */
+    public function saveDetails(StoreBusinessRequest $request, Business $business)
+    {
+        $data = $request->validated();
+        $updates = [];
+        
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $updates['logo'] = upload('business/logo', 'png', $request->file('logo'));
+        }
+        
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            $updates['cover_image'] = upload('business/cover_image', 'png', $request->file('cover_image'));
+        }
+        
+        // Update the business record
+        if (!empty($updates)) {
+            $business->update($updates);
+        }
+        
+        // Handle facilities
+        if (isset($data['facilities']) && is_array($data['facilities'])) {
+            $facilities = [];
+            foreach ($data['facilities'] as $facilityId => $value) {
+                $facilities[$facilityId] = ['value' => $value];
+            }
+            $business->facilities()->sync($facilities);
+        }
+        
+        // Handle business hours
+        if ($request->has('hours')) {
+            $this->updateBusinessHours($business, $request->hours);
+        }
+        
+        return back()->with('success', 'Business details updated successfully!');
+    }
+    
+    /**
+     * Save or update business address
+     */
+    public function saveAddress(StoreBusinessRequest $request, Business $business)
+    {
+        $data = $request->validated();
+        
+        // Process location data
+        if (isset($data['address']['location'])) {
+            preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
+            if (isset($matches[1])) {
+                list($lng, $lat) = explode(' ', $matches[1]);
+                $data['address']['location'] = new Point($lat, $lng);
+            }
+        }
+        
+        // Update or create address
+        if ($business->address) {
+            $business->address->update($data['address']);
+        } else {
+            $business->address()->create($data['address']);
+        }
+        
+        return back()->with('success', 'Business address updated successfully!');
+    }
+    
+    /**
+     * Save or update business contact information
+     */
+    public function saveContact(StoreBusinessRequest $request, Business $business)
+    {
+        $data = $request->validated();
+        
+        // Update basic contact information
+        $business->update([
+            'email' => $data['email'],
+            'phone_1' => $data['phone_1'],
+            'phone_2' => $data['phone_2'] ?? null,
+            'established_year' => $data['established_year'] ?? null,
+            'custom_email_message' => $data['custom_email_message'] ?? null,
+            'is_active' => $data['is_active'],
+        ]);
+        
+        // Update settings if provided
+        if (isset($data['settings'])) {
+            foreach ($data['settings'] as $key => $value) {
+                $business->settings()->updateOrCreate(
+                    ['key' => $key],
+                    ['value' => $value]
+                );
+            }
+        }
+        
+        // Handle languages (for education business types)
+        $educationBusinessTypes = [5, 6]; // Adjust IDs based on your manpower/consultancy types
+        if (in_array($business->type_id, $educationBusinessTypes)) {
+            if (isset($data['languages'])) {
+                $business->taughtLanguages()->detach();
+                foreach ($data['languages'] as $language) {
+                    $business->taughtLanguages()->attach($language['id'], [
+                        'price' => $language['price'],
+                        'currency' => $language['currency'],
+                    ]);
+                }
+            }
+            
+            // Handle destinations
+            if (isset($data['destinations'])) {
+                $business->destinations()->detach();
+                foreach ($data['destinations'] as $destination) {
+                    $business->destinations()->attach($destination['country_id'], [
+                        'num_people_sent' => $destination['num_people_sent']
+                    ]);
+                }
+            }
+        }
+        
+        // Handle social networks
+        if (isset($data['social_networks'])) {
+            $business->socialNetworks()->sync($data['social_networks']);
+        }
+        
+        return back()->with('success', 'Contact information updated successfully!');
     }
 }

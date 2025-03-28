@@ -267,6 +267,7 @@ class BusinessController extends Controller
             'type_id' => $request->type_id,
             'created_by' => auth()->id()
         ]);
+        $business->users()->attach(auth()->id(), ['role' => 'owner']);
 
         return response()->json([
             'message' => trans('Business added successfully', [], $request->get('lang', 'en')),
