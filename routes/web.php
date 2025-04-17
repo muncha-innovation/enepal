@@ -1,8 +1,7 @@
 <?php
 
-use App\Events\NotificationCreated;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\ChecklistController;
+use App\Http\Controllers\CommunicationsController;
 use App\Http\Middleware\StatusMiddleware;
 
 use Illuminate\Support\Facades\Route;
@@ -10,17 +9,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\MembersController;
-use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapidApiController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\NewsSourceController;
-use App\Http\Controllers\NewsCategoryController;
 use App\Http\Controllers\NewsController;
-use App\Http\Controllers\TaughtLanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +68,20 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('delete/{business}/{post}', [PostController::class, 'destroy'])->name('destroy');
     });
     Route::resource('business', BusinessController::class);
+    
+    // Business Communication Routes
+    Route::prefix('business/{business}/communications')->group(function () {
+        Route::get('/', [CommunicationsController::class, 'getConversations'])->name('business.communications.index');
+        Route::get('/segments', [CommunicationsController::class, 'manageSegments'])->name('business.communications.segments.index');
+        Route::post('/chat/create', [CommunicationsController::class, 'createChat'])->name('business.communications.createChat');
+        Route::post('/notification/send', [CommunicationsController::class, 'sendNotification'])->name('business.communications.sendNotification');
+        Route::get('/conversation/{conversation}', [CommunicationsController::class, 'getMessages'])->name('business.communications.messages');
+        Route::post('/conversation/{conversation}/send', [CommunicationsController::class, 'sendMessage'])->name('business.communications.send');
+        Route::post('/conversation/{conversation}/thread', [CommunicationsController::class, 'createThread'])->name('business.communications.createThread');
+        Route::delete('/conversation/{conversation}/thread/{thread}', [CommunicationsController::class, 'deleteThread'])->name('business.communications.deleteThread');
+        Route::post('/notifications/{notification}/read', [CommunicationsController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
+        Route::post('/notifications/read-all', [CommunicationsController::class, 'markAllNotificationsAsRead'])->name('business.communications.markAllRead');
+    });
 
     Route::post('{business}/restore', [BusinessController::class, 'restore'])->name('business.restore');
     Route::post('business/{business}/featured', [BusinessController::class, 'featured'])->name('business.featured');
@@ -85,16 +94,6 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::put('update/{business}/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{product}', [ProductController::class, 'destroy'])->name('destroy');
     });
-    Route::group(['prefix' => 'notices', 'as' => 'notices.'], function() {
-        Route::get('/{business}', [NoticeController::class, 'index'])->name('index');
-        Route::get('create/{business}', [NoticeController::class, 'create'])->name('create');
-        Route::post('create/{business}', [NoticeController::class, 'store'])->name('store');
-        Route::get('show/{business}/{notice}', [NoticeController::class, 'show'])->name('show');
-        Route::get('edit/{business}/{notice}', [NoticeController::class, 'edit'])->name('edit');
-        Route::put('update/{business}/{notice}', [NoticeController::class, 'update'])->name('update');
-        Route::delete('delete/{business}/{notice}', [NoticeController::class, 'destroy'])->name('destroy');
-        Route::get('verify/{business}/{notice}', [NoticeController::class, 'verify'])->name('verify');
-    });
 
     Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function() {
         Route::get('/{business}', [GalleryController::class, 'index'])->name('index');
@@ -105,8 +104,6 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::put('update/{business}/{gallery}', [GalleryController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
-
- 
 
     
     Route::resource('galleryImage', GalleryImageController::class);
@@ -138,6 +135,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile/education/{id}', [ProfileController::class, 'getEducationItem'])->name('profile.education.show');
     Route::post('/profile/education', [ProfileController::class, 'updateEducation'])->name('profile.education.update');
     Route::delete('/profile/education/{id}', [ProfileController::class, 'deleteEducation'])->name('profile.education.delete');
+});
+
+// Chat routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', function () {
+        return view('chat.index');
+    })->name('chat.index');
 });
 
 Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');

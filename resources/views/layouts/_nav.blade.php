@@ -13,6 +13,7 @@
         !str_contains(url()->current(), 'news-sources') &&
         !str_contains(url()->current(), 'news-categories');
     $isNewsCategoriesRoute = str_contains(url()->current(), 'news-categories');
+    $isVendorRoute = str_contains(url()->current(), 'vendors');
     if (!$isBusinessRoute) {
         $isBusinessRoute = 0;
     }
@@ -33,6 +34,9 @@
     }
     if (!$isTemplatesRoute) {
         $isTemplatesRoute = 0;
+    }
+    if (!$isVendorRoute) {
+        $isVendorRoute = 0;
     }
 @endphp
 
@@ -327,6 +331,37 @@
         @endrole
 
         @role('super-admin')
+            <div x-data="{ open: {{ $isVendorRoute }} }" class="space-y-1">
+                <button type="button" x-on:click="open = !open"
+                    class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">
+                    <div class="flex items-center pointer-events-none">
+                        <div>
+                            <svg class="mr-3 text-gray-500" width="24" height="24" fill="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15.5 2a6.5 6.5 0 0 1 3.25 12.13 8 8 0 0 0-6.14-2.38l-1.77-1.77L10 10.82a8 8 0 1 1-7.5 7.5 8 8 0 0 1 1.57-4.77L3 12.48V8a4 4 0 0 1 4-4h5.25L14 2.25A6.47 6.47 0 0 1 15.5 2Z"></path>
+                                <circle cx="15.5" cy="8.5" r="2.5"></circle>
+                            </svg>
+                        </div>
+                        {{ __('Vendors') }}
+                    </div>
+                    <svg x-bind:class="!open ? '' : 'rotate-90'"
+                        class="flex-shrink-0 w-5 h-5 mr-2 text-gray-500 transition-colors duration-150 ease-in-out transform pointer-events-none group-hover:text-gray-400"
+                        viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+                <div x-show="open" class="space-y-1">
+                    <a href="{{ route('admin.vendors.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (request()->routeIs('admin.vendors.index')) bg-gray-200 @endif">
+                        {{ __('List') }}
+                    </a>
+                    <a href="{{ route('admin.vendors.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium text-gray-500 rounded-md group hover:bg-gray-100 hover:text-gray-900 @if (request()->routeIs('admin.vendors.create')) bg-gray-200 @endif">
+                        {{ __('Create') }}
+                    </a>
+                </div>
+            </div>
+
             <div x-data="{ open: {{ $isSettingsRoute }} }" class="space-y-1">
                 <a href="{{ route('admin.settings.index') }}"
                     class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group">

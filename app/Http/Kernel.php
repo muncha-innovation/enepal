@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\ForcePasswordUpdate;
 use App\Http\Middleware\Localization;
 use App\Http\Middleware\StatusMiddleware;
+use App\Http\Middleware\VerifyTenant;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 use Spatie\Permission\Middlewares\RoleMiddleware;
@@ -45,6 +46,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             Localization::class,
+            \App\Http\Middleware\TrackUserActivity::class,
 
         ],
 
@@ -77,5 +79,7 @@ class Kernel extends HttpKernel
         'role_or_permission' => RoleOrPermissionMiddleware::class,
         'force.password.update' => ForcePasswordUpdate::class,
         'user.inactive.check' => InactiveUserChecker::class,
+        'verify.tenant' => VerifyTenant::class,
+        'tenant' => \App\Http\Middleware\EnforceTenancy::class,
     ];
 }

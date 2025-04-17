@@ -19,5 +19,5 @@ class DatabaseSeeder extends Seeder
         $this->call(BusinessTypesSeeder::class);
         $this->call(BusinessFacilitiesSeeder::class);
         $this->call(SocialMediaSeeder::class);
-    }
+       }
 }

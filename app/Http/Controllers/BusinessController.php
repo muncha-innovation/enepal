@@ -525,7 +525,6 @@ class BusinessController extends Controller
     public function saveContact(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
-        
         // Update basic contact information
         $business->update([
             'email' => $data['email'],

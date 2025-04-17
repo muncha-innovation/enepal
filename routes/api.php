@@ -9,7 +9,6 @@ use App\Http\Controllers\APIS\BusinessController;
 use App\Http\Controllers\APIS\BusinessTypesController;
 use App\Http\Controllers\APIS\CountryController;
 use App\Http\Controllers\APIS\GalleryController;
-use App\Http\Controllers\APIS\NoticeController;
 use App\Http\Controllers\APIS\NotificationController;
 use App\Http\Controllers\APIS\PostsController;
 use App\Http\Controllers\APIS\AddressPreferencesController;
@@ -56,9 +55,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('galleries', [GalleryController::class, 'index']);
     Route::get('galleries/{id}', [GalleryController::class, 'getById']);
 
-    Route::get('notices', [NoticeController::class, 'index']);
-    Route::get('notices/{id}', [NoticeController::class, 'getById']);
-
     Route::get('notifications/user', [NotificationController::class, 'userNotifications']);
     Route::get('notifications/business', [NotificationController::class, 'businessNotifications']);
     // Route::
@@ -66,7 +62,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('user/following', [BusinessController::class, 'following']);
         Route::get('posts', [BusinessController::class, 'posts']);
         Route::get('products', [BusinessController::class, 'products']);
-        Route::get('notices', [BusinessController::class, 'notices']);
         Route::get('galleries', [BusinessController::class, 'galeries']);
 
         Route::post('follow/{id}', [BusinessController::class, 'followUnfollow']);
@@ -102,6 +97,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/profile/preferences', [UserProfileController::class, 'updatePreferences']);
 });
 
+// User Segment Management Routes
+// Route::prefix('business/{business}/segments')->group(function () {
+//     Route::get('preview/{segmentId}', [SegmentController::class, 'previewCount']);
+//     Route::post('/', [SegmentController::class, 'store']);
+//     Route::put('{segment}', [SegmentController::class, 'update']);
+//     Route::delete('{segment}', [SegmentController::class, 'destroy']);
+// });
+
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
 
@@ -115,6 +118,27 @@ Route::prefix('v1')->group(function () {
         Route::get('categories/{category}', [NewsApiController::class, 'category']);
         Route::get('tags/{tag}', [NewsApiController::class, 'tag']);
         Route::get('{newsItem}', [NewsApiController::class, 'show']);
+    });
+
+    // Chat API Routes
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // Conversations
+        Route::apiResource('conversations', \App\Http\Controllers\Api\ConversationController::class);
+        
+        // Threads
+        Route::get('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'index']);
+        Route::post('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'store']);
+        Route::get('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'show']);
+        Route::put('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'update']);
+        Route::delete('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'destroy']);
+        Route::post('threads/{thread}/mark-read', [\App\Http\Controllers\Api\ThreadController::class, 'markAsRead']);
+        
+        // Messages
+        Route::get('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'index']);
+        Route::post('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
+        Route::get('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'show']);
+        Route::post('messages/{message}/mark-read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
+        Route::delete('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'destroy']);
     });
 });
 

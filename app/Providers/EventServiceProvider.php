@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Events\MemberAddedToBusiness;
-use App\Events\NoticeCreated;
-use App\Listeners\SendNotificationToSubscribedUsers;
 use App\Listeners\SendRegistrationEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -25,9 +23,6 @@ class EventServiceProvider extends ServiceProvider
         MemberAddedToBusiness::class => [
             SendRegistrationEmail::class,
         ],
-        NoticeCreated::class => [
-            SendNotificationToSubscribedUsers::class
-        ]
     ];
 
     /**

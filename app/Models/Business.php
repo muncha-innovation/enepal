@@ -82,10 +82,6 @@ class Business extends Model
     {
         return $this->hasMany(Product::class);
     }
-    public function notices()
-    {
-        return $this->hasMany(Notice::class);
-    }
 
     public function destinations() {
         return $this->belongsToMany(Country::class, 'business_destinations')
@@ -203,5 +199,20 @@ class Business extends Model
         }
 
         return implode('; ', $formatted);
+    }
+
+    public function vendors()
+    {
+        return $this->belongsToMany(Vendor::class, 'business_vendor')
+            ->withTimestamps();
+    }
+
+    public function conversations() {
+        return $this->hasMany(Conversation::class);
+    }
+
+    public function userSegments()
+    {
+        return $this->hasMany(UserSegment::class);
     }
 }

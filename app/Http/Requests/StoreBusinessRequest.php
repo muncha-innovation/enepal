@@ -82,7 +82,7 @@ class StoreBusinessRequest extends FormRequest
                 
             case 'contact':
                 $rules = [
-                    'email' => ['required', 'email', 'unique:businesses,email,' . $this->route('business')],
+                    'email' => ['required', 'email', 'unique:businesses,email,' . $this->route('business')->id],
                     'phone_1' => ['required'],
                     'phone_2' => ['sometimes'],
                     'is_active' => ['required'],
@@ -155,8 +155,7 @@ class StoreBusinessRequest extends FormRequest
                 ];
                 break;
         }
-        
-        return $rules;
+;        return $rules;
     }
 
     protected function prepareForValidation()
@@ -173,6 +172,7 @@ class StoreBusinessRequest extends FormRequest
         if (!empty($cleanedHours)) {
             $this->merge(['hours' => $cleanedHours]);
         }
+
     }
 
     public function messages()

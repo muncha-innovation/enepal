@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\BusinessTypesController;
 use App\Http\Controllers\Admin\FacilitiesController;
 use App\Http\Controllers\Admin\NotificationTemplateController;
+use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessLanguageController;
 use App\Http\Controllers\NewsController;
@@ -28,6 +29,11 @@ Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin',
     Route::put('settings', [BusinessSettingController::class, 'update'])->name('settings.update');
     Route::match(['get', 'post'], 'templates/global', [NotificationTemplateController::class, 'global'])->name('templates.global');
     Route::resource('templates', NotificationTemplateController::class);
+    
+    // Vendors
+    Route::post('vendors/{vendor}/regenerate-api-key', [VendorsController::class, 'regenerateApiKey'])->name('vendors.regenerate-api-key');
+    Route::resource('vendors', VendorsController::class);
+    
     // News Sources
     Route::resource('news-sources', NewsSourceController::class);
     
