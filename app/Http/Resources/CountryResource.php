@@ -19,7 +19,9 @@ class CountryResource extends JsonResource
             'name' => $this->name,
             'code' => $this->code,
             'dial_code' => $this->dial_code,
-            'states' => StateResource::collection($this->states),
+            'states' => $this->whenLoaded('states', function() {
+                return StateResource::collection($this->states);
+            }),
         ];
     }
 }
