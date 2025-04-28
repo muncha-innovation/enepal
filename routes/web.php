@@ -147,7 +147,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('chat.index');
 });
 
-Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->name('password.update');
+Route::get('password/update', [ProfileController::class, 'passwordUpdate'])->name('profile.password.update');
 
 Route::get('/home', function () {
     return view('modules.frontend.index');
