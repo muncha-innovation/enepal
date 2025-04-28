@@ -34,6 +34,14 @@ class UpdateNewsFeed extends Command
             'url' => 'https://en.setopati.com/feed',
             'is_active' => true,
             'language' => 'en',
+        ],
+        [
+            'name' => 'Onlinekhabar English',
+            
+            'url' => 'https://english.onlinekhabar.com/feed',
+            'is_active' => true,
+            'language' => 'en',
+            'logo' => 'https://english.onlinekhabar.com/wp-content/themes/onlinekhabar-english-2020/img/site-main-logo.png'
         ]
     ];
 

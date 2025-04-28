@@ -7,8 +7,10 @@
             <h1 class="text-2xl font-semibold text-gray-900">Send Notification</h1>
         </div>
 
-        <form action="{{ route('business.communications.sendNotification', $business) }}" method="POST" class="space-y-6">
+        <form action="{{ route('business.communications.sendNotification', $business) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
+            <input type="hidden" id="recipient_type" name="recipient_type" value="segment">
+            
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Select Recipients</label>
                 <div class="space-y-4">
@@ -57,11 +59,12 @@
                     <!-- Manual Selection Section -->
                     <div id="manual-selection" class="segment-section hidden">
                         <select name="users[]" multiple class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" style="height: 200px;">
+                            <option value="all_users">All Users</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->first_name }} ({{ $user->email }})</option>
                             @endforeach
                         </select>
-                        <p class="mt-2 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple users</p>
+                        <p class="mt-2 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple users or select "All Users" to send to everyone</p>
                     </div>
                 </div>
             </div>
@@ -74,6 +77,11 @@
             <div>
                 <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
                 <textarea name="message" id="message" rows="4" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+            </div>
+
+            <div>
+                <label for="image" class="block text-sm font-medium text-gray-700">Image (Optional)</label>
+                <input type="file" name="image" id="image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
             </div>
 
             <div class="flex justify-end space-x-3">
@@ -94,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle segment type selection
     const segmentSelectors = document.querySelectorAll('.segment-selector');
     const segmentSections = document.querySelectorAll('.segment-section');
+    const recipientTypeInput = document.getElementById('recipient_type');
 
     segmentSelectors.forEach(selector => {
         selector.addEventListener('click', function() {
@@ -112,6 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             document.getElementById(`${targetType}-segments`)?.classList.remove('hidden');
             document.getElementById(`${targetType}-selection`)?.classList.remove('hidden');
+            
+            // Update recipient_type based on selection
+            if (targetType === 'manual') {
+                recipientTypeInput.value = 'users';
+            } else {
+                recipientTypeInput.value = 'segment';
+            }
         });
     });
 
@@ -123,38 +139,82 @@ async function loadRecipientCounts() {
     const countElements = document.querySelectorAll('.recipient-count');
     countElements.forEach(async element => {
         const segmentOption = element.closest('.segment-option');
+        if (!segmentOption) return; // Skip if not in a segment option
         const input = segmentOption.querySelector('input[name="segment_id"]');
+        if (!input || !input.value) return; // Skip if no input or value
         
         try {
-            const response = await fetch(`/api/segment-preview/${input.value}`);
+            // Construct the URL carefully, ensuring segment ID is valid
+            const segmentId = input.value;
+            // Basic check to avoid fetching for potentially invalid IDs if needed
+            if (!segmentId.startsWith('custom_') && !['recently_active', 'inactive', 'engaged', 'students', 'job_seekers'].includes(segmentId)) {
+                 // console.warn(`Skipping fetch for potentially invalid segment ID: ${segmentId}`);
+                 // element.textContent = 'N/A'; // Or some placeholder
+                 // return;
+            }
+            // Assuming API route exists and handles these IDs
+            const response = await fetch(`/api/segment-preview/${segmentId}`); 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             element.textContent = data.count;
         } catch (error) {
+            console.error('Error loading recipient count for segment:', input?.value, error);
             element.textContent = 'Error';
         }
     });
 }
 
 async function previewRecipients() {
-    const selectedSegment = document.querySelector('input[name="segment_id"]:checked');
-    const selectedUsers = document.querySelector('select[name="users[]"]');
-    
+    const selectedSegmentRadio = document.querySelector('input[name="segment_id"]:checked');
+    const manualUserSelect = document.querySelector('select[name="users[]"]');
+    const selectedManualUsers = Array.from(manualUserSelect.selectedOptions).map(option => option.value);
+
     let recipientCount = 0;
-    
-    if (selectedSegment) {
-        try {
-            const response = await fetch(`/api/segment-preview/${selectedSegment.value}`);
-            const data = await response.json();
-            recipientCount = data.count;
-        } catch (error) {
-            alert('Error loading recipient preview');
+    let previewType = '';
+
+    // Determine which selection type is active
+    const activeSelector = document.querySelector('.segment-selector.bg-indigo-600');
+    const activeType = activeSelector ? activeSelector.dataset.segmentType : null;
+
+    if (activeType === 'predefined' || activeType === 'custom') {
+        if (selectedSegmentRadio && selectedSegmentRadio.value) {
+            previewType = 'segment';
+            try {
+                const response = await fetch(`/api/segment-preview/${selectedSegmentRadio.value}`);
+                if (!response.ok) throw new Error('Failed to fetch segment count');
+                const data = await response.json();
+                recipientCount = data.count;
+            } catch (error) {
+                console.error('Error loading segment recipient preview:', error);
+                alert('Error loading recipient preview for the selected segment.');
+                return;
+            }
+        } else {
+            alert('Please select a segment first.');
             return;
         }
-    } else if (selectedUsers) {
-        recipientCount = selectedUsers.selectedOptions.length;
+    } else if (activeType === 'manual') {
+        previewType = 'manual';
+        if (selectedManualUsers.includes('all_users')) {
+            // Need a way to get total user count, maybe another API endpoint?
+            // For now, just indicate "All Users"
+            alert('This notification will be sent to All Users.'); 
+            // Ideally, fetch the actual count: fetch('/api/users/count').then(...)
+            return; // Exit after showing the specific message for "All Users"
+        } else if (selectedManualUsers.length > 0) {
+            recipientCount = selectedManualUsers.length;
+        } else {
+            alert('Please select users manually or choose "All Users".');
+            return;
+        }
+    } else {
+        alert('Please select a recipient type (Segment or Manual).');
+        return;
     }
-    
-    alert(`This notification will be sent to ${recipientCount} recipients.`);
+
+    alert(`This notification will be sent to approximately ${recipientCount} recipients based on your ${previewType} selection.`);
 }
 </script>
 @endpush

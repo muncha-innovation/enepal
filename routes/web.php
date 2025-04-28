@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CommunicationsController;
+use App\Http\Controllers\BusinessNotificationController;
 use App\Http\Middleware\StatusMiddleware;
 
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\NewsController;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +29,6 @@ use App\Http\Controllers\NewsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 
 Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update','user.inactive.check']], function () {
 
@@ -74,17 +75,19 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('/', [CommunicationsController::class, 'getConversations'])->name('business.communications.index');
         Route::get('/segments', [CommunicationsController::class, 'manageSegments'])->name('business.communications.segments.index');
         Route::post('/chat/create', [CommunicationsController::class, 'createChat'])->name('business.communications.createChat');
-        Route::post('/notification/send', [CommunicationsController::class, 'sendNotification'])->name('business.communications.sendNotification');
-        Route::get('/conversation/{conversation}', [CommunicationsController::class, 'getMessages'])->name('business.communications.messages');
+        Route::post('/notification/send', [BusinessNotificationController::class, 'sendNotification'])->name('business.communications.sendNotification');
+        Route::get('conversation/{conversation}', [CommunicationsController::class, 'getMessages'])->name('business.communications.messages');
         Route::post('/conversation/{conversation}/send', [CommunicationsController::class, 'sendMessage'])->name('business.communications.send');
         Route::post('/conversation/{conversation}/thread', [CommunicationsController::class, 'createThread'])->name('business.communications.createThread');
         Route::delete('/conversation/{conversation}/thread/{thread}', [CommunicationsController::class, 'deleteThread'])->name('business.communications.deleteThread');
-        Route::post('/notifications/{notification}/read', [CommunicationsController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
-        Route::post('/notifications/read-all', [CommunicationsController::class, 'markAllNotificationsAsRead'])->name('business.communications.markAllRead');
+        Route::post('/notifications/{notification}/read', [BusinessNotificationController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
+        Route::post('/notifications/read-all', [BusinessNotificationController::class, 'markAllNotificationsAsRead'])->name('business.communications.markAllRead');
+        Route::get('/search-users', [CommunicationsController::class, 'searchUsers'])->name('business.communications.search-users');
     });
-
+    
     Route::post('{business}/restore', [BusinessController::class, 'restore'])->name('business.restore');
     Route::post('business/{business}/featured', [BusinessController::class, 'featured'])->name('business.featured');
+
     Route::group(['prefix' => 'products', 'as' => 'products.'], function() {
         Route::get('/{business}', [ProductController::class, 'index'])->name('index');
         Route::get('create/{business}', [ProductController::class, 'create'])->name('create');

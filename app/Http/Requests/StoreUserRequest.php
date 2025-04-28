@@ -44,7 +44,7 @@ class StoreUserRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:191'],
             'address.country_id' => ['required'],
             'address.state_id' => ['nullable', 'exists:states,id'],
-            'address.city' => ['required', 'string', 'max:50'],
+            'address.city' => ['nullable', 'string', 'max:50'],
             'address.address_line_1' => ['nullable', 'string', 'max:255'],
             'address.address_line_2' => ['nullable', 'string', 'max:255'],
             'address.postal_code' => ['nullable', 'string', 'max:50'],

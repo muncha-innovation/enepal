@@ -16,8 +16,7 @@ class ThreadController extends Controller
      */
     public function index(Request $request, Conversation $conversation)
     {
-        $this->authorize('view', $conversation);
-        
+      
         $threads = $conversation->threads()
             ->with('latestMessage')
             ->orderBy('last_message_at', 'desc')
@@ -31,7 +30,6 @@ class ThreadController extends Controller
      */
     public function show(Request $request, Thread $thread)
     {
-        $this->authorize('view', $thread->conversation);
         
         // Mark messages as read if requested
         if ($request->has('mark_as_read') && $request->input('mark_as_read')) {
@@ -49,7 +47,6 @@ class ThreadController extends Controller
      */
     public function store(Request $request, Conversation $conversation)
     {
-        $this->authorize('update', $conversation);
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -69,7 +66,6 @@ class ThreadController extends Controller
             'sender_id' => $user->id,
             'sender_type' => get_class($user),
             'content' => 'Thread created: ' . $thread->title,
-            'is_notification' => true,
         ]);
         
         return new ThreadResource($thread);
@@ -80,7 +76,6 @@ class ThreadController extends Controller
      */
     public function update(Request $request, Thread $thread)
     {
-        $this->authorize('update', $thread->conversation);
         
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
@@ -98,7 +93,6 @@ class ThreadController extends Controller
                 'sender_id' => $user->id,
                 'sender_type' => get_class($user),
                 'content' => 'Thread status changed to: ' . $validated['status'],
-                'is_notification' => true,
             ]);
         }
         
@@ -110,7 +104,6 @@ class ThreadController extends Controller
      */
     public function destroy(Thread $thread)
     {
-        $this->authorize('delete', $thread->conversation);
         
         // Don't allow deleting the default thread
         if ($thread->conversation->threads()->count() === 1) {
@@ -143,7 +136,7 @@ class ThreadController extends Controller
             ->where('sender_type', '!=', $userType)
             ->update(['is_read' => true, 'opened_at' => now()]);
             
-        return response()->json(['message' => 'Messages marked as read']);
+        return response()->json(['message' => 'Thread marked as read']);
     }
     
     /**
@@ -151,7 +144,6 @@ class ThreadController extends Controller
      */
     public function markAsRead(Thread $thread)
     {
-        $this->authorize('view', $thread->conversation);
         
         return $this->markThreadAsRead($thread);
     }

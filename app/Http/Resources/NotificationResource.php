@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Events\MemberAddedToBusiness;
 use App\Models\Business;
+use App\Models\BusinessNotification;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class NotificationResource extends JsonResource
 {
@@ -17,18 +18,26 @@ class NotificationResource extends JsonResource
      */
     public function toArray($request)
     {
-        $data = collect($this->data);
-        $creatorDetails = $this->creatorDetails();
-        return [
-            'id' => $this->id,
-            'title' => $data->get('title'),
-            'description' => $data->get('message'),
-            'image' => $data->get('image'),
-            'createdByType' => $data->get('created_by_type'),
-            'createdById' => $data->get('created_by_id'),
-            'createdByImage' => $creatorDetails['image'],
-            'createdByName' => $creatorDetails['name'],
-        ];
+            $isRead = false;
+            
+            // Check if notification has been read by the current user
+            if ($request->user()) {
+                $isRead = $this->isReadBy($request->user());
+            }
+            
+            return [
+                'id' => $this->id,
+                'title' => $this->title,
+                'description' => $this->content,
+                'image' => $this->image ? Storage::url($this->image) : null,
+                'created_at' => $this->created_at,
+                'sent_at' => $this->sent_at,
+                'is_read' => $isRead,
+                'business' => BusinessResource::make($this->whenLoaded('business')),
+            ];
+        
+        
+       
     }
 
     public function creatorDetails() {
@@ -46,9 +55,10 @@ class NotificationResource extends JsonResource
                 'image' => getImage($user->image, 'profile/'),
             ];
         }
+        
+        return [
+            'name' => 'Unknown',
+            'image' => null,
+        ];
     }
-
-   
-
-
 }

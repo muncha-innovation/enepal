@@ -19,12 +19,8 @@ class ConversationController extends Controller
         $user = Auth::user();
         $query = Conversation::query();
         
-        // Filter conversations based on user type
-        if ($user->hasRole('business_admin') || $user->hasRole('business_user')) {
-            $query->where('business_id', $user->business_id);
-        } else {
-            $query->where('user_id', $user->id);
-        }
+        $query->where('user_id', $user->id);
+        
         
         // Apply search filter if provided
         if ($request->has('search')) {
@@ -41,7 +37,7 @@ class ConversationController extends Controller
         }
         
         // Load necessary relationships
-        $query->with(['defaultThread.latestMessage']);
+        $query->with(['defaultThread.latestMessage','business', 'user', 'vendor']);
         
         // Order by latest message
         $query->orderBy('updated_at', 'desc');
@@ -98,7 +94,6 @@ class ConversationController extends Controller
             'sender_id' => $user->id,
             'sender_type' => get_class($user),
             'content' => 'Conversation started',
-            'is_notification' => true,
         ]);
         
         $conversation->load(['threads', 'defaultThread']);

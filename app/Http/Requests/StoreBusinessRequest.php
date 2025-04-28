@@ -245,55 +245,43 @@ class StoreBusinessRequest extends FormRequest
 
         switch ($network->name) {
             case 'Facebook':
-                // Handle Facebook URLs
-                if (preg_match('/^@/', $url)) {
-                    // Handle @username format
-                    $username = ltrim($url, '@');
-                    return "https://www.facebook.com/{$username}";
-                }
-                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-                    // Add https:// if not present
-                    $url = "https://" . ltrim($url, '/');
-                }
-                // Ensure www.facebook.com format
-                $url = preg_replace('~^(?:https?://)?(?:www\.)?facebook\.com~i', 'https://www.facebook.com', $url);
+                return $this->normalizeSocialUrl($url);
                 break;
 
-            case 'Twitter':
-                // Handle Twitter URLs
-                if (preg_match('/^@/', $url)) {
-                    $username = ltrim($url, '@');
-                    return "https://twitter.com/{$username}";
-                }
-                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-                    $url = "https://" . ltrim($url, '/');
-                }
-                $url = preg_replace('~^(?:https?://)?(?:www\.)?twitter\.com~i', 'https://twitter.com', $url);
+           case 'Instagram':
+            return $this->normalizeSocialUrl($url, 'instagram');
                 break;
-
-            case 'Instagram':
-                // Handle Instagram URLs
-                if (preg_match('/^@/', $url)) {
-                    $username = ltrim($url, '@');
-                    return "https://www.instagram.com/{$username}";
-                }
-                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-                    $url = "https://" . ltrim($url, '/');
-                }
-                $url = preg_replace('~^(?:https?://)?(?:www\.)?instagram\.com~i', 'https://www.instagram.com', $url);
-                break;
-
-            case 'LinkedIn':
-                // Handle LinkedIn URLs
-                if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-                    $url = "https://" . ltrim($url, '/');
-                }
-                $url = preg_replace('~^(?:https?://)?(?:www\.)?linkedin\.com~i', 'https://www.linkedin.com', $url);
-                break;
-
-            // Add more cases for other networks as needed
-        }
+      }
 
         return $url;
     }
+
+    function normalizeSocialUrl($url, $platform = 'facebook')
+    {
+        $url = trim($url);
+    
+        if (empty($url)) {
+            return null; // User entered nothing
+        }
+    
+        if (preg_match('/^@/', $url)) {
+            $username = ltrim($url, '@');
+        } elseif (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+            // No http(s):// → assume it's just a username
+            $username = ltrim($url, '/');
+        } else {
+            // If already a full URL, just return it
+            return $url;
+        }
+    
+        // Now build the correct link based on platform
+        switch (strtolower($platform)) {
+            case 'instagram':
+                return "https://www.instagram.com/{$username}";
+            case 'facebook':
+            default:
+                return "https://www.facebook.com/{$username}";
+        }
+    }
+
 }

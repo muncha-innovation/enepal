@@ -21,29 +21,24 @@ class MessageResource extends JsonResource
             'sender_id' => $this->sender_id,
             'sender_type' => $this->sender_type,
             'sender' => $this->when($this->sender, function() {
-                if (method_exists($this->sender, 'name')) {
-                    return $this->sender->name;
+                if ($this->sender instanceof \App\Models\User) {
+                    return [
+                        'name' => $this->sender->first_name . ' ' . $this->sender->last_name,
+                        'type' => 'user'
+                    ];
+                } else if ($this->sender instanceof \App\Models\Business) {
+                    return [
+                        'name' => $this->sender->name,
+                        'type' => 'business'
+                    ];
                 }
                 return null;
             }),
             'content' => $this->content,
             'attachments' => $this->attachments,
-            'is_notification' => $this->is_notification,
             'is_read' => $this->is_read,
             'opened_at' => $this->opened_at,
             'has_attachments' => $this->hasAttachments(),
-            'notification_content' => $this->when($this->is_notification, fn() => $this->getNotificationContent()),
-            'attachment_details' => $this->when($this->hasAttachments(), function() {
-                return collect($this->attachments)->map(function($attachment) {
-                    return [
-                        'name' => $attachment['name'] ?? null,
-                        'path' => $attachment['path'] ?? null,
-                        'url' => $this->getAttachmentUrl($attachment),
-                        'extension' => $this->getAttachmentExtension($attachment),
-                        'is_image' => $this->isAttachmentImage($attachment),
-                    ];
-                });
-            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

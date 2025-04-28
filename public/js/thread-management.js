@@ -5,12 +5,21 @@
 
 window.threadManagement = {
   activeConversationId: null,
+  pusherClient: null,
+  currentThreadChannel: null,
+  currentConversationChannel: null,
+  currentThreadId: null,
 
   // Initialize thread management
   init: function() {
     // Set up any initial state or event listeners
     this.getActiveConversationIdFromUrl();
     this.setupEventListeners();
+    
+    // Initialize Pusher if configuration is available
+    if (window.PUSHER_CONFIG) {
+      this.initializePusher();
+    }
   },
 
   setupEventListeners: function() {
@@ -34,6 +43,207 @@ window.threadManagement = {
       threadForm.addEventListener('submit', (e) => {
         this.createNewThread(e);
       });
+    }
+  },
+  
+  // Initialize Pusher real-time messaging
+  initializePusher: function() {
+    if (!window.PUSHER_CONFIG || !window.PUSHER_CONFIG.key || !window.PUSHER_CONFIG.cluster) {
+      console.error('Pusher configuration is missing');
+      return;
+    }
+    
+    if (this.pusherClient) {
+      // If we already have a Pusher instance, disconnect it
+      this.pusherClient.disconnect();
+    }
+    
+    // Create a new Pusher instance
+    this.pusherClient = new Pusher(window.PUSHER_CONFIG.key, {
+      cluster: window.PUSHER_CONFIG.cluster,
+      forceTLS: true,
+      auth: {
+        headers: {
+          'X-CSRF-Token': window.PUSHER_CONFIG.authToken,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }
+    });
+    
+    // Log connection events
+    this.pusherClient.connection.bind('connected', () => {
+      console.log('Pusher connected with socket ID:', this.pusherClient.connection.socket_id);
+    });
+    
+    this.pusherClient.connection.bind('error', (err) => {
+      console.error('Pusher connection error:', err);
+    });
+    
+    // Subscribe to active channels if we have conversation and thread IDs
+    if (this.activeConversationId) {
+      this.subscribeToConversationChannel(this.activeConversationId);
+      
+      if (this.currentThreadId) {
+        this.subscribeToThreadChannel(this.currentThreadId);
+      }
+    }
+  },
+  
+  // Subscribe to conversation channel
+  subscribeToConversationChannel: function(conversationId) {
+    if (!this.pusherClient) return;
+    
+    // Unsubscribe from any existing conversation channel
+    if (this.currentConversationChannel) {
+      this.pusherClient.unsubscribe('conversation-' + this.activeConversationId);
+    }
+    
+    // Subscribe to new conversation channel
+    const channelName = 'conversation-' + conversationId;
+    const conversationChannel = this.pusherClient.subscribe(channelName);
+    this.currentConversationChannel = conversationChannel;
+    
+    // Handle new message events
+    conversationChannel.bind('new.message', (data) => {
+      console.log('Received message in conversation channel:', data);
+      
+      // If the message is for a different thread, show notification
+      if (data.thread_id != this.currentThreadId) {
+        // Add notification dot to thread tab
+        const threadTab = document.querySelector(`.thread-tab[data-thread-id="${data.thread_id}"]`);
+        if (threadTab) {
+          threadTab.classList.add('relative');
+          
+          // Remove existing notification dot if any
+          const existingDot = threadTab.querySelector('.notification-dot');
+          if (existingDot) {
+            existingDot.remove();
+          }
+          
+          // Add new notification dot
+          const notificationDot = document.createElement('span');
+          notificationDot.className = 'notification-dot absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3';
+          threadTab.appendChild(notificationDot);
+        }
+      }
+    });
+  },
+  
+  // Subscribe to thread channel
+  subscribeToThreadChannel: function(threadId) {
+    if (!this.pusherClient) return;
+    
+    // Unsubscribe from any existing thread channel
+    if (this.currentThreadChannel) {
+      this.pusherClient.unsubscribe('thread-' + this.currentThreadId);
+    }
+    
+    // Subscribe to new thread channel
+    const channelName = 'thread-' + threadId;
+    const threadChannel = this.pusherClient.subscribe(channelName);
+    this.currentThreadChannel = threadChannel;
+    this.currentThreadId = threadId;
+    
+    // Handle new message events
+    threadChannel.bind('new.message', (data) => {
+      console.log('Received message in thread channel:', data);
+      
+      // Only process if it's for the current thread
+      if (data.thread_id == this.currentThreadId) {
+        // Check if the message is already in the DOM
+        const existingMessage = document.querySelector(`[data-message-id="${data.id}"]`);
+        if (!existingMessage) {
+          this.appendNewMessage(data);
+        }
+      }
+    });
+  },
+  
+  // Append a new message to the message list
+  appendNewMessage: function(message) {
+    const messageList = document.querySelector('.message-list .space-y-4');
+    if (!messageList) return;
+    
+    const isFromBusiness = message.sender_type === 'App\\Models\\Business';
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = `flex ${isFromBusiness ? 'justify-end' : 'justify-start'}`;
+    messageElement.setAttribute('data-message-id', message.id);
+    
+    let attachmentsHtml = '';
+    if (message.attachments && message.attachments.length > 0) {
+      let attachmentsContent = '';
+      
+      message.attachments.forEach(attachment => {
+        let imagePreview = '';
+        if (attachment.mime && attachment.mime.startsWith('image/')) {
+          imagePreview = `<div class="mb-1">
+            <img src="${window.location.origin}/storage/${attachment.path}" alt="${attachment.name || 'Image'}" 
+                class="max-h-48 rounded border">
+          </div>`;
+        }
+        
+        attachmentsContent += `
+          <div class="mb-1">
+            ${imagePreview}
+            <a href="${window.location.origin}/storage/${attachment.path}" target="_blank" 
+               class="flex items-center text-xs text-blue-600 hover:underline">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                     d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+              </svg>
+              ${attachment.name || 'Attachment'}
+              ${attachment.size ? `<span class="text-gray-500 ml-1">(${Math.round(attachment.size / 1024)} KB)</span>` : ''}
+            </a>
+          </div>
+        `;
+      });
+      
+      attachmentsHtml = `
+        <div class="mt-2 space-y-2 p-2 bg-white bg-opacity-50 rounded-md">
+          ${attachmentsContent}
+        </div>
+      `;
+    }
+    
+    const timeFormatted = this.formatMessageTime(message.created_at);
+    
+    messageElement.innerHTML = `
+      <div class="max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 ${isFromBusiness ? 'bg-indigo-100 text-gray-800' : 'bg-gray-100 text-gray-800'}">
+        <p class="text-sm">${message.content}</p>
+        
+        ${attachmentsHtml}
+        
+        <div class="mt-1 text-xs text-gray-500 text-right">
+          ${timeFormatted}
+          ${message.is_read && isFromBusiness ? '<span class="ml-1 text-green-600">✓</span>' : ''}
+        </div>
+      </div>
+    `;
+    
+    messageList.appendChild(messageElement);
+    this.scrollToBottom();
+  },
+  
+  // Format message time helper
+  formatMessageTime: function(timestamp) {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+  },
+  
+  // Scroll to bottom of message list
+  scrollToBottom: function() {
+    const messageList = document.querySelector('.message-list');
+    if (messageList) {
+      messageList.scrollTop = messageList.scrollHeight;
     }
   },
 
@@ -169,7 +379,7 @@ window.threadManagement = {
   },
 
   // Load a conversation
-  loadConversation: function loadConversation(conversationId, threadId) {
+  loadConversation: function(conversationId, threadId) {
     if (!conversationId) {
       console.error('No conversation ID provided');
       return;
@@ -216,11 +426,23 @@ window.threadManagement = {
         // Update the message container with the new content
         messageContainer.innerHTML = html;
         
+        // Get current thread ID from the input field
+        const threadIdInput = document.querySelector('input[name="thread_id"]');
+        if (threadIdInput) {
+          this.currentThreadId = threadIdInput.value;
+        }
+        
+        // Subscribe to Pusher channels for this conversation and thread
+        if (this.pusherClient) {
+          this.subscribeToConversationChannel(conversationId);
+          
+          if (this.currentThreadId) {
+            this.subscribeToThreadChannel(this.currentThreadId);
+          }
+        }
+        
         // Scroll to the bottom of the message list
-        // Using the global scrollToBottom function instead of this.scrollToBottom
-        setTimeout(() => {
-          window.scrollToBottom();
-        }, 100);
+        this.scrollToBottom();
       })
       .catch(error => {
         console.error('Error loading conversation:', error);
@@ -261,6 +483,14 @@ window.threadManagement = {
       }
     });
     
+    // Update current thread ID
+    this.currentThreadId = threadId;
+    
+    // Subscribe to the new thread channel
+    if (this.pusherClient) {
+      this.subscribeToThreadChannel(threadId);
+    }
+    
     // Load the thread content
     const businessId = window.location.pathname.split('/')[2];
     const url = `/business/${businessId}/communications/conversation/${conversationId}?thread_id=${threadId}&ajax=1`;
@@ -298,7 +528,7 @@ window.threadManagement = {
       this.updateThreadMenuOptions(threadId);
       
       // Scroll to bottom
-      window.scrollToBottom();
+      this.scrollToBottom();
     })
     .catch(error => {
       console.error('Error switching thread:', error);
@@ -461,6 +691,90 @@ window.threadManagement = {
       this.pendingDeleteConversationId = null;
       this.pendingDeleteThreadId = null;
     });
+  }
+};
+
+// Handle message form submission - add data-message-id to new messages
+window.handleMessageSubmit = async function(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const formData = new FormData(form);
+  const submitButton = form.querySelector('button[type="submit"]');
+  
+  // Disable submit button
+  submitButton.disabled = true;
+  
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Clear the form
+      form.reset();
+      document.getElementById('selected-files').innerHTML = '';
+      
+      // We don't reload messages here as Pusher will handle this
+      // This allows the message to appear in real-time across clients
+      console.log('Message sent successfully');
+    } else {
+      alert('Error sending message: ' + (data.message || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error sending message. Please try again.');
+  } finally {
+    // Re-enable submit button
+    submitButton.disabled = false;
+  }
+};
+
+// Handle file selection for message attachments
+window.handleFileSelection = function(input) {
+  const fileList = input.files;
+  const previewContainer = document.getElementById('selected-files');
+  
+  if (!previewContainer) return;
+  
+  previewContainer.innerHTML = '';
+  
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+    
+    const filePreview = document.createElement('div');
+    filePreview.className = 'bg-gray-100 rounded-md p-2 flex items-center justify-between';
+    filePreview.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+        </svg>
+        <span class="text-xs truncate max-w-[150px]">${file.name}</span>
+        <span class="text-xs text-gray-500 ml-2">${fileSize}</span>
+      </div>
+      <button type="button" class="text-gray-500 hover:text-red-500" onclick="this.parentNode.remove()">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    `;
+    
+    previewContainer.appendChild(filePreview);
+  }
+};
+
+// Global function to scroll to bottom of message list
+window.scrollToBottom = function() {
+  const messageList = document.querySelector('.message-list');
+  if (messageList) {
+    messageList.scrollTop = messageList.scrollHeight;
   }
 };
 

@@ -16,6 +16,3 @@
 
 @endsection
 
-@push('js')
-<script src="{{ asset('js/thread-management.js') }}"></script>
-@endpush

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Models\Business;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -12,6 +13,14 @@ use Illuminate\Http\Request;
 
 class CommunicationsController extends Controller
 {
+    protected $businessNotificationController;
+    protected $usersPerPage = 10;
+
+    public function __construct(BusinessNotificationController $businessNotificationController)
+    {
+        $this->businessNotificationController = $businessNotificationController;
+    }
+
     public function getConversations(Business $business, Request $request)
     {
         $type = $request->get('type', 'chat');
@@ -48,8 +57,8 @@ class CommunicationsController extends Controller
             ]
         ];
         
-        // Get users for both tabs
-        $users = User::all(['id', 'first_name', 'email']);
+        // Get users with pagination and search query support
+        $usersPaginated = $this->getPaginatedUsers($request);
         
         if ($type === 'chat') {
             $conversations = $business->conversations()
@@ -62,60 +71,84 @@ class CommunicationsController extends Controller
             $unreadChats = Message::whereHas('conversation', function ($query) use ($business) {
                 $query->where('business_id', $business->id);
             })->where('is_read', false)
-              ->where('is_notification', false)
               ->count();
 
-            return view('modules.business.communications.index', compact('business', 'conversations', 'unreadChats', 'segments', 'predefinedSegments', 'users'));
+            return view('modules.business.communications.index', compact(
+                'business', 
+                'conversations', 
+                'unreadChats', 
+                'segments', 
+                'predefinedSegments', 
+                'usersPaginated'
+            ));
+        } else {
+            // Get notifications for the notifications tab
+            $notifications = $business->notifications()
+                ->where('is_active', true)
+                ->latest()
+                ->get();
+                
+            // Count unread notifications
+            $unreadNotifications = 0;
+            if (auth()->check()) {
+                $user = auth()->user();
+                $unreadNotificationsQuery = $business->notifications()
+                    ->whereHas('users', function($query) use ($user) {
+                        $query->where('user_id', $user->id)
+                            ->whereNull('read_at');
+                    });
+                    
+                $unreadNotifications = $unreadNotificationsQuery->count();
+            }
+            
+            return view('modules.business.communications.index', 
+                compact('business', 'usersPaginated', 'segments', 'predefinedSegments', 'notifications', 'unreadNotifications'));
         }
+    }
 
-        // For notifications view
-        $notifications = Message::whereHas('conversation', function ($query) use ($business) {
-            $query->where('business_id', $business->id);
-        })->where('is_notification', true)
-          ->latest()
-          ->paginate(15);
-
-        $unreadNotifications = Message::whereHas('conversation', function ($query) use ($business) {
-            $query->where('business_id', $business->id);
-        })->where('is_notification', true)
-          ->where('is_read', false)
-          ->count();
-
-        // Get user segments and all users for sending new notifications
-        $users = User::all(['id', 'first_name', 'email']);
-        $segments = $business->userSegments()->where('is_active', true)->get();
+    /**
+     * Get paginated users with optional search query
+     */
+    private function getPaginatedUsers(Request $request)
+    {
+        $query = User::query()->select(['id', 'first_name', 'email']);
         
-        // Get predefined segments
-        $predefinedSegments = [
-            [
-                'id' => 'recently_active',
-                'name' => 'Recently Active Users',
-                'conditions' => [['type' => 'last_active', 'operator' => 'less_than', 'value' => 7]]
-            ],
-            [
-                'id' => 'inactive',
-                'name' => 'Inactive Users (30+ days)',
-                'conditions' => [['type' => 'last_active', 'operator' => 'more_than', 'value' => 30]]
-            ],
-            [
-                'id' => 'engaged',
-                'name' => 'Engaged Users',
-                'conditions' => [['type' => 'notification_opened', 'value' => 7]]
-            ],
-            [
-                'id' => 'students',
-                'name' => 'Students',
-                'conditions' => [['type' => 'user_type', 'value' => 'student']]
-            ],
-            [
-                'id' => 'job_seekers',
-                'name' => 'Job Seekers',
-                'conditions' => [['type' => 'user_type', 'value' => 'job_seeker']]
-            ]
-        ];
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('first_name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        return $query->paginate($this->usersPerPage);
+    }
 
-        return view('modules.business.communications.index', 
-            compact('business', 'notifications', 'unreadNotifications', 'users', 'segments', 'predefinedSegments'));
+    /**
+     * API endpoint to search users
+     */
+    public function searchUsers(Request $request)
+    {
+        $query = User::query()->select(['id', 'first_name', 'email']);
+        
+        if ($request->has('q')) {
+            $searchTerm = $request->input('q');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('first_name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        $users = $query->limit(10)->get();
+        
+        return response()->json([
+            'results' => $users->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'text' => $user->first_name . ' (' . $user->email . ')'
+                ];
+            })
+        ]);
     }
 
     public function createChat(Business $business, Request $request)
@@ -144,7 +177,6 @@ class CommunicationsController extends Controller
             'content' => $request->message,
             'sender_id' => $business->id,
             'sender_type' => Business::class,
-            'is_notification' => false
         ]);
 
         $thread->messages()->save($message);
@@ -153,115 +185,13 @@ class CommunicationsController extends Controller
         $thread->update(['last_message_at' => now()]);
         $conversation->update(['last_message_at' => now()]);
 
-        return redirect()->route('business.communications.messages', [
-            'business' => $business,
-            'conversation' => $conversation,
-            'thread_id' => $thread->id
-        ])->with('success', 'Message sent successfully');
+        return redirect()->back();
     }
 
     public function sendNotification(Business $business, Request $request, UserSegmentationService $segmentationService)
     {
-        $request->validate([
-            'segment_id' => 'required_without:users',
-            'users' => 'required_without:segment_id|array',
-            'users.*' => 'exists:users,id',
-            'title' => 'required|string|max:255',
-            'message' => 'required|string',
-            'thread_title' => 'nullable|string|max:255',
-            'attachments.*' => 'file|max:10240' // 10MB max per file
-        ]);
-
-        // Get users based on segment or direct selection
-        if ($request->segment_id) {
-            if (str_starts_with($request->segment_id, 'custom_')) {
-                $segmentId = str_replace('custom_', '', $request->segment_id);
-                $segment = $business->userSegments()->findOrFail($segmentId);
-                $userQuery = $segmentationService->getUsersBySegment($segment->conditions);
-            } else {
-                $predefinedSegments = [
-                    'recently_active' => [['type' => 'last_active', 'operator' => 'less_than', 'value' => 7]],
-                    'inactive' => [['type' => 'last_active', 'operator' => 'more_than', 'value' => 30]],
-                    'engaged' => [['type' => 'notification_opened', 'value' => 7]],
-                    'students' => [['type' => 'user_type', 'value' => 'student']],
-                    'job_seekers' => [['type' => 'user_type', 'value' => 'job_seeker']]
-                ];
-                
-                $conditions = $predefinedSegments[$request->segment_id] ?? [];
-                $userQuery = $segmentationService->getUsersBySegment($conditions);
-            }
-            
-            $userIds = $userQuery->pluck('id')->toArray();
-        } else {
-            // Check if "all" is selected
-            if (in_array('all', $request->users)) {
-                $userIds = User::pluck('id')->toArray();
-            } else {
-                $userIds = $request->users;
-            }
-        }
-
-        // Process attachments if any
-        $attachments = [];
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                try {
-                    $path = $file->store('notification-attachments', 'public');
-                    $attachments[] = [
-                        'path' => $path,
-                        'name' => $file->getClientOriginalName(),
-                        'mime' => $file->getMimeType(),
-                        'size' => $file->getSize()
-                    ];
-                } catch (\Exception $e) {
-                    \Log::error('Error uploading notification attachment: ' . $e->getMessage(), [
-                        'exception' => $e,
-                        'file' => $file->getClientOriginalName()
-                    ]);
-                }
-            }
-        }
-
-        // Get thread title (default to "Notifications")
-        $threadTitle = $request->thread_title ?: 'Notifications';
-        $notificationsSent = 0;
-
-        foreach ($userIds as $userId) {
-            $conversation = Conversation::firstOrCreate([
-                'business_id' => $business->id,
-                'user_id' => $userId
-            ]);
-
-            // Get or create the thread for notifications
-            $thread = $conversation->threads()->firstOrCreate(
-                ['title' => $threadTitle],
-                ['status' => 'open']
-            );
-
-            $message = new Message([
-                'conversation_id' => $conversation->id,
-                'thread_id' => $thread->id,
-                'content' => json_encode([
-                    'title' => $request->title,
-                    'message' => $request->message
-                ]),
-                'sender_id' => $business->id,
-                'sender_type' => Business::class,
-                'attachments' => $attachments,
-                'is_notification' => true,
-                'is_read' => false
-            ]);
-
-            $thread->messages()->save($message);
-            
-            // Update last_message_at timestamps
-            $thread->update(['last_message_at' => now()]);
-            $conversation->update(['last_message_at' => now()]);
-            
-            $notificationsSent++;
-        }
-
-        return back()->with('success', 'Notification sent successfully to ' . $notificationsSent . ' user(s)');
+        // Delegate to BusinessNotificationController
+        return $this->businessNotificationController->sendNotification($business, $request, $segmentationService);
     }
 
     public function getMessages(Business $business, Conversation $conversation, Request $request)
@@ -298,8 +228,17 @@ class CommunicationsController extends Controller
             }
             
             if (!$thread) {
-                // Get or create default thread
-                $thread = $conversation->defaultThread();
+                // Get default thread - get the first thread instead of using defaultThread()
+                $thread = $conversation->threads()->oldest()->first();
+                
+                // If still no thread, create one
+                if (!$thread) {
+                    $thread = $conversation->threads()->create([
+                        'title' => 'General',
+                        'status' => 'open',
+                        'last_message_at' => now()
+                    ]);
+                }
             }
             
             // Load messages for the specific thread
@@ -358,10 +297,18 @@ class CommunicationsController extends Controller
     public function sendMessage(Business $business, Conversation $conversation, Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'nullable|string', // Changed from required to nullable
             'thread_id' => 'nullable|exists:threads,id',
             'attachments.*' => 'file|max:10240' // 10MB max per file
         ]);
+
+        // Validate that at least message or attachment is present
+        if (empty($request->message) && !$request->hasFile('attachments')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide a message or attachment'
+            ], 422);
+        }
 
         // Get or create thread
         $threadId = $request->input('thread_id');
@@ -394,11 +341,10 @@ class CommunicationsController extends Controller
         $message = new Message([
             'conversation_id' => $conversation->id,
             'thread_id' => $thread->id,
-            'content' => $request->message,
+            'content' => $request->message ?? '', // Use empty string if message is null
             'sender_id' => $business->id,
             'sender_type' => Business::class,
             'attachments' => $attachments,
-            'is_notification' => false,
             'is_read' => true // Business messages are automatically read by the business
         ]);
 
@@ -407,6 +353,12 @@ class CommunicationsController extends Controller
         // Update last_message_at timestamp on both thread and conversation
         $thread->update(['last_message_at' => now()]);
         $conversation->update(['last_message_at' => now()]);
+
+        // Load relationships needed for the broadcast
+        $message->load(['sender', 'conversation', 'thread']);
+        
+        // Broadcast the message to the thread's channel
+        broadcast(new MessageSent($message))->toOthers();
 
         // If this is an AJAX request, return the message view
         if ($request->ajax()) {
@@ -419,28 +371,6 @@ class CommunicationsController extends Controller
         }
 
         return back()->with('success', 'Message sent successfully');
-    }
-
-    public function markNotificationAsRead(Business $business, Message $notification)
-    {
-        if ($notification->is_notification) {
-            $notification->update([
-                'is_read' => true,
-                'opened_at' => now()
-            ]);
-        }
-        return response()->json(['success' => true]);
-    }
-
-    public function markAllNotificationsAsRead(Business $business)
-    {
-        Message::whereHas('conversation', function ($query) use ($business) {
-            $query->where('business_id', $business->id);
-        })->where('is_notification', true)
-          ->where('is_read', false)
-          ->update(['is_read' => true]);
-
-        return response()->json(['success' => true]);
     }
 
     public function manageSegments(Business $business)
@@ -489,7 +419,6 @@ class CommunicationsController extends Controller
             'content' => $request->message,
             'sender_id' => $business->id,
             'sender_type' => Business::class,
-            'is_notification' => false,
             'is_read' => true
         ]);
 
@@ -573,4 +502,19 @@ class CommunicationsController extends Controller
         }
     }
 
+    /**
+     * Mark notification as read
+     */
+    public function markNotificationAsRead(Business $business, $notification)
+    {
+        return $this->businessNotificationController->markNotificationAsRead($business, $notification);
+    }
+    
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllNotificationsAsRead(Business $business)
+    {
+        return $this->businessNotificationController->markAllNotificationsAsRead($business);
+    }
 }

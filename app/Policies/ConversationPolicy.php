@@ -30,11 +30,6 @@ class ConversationPolicy
      */
     public function view(User $user, Conversation $conversation)
     {
-        // Business users can access their business's conversations
-        if ($user->hasRole('business_admin') || $user->hasRole('business_user')) {
-            return $conversation->business_id === $user->business_id;
-        }
-        
         // Regular users can access their own conversations
         return $conversation->user_id === $user->id;
     }

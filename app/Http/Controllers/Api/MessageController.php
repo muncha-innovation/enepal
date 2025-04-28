@@ -18,7 +18,6 @@ class MessageController extends Controller
      */
     public function index(Request $request, Thread $thread)
     {
-        $this->authorize('view', $thread->conversation);
         
         $messages = $thread->messages()
             ->with('sender')
@@ -33,7 +32,6 @@ class MessageController extends Controller
      */
     public function store(Request $request, Thread $thread)
     {
-        $this->authorize('send-message', $thread->conversation);
         
         $validated = $request->validate([
             'content' => 'required_without:attachments|string',
@@ -64,7 +62,6 @@ class MessageController extends Controller
             'sender_type' => get_class($user),
             'content' => $validated['content'] ?? '',
             'attachments' => $attachments,
-            'is_notification' => false,
             'is_read' => false,
         ]);
         
@@ -88,7 +85,6 @@ class MessageController extends Controller
      */
     public function show(Message $message)
     {
-        $this->authorize('view', $message->conversation);
         
         return new MessageResource($message);
     }
@@ -98,7 +94,6 @@ class MessageController extends Controller
      */
     public function markAsRead(Message $message)
     {
-        $this->authorize('view', $message->conversation);
         
         if (!$message->is_read) {
             $message->update([
@@ -115,7 +110,6 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        $this->authorize('delete', $message);
         
         // Delete attached files
         if ($message->hasAttachments()) {

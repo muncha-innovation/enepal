@@ -12,7 +12,7 @@
       </div>
       <div class="w-72">
         @forelse($conversations ?? [] as $conv)
-        <a href="{{ route('business.communications.messages', [$business, $conv]) }}" 
+        <a href="{{ route('ajax.business.communications.messages', [$business, $conv]) }}" 
            class="flex cursor-pointer hover:bg-gray-200 py-3 px-2 border-b {{ isset($conversation) && $conversation->id == $conv->id ? 'bg-gray-100' : '' }}">
           <div class="w-8 h-8 bg-gray-300 rounded-full mr-3">
             <img class="w-8 h-8 rounded-full" src="https://placehold.co/600x400?text={{ substr($conv->title ?? 'C', 0, 1) }}" alt="{{ $conv->title ?? 'Conversation' }}">

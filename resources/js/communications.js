@@ -45,6 +45,58 @@ window.scrollToBottom = function() {
     }
 };
 
+/**
+ * Mark notification as read
+ * @param {string} url - The URL to send the mark as read request to
+ * @param {Event} event - The click event
+ */
+window.markAsRead = function(url, event) {
+    // Prevent default behavior if event is provided
+    if (event) {
+        event.preventDefault();
+    }
+    
+    // Store the button element before making the async call
+    const button = event ? event.target : null;
+    const listItem = button ? button.closest('li') : null;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && listItem) {
+            // Update the UI for this notification
+            listItem.classList.remove('bg-blue-50');
+            listItem.classList.add('bg-white');
+            
+            // Remove the button
+            if (button) {
+                button.remove();
+            }
+            
+            // Update the unread count badge in the tab
+            const badgeElement = document.querySelector('a[href*="notifications"] span');
+            if (badgeElement) {
+                const currentCount = parseInt(badgeElement.textContent);
+                if (currentCount > 1) {
+                    badgeElement.textContent = currentCount - 1;
+                } else {
+                    badgeElement.remove();
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error marking notification as read:', error);
+    });
+};
+
 // Initialize event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize recipient type toggle for notification modal
@@ -70,8 +122,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof $.fn.select2 !== 'undefined' && document.getElementById('select-users')) {
         $('#select-users').select2({
             placeholder: 'Select users',
-            allowClear: true
+            allowClear: true,
+            ajax: {
+                url: function() {
+                    // Get the business ID from the URL
+                    const path = window.location.pathname.split('/');
+                    const businessId = path[2]; // business ID should be at index 2
+                    return `/business/${businessId}/communications/search-users`;
+                },
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        page: params.page
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: false
+                        }
+                    };
+                },
+                cache: true
+            }
         });
+        
+        // Add "Select All Users" option when initializing
+        const allOption = new Option('All Users', 'all_users', false, false);
+        $('#select-users').append(allOption);
     }
     
     // Make sure conversation-related functionality is properly connected
@@ -86,5 +168,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+    }
+    
+    // Show notification modal only when explicitly requested, not for validation errors
+    const hasModalOpenRequest = sessionStorage.getItem('notification_modal_open');
+    
+    if (hasModalOpenRequest) {
+        const modal = document.getElementById('newNotificationModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+        sessionStorage.removeItem('notification_modal_open');
     }
 });

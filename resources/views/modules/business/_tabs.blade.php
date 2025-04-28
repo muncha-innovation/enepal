@@ -1,6 +1,3 @@
-<div class="mb-4 border-b border-gray-200">
-    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
-        <li class="mr-2">
             <a href="{{ route('business.communications.index', ['business' => $business]) }}" 
                class="inline-flex items-center p-4 border-b-2 rounded-t-lg {{ !request()->has('type') && !request()->routeIs('business.communications.segments*') ? 'text-blue-600 border-blue-600 active' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,5 +24,3 @@
                 Segments
             </a>
         </li>
-    </ul>
-</div>

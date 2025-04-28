@@ -158,22 +158,6 @@ class BusinessController extends Controller
         return response()->json($products);
     }
 
-    public function notices(Request $request)
-    {
-        $request->validate([
-            'business_id' => 'required|integer',
-            'limit' => 'sometimes|integer',
-            'page' => 'sometimes|integer'
-        ]);
-
-        $limit = $request->get('limit', 10);
-        $page = $request->get('page', 1);
-        $offset = ($page - 1) * $limit;
-
-        $business = Business::findOrFail($request->business_id);
-        $notices = $business->notices()->limit($limit)->offset($offset)->get();
-        return response()->json($notices);
-    }
 
     public function galleries(Request $request)
     {
@@ -193,7 +177,7 @@ class BusinessController extends Controller
     }
     public function getById($id)
     {
-        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'notices', 'galleries'])->findOrFail($id));
+        return new BusinessResource(Business::with(['type', 'address', 'posts', 'products', 'galleries'])->findOrFail($id));
     }
 
     public function followUnfollow($businessId)

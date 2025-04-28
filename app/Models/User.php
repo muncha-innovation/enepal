@@ -140,8 +140,10 @@ class User extends Authenticatable
     }
 
 
-    public function getNotifications() {}
-
+    public function notifications()
+    {
+        // 
+    }
     public function preferredCategories()
     {
         return $this->belongsToMany(NewsCategory::class, 'user_news_preferences', 'user_id', 'category_id')
@@ -182,6 +184,23 @@ class User extends Authenticatable
 
     public function newsPreferences()
     {
-        return $this->hasMany(UserNewsPreference::class);
+        return $this->belongsToMany(NewsCategory::class, 'user_news_preferences')
+            ->withPivot('is_subscribed')
+            ->withTimestamps();
+    }
+    
+    /**
+     * The business notifications that the user has received
+     */
+    public function businessNotifications()
+    {
+        return $this->belongsToMany(BusinessNotification::class, 'business_notifications_users', 'user_id', 'notification_id')
+                    ->withPivot('read_at')
+                    ->withTimestamps();
+    }
+    
+    public function canAccessFilament(): bool
+    {
+        return $this->hasRole('super-admin') && $this->hasVerifiedEmail();
     }
 }

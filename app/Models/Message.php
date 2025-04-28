@@ -17,14 +17,12 @@ class Message extends Model
         'sender_type',
         'content',
         'attachments',
-        'is_notification',
         'is_read',
         'opened_at',
     ];
 
     protected $casts = [
         'attachments' => 'array',
-        'is_notification' => 'boolean',
         'is_read' => 'boolean',
         'opened_at' => 'datetime',
     ];
@@ -59,20 +57,6 @@ class Message extends Model
     public function hasAttachments()
     {
         return !empty($this->attachments);
-    }
-
-    /**
-     * Get the notification content for notification messages.
-     */
-    public function getNotificationContent()
-    {
-        if (!$this->is_notification) {
-            return null;
-        }
-
-        // Extract notification info from the content
-        // For now, just return the content directly
-        return $this->content;
     }
 
     /**

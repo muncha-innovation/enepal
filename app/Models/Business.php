@@ -57,6 +57,12 @@ class Business extends Model
     {
         return $this->belongsToMany(User::class)->withPivot(['role', 'position']);
     }
+    
+    public function notifications()
+    {
+        return $this->hasMany(BusinessNotification::class);
+    }
+    
     public function type()
     {
         return $this->belongsTo(BusinessType::class, 'type_id');
@@ -127,24 +133,6 @@ class Business extends Model
     public function getIsOwnerAttribute() {
         $user = $this->users()->where('user_id', auth()->id())->first();
         return $user && $user->pivot->role === 'owner';
-    }
-
-    public function canCreateNotice() {
-        $notification = $this->notices()->where('created_at', '>=', now()->startOfDay())->count();
-        $maxNotificationPerDay = $this->settings()->where('key', SettingKeys::MAX_NOTIFICATION_PER_DAY)->first();
-        if($maxNotificationPerDay) {
-            if($notification >= $maxNotificationPerDay->value) {
-                return false;
-            }
-        }
-        $notification = $this->notices()->where('created_at', '>=', now()->startOfMonth())->count();
-        $maxNotificationPerMonth = $this->settings()->where('key', SettingKeys::MAX_NOTIFICATION_PER_MONTH)->first();
-        if($maxNotificationPerMonth) {
-            if($notification >= $maxNotificationPerMonth->value) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public function getFormattedHoursAttribute()

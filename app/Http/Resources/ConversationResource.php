@@ -16,12 +16,12 @@ class ConversationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'business' => $this->when($this->business, $this->business->name),
+            'title' => $this->title??$this->business->name,
+            'business' => $this->when($this->business, BusinessResource::make($this->business)),
             'business_id' => $this->business_id,
-            'user' => $this->when($this->user, $this->user->name),
+            'user' => $this->when($this->user, UserResource::make($this->user)),
             'user_id' => $this->user_id,
-            'vendor' => $this->when($this->vendor, $this->vendor->name),
+            'vendor' => $this->when($this->vendor, $this->vendor),
             'vendor_id' => $this->vendor_id,
             'unread_count' => $this->unreadMessagesCount(),
             'has_unread' => $this->hasUnreadMessages(),

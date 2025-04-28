@@ -20,6 +20,8 @@ use App\Http\Controllers\APIS\SearchController;
 use App\Http\Controllers\APIS\UserProfileController;
 use App\Http\Controllers\APIS\UserPreferenceController;
 
+Route::post('reset-password', ResetPasswordController::class);
+
 Route::post('/login', LoginController::class);
 Route::post('/register', RegistrationController::class);
 Route::post('/password/reset', ResetPasswordController::class);
@@ -57,7 +59,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('notifications/user', [NotificationController::class, 'userNotifications']);
     Route::get('notifications/business', [NotificationController::class, 'businessNotifications']);
-    // Route::
+    Route::post('notifications/{notificationId}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
     Route::group(['prefix' => 'business'], function () {
         Route::get('user/following', [BusinessController::class, 'following']);
         Route::get('posts', [BusinessController::class, 'posts']);
@@ -120,28 +124,28 @@ Route::prefix('v1')->group(function () {
         Route::get('{newsItem}', [NewsApiController::class, 'show']);
     });
 
-    // Chat API Routes
-    Route::middleware(['auth:sanctum'])->group(function () {
-        // Conversations
-        Route::apiResource('conversations', \App\Http\Controllers\Api\ConversationController::class);
-        
-        // Threads
-        Route::get('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'index']);
-        Route::post('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'store']);
-        Route::get('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'show']);
-        Route::put('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'update']);
-        Route::delete('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'destroy']);
-        Route::post('threads/{thread}/mark-read', [\App\Http\Controllers\Api\ThreadController::class, 'markAsRead']);
-        
-        // Messages
-        Route::get('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'index']);
-        Route::post('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
-        Route::get('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'show']);
-        Route::post('messages/{message}/mark-read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
-        Route::delete('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'destroy']);
-    });
+   
 });
-
+ // Chat API Routes
+ Route::middleware(['auth:sanctum'])->group(function () {
+    // Conversations
+    Route::apiResource('conversations', \App\Http\Controllers\Api\ConversationController::class);
+    
+    // Threads
+    Route::get('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'index']);
+    Route::post('conversations/{conversation}/threads', [\App\Http\Controllers\Api\ThreadController::class, 'store']);
+    Route::get('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'show']);
+    Route::put('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'update']);
+    Route::delete('threads/{thread}', [\App\Http\Controllers\Api\ThreadController::class, 'destroy']);
+    Route::post('threads/{thread}/mark-read', [\App\Http\Controllers\Api\ThreadController::class, 'markAsRead']);
+    
+    // Messages
+    Route::get('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::post('threads/{thread}/messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
+    Route::get('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'show']);
+    Route::post('messages/{message}/mark-read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
+    Route::delete('messages/{message}', [\App\Http\Controllers\Api\MessageController::class, 'destroy']);
+});
 Route::prefix('search')->group(function () {
     Route::get('/', [SearchController::class, 'search']);
     Route::get('/posts', [SearchController::class, 'searchPosts']);

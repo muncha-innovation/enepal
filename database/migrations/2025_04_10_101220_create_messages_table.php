@@ -23,8 +23,6 @@ class CreateMessagesTable extends Migration
             $table->text('content')->nullable();
             $table->json('attachments')->nullable();
         
-            // Flags
-            $table->boolean('is_notification')->default(false);
             $table->boolean('is_read')->default(false);
         
             // Timestamps
