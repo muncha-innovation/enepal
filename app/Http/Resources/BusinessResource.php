@@ -32,6 +32,24 @@ class BusinessResource extends JsonResource
             }
         }
 
+        // Get user's distance unit preference (default to km if not set)
+        $distanceUnit = 'km';
+        $unitLabel = 'km';
+        if (auth()->check() && auth()->user()->preference) {
+            $distanceUnit = auth()->user()->preference->distance_unit ?? 'km';
+            $unitLabel = ($distanceUnit === 'miles') ? 'mi' : 'km';
+        }
+
+        // Convert distance if needed and format it
+        $distance = null;
+        if (isset($this->distance)) {
+            $distance = round($this->distance, 2);
+            // Convert to miles if user prefers miles (1 km = 0.621371 miles)
+            if ($distanceUnit === 'miles') {
+                $distance = round($this->distance * 0.621371, 2);
+            }
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->name,
@@ -78,8 +96,11 @@ class BusinessResource extends JsonResource
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'type' => BusinessTypesResource::make($this->whenLoaded('type')),
             'galleries' => GalleryResource::collection($this->whenLoaded('galleries')),
-            'distance' => $this->when(isset($this->distance), function() {
-                return round($this->distance, 2);
+            'distance' => $this->when(isset($this->distance), function() use ($distance) {
+                return $distance;
+            }),
+            'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel) {
+                return $unitLabel;
             }),
         ];
     }

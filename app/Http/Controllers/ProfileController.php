@@ -208,6 +208,7 @@ class ProfileController extends Controller
             'departure_date' => 'nullable|date',
             'receive_notifications' => 'nullable|boolean',
             'show_personalized_content' => 'nullable|boolean',
+            'distance_unit' => 'nullable|string|in:km,miles',
         ];
         
         // Add conditional validation only for study_field if user_type is student
@@ -224,6 +225,7 @@ class ProfileController extends Controller
             'has_passport' => $request->has('has_passport'),
             'receive_notifications' => $request->has('receive_notifications'),
             'show_personalized_content' => $request->has('show_personalized_content'),
+            'distance_unit' => $validated['distance_unit'] ?? 'km',
         ];
         
         // Only add these fields if user type is not NRN

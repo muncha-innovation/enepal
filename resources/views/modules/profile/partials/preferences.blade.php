@@ -105,6 +105,29 @@
                     </label>
                 </div>
             </div>
+
+            <!-- Distance Unit Preference -->
+            <div>
+                <label for="distance_unit" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Distance Unit') }}</label>
+                <div class="flex items-center space-x-4 mt-2">
+                    <div class="flex items-center">
+                        <input type="radio" id="distance_unit_km" name="distance_unit" value="km"
+                            {{ $user->preference?->distance_unit !== 'miles' ? 'checked' : '' }}
+                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="distance_unit_km" class="ml-2 text-sm font-medium text-gray-700">
+                            {{ __('Kilometers (km)') }}
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="distance_unit_miles" name="distance_unit" value="miles"
+                            {{ $user->preference?->distance_unit === 'miles' ? 'checked' : '' }}
+                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="distance_unit_miles" class="ml-2 text-sm font-medium text-gray-700">
+                            {{ __('Miles') }}
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Submit Button -->

@@ -204,48 +204,5 @@ class UserProfileController extends Controller
         }
     }
 
-    /**
-     * Update user preferences
-     */
-    public function updatePreferences(Request $request)
-    {
-        try {
-            $data = $request->validate([
-                'user_type' => 'required|string|in:student,nrn,job_seeker',
-                'app_language' => 'required|string|in:en,ja',
-                'known_languages' => 'nullable|array',
-                'known_languages.*' => 'string',
-                'study_field' => 'nullable|string|max:255|required_if:user_type,student',
-                'departure_date' => 'nullable|date',
-                'countries' => 'nullable|array',
-                'countries.*' => 'numeric|exists:countries,id',
-                'has_passport' => 'boolean',
-                'passport_expiry' => 'nullable|date|required_if:has_passport,true',
-                'receive_notifications' => 'boolean',
-                'show_personalized_content' => 'boolean',
-            ]);
-
-            $user = auth()->user();
-            $preference = $user->preference()->updateOrCreate(
-                ['user_id' => $user->id],
-                $data
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Preferences updated successfully',
-                'data' => $preference
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update preferences: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
+    
 }

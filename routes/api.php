@@ -97,8 +97,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/news/bulk', [UserPreferenceController::class, 'bulkUpdateNewsPreferences']);
     });
 
-
-    Route::post('/profile/preferences', [UserProfileController::class, 'updatePreferences']);
 });
 
 // User Segment Management Routes

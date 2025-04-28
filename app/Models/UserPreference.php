@@ -19,7 +19,8 @@ class UserPreference extends Model
         'has_passport',
         'passport_expiry',
         'receive_notifications',
-        'show_personalized_content'
+        'show_personalized_content',
+        'distance_unit'
     ];
     
     protected $casts = [

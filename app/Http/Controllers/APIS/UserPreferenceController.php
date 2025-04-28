@@ -51,7 +51,8 @@ class UserPreferenceController extends Controller
             'has_passport' => 'nullable|boolean',
             'passport_expiry' => 'nullable|date|required_if:has_passport,true',
             'receive_notifications' => 'nullable|boolean',
-            'show_personalized_content' => 'nullable|boolean'
+            'show_personalized_content' => 'nullable|boolean',
+            'distance_unit' => 'nullable|string|in:km,miles'
         ]);
         
         if ($validator->fails()) {
