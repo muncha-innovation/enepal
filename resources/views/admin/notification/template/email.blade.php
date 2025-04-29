@@ -33,7 +33,7 @@
                         <label for="email_from_name"
                             class="block text-gray-700 text-sm font-bold mb-2">{{ __('Email From Name') }}:</label>
                         <input type="text" id="email_from_name" name="email_sent_from_name"
-                            value="{{ $template->email_sent_from_name }}"
+                            value="{{ old('email_sent_from_name', $template->email_sent_from_name) }}"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required>
                     </div>
@@ -42,7 +42,7 @@
                         <label for="email_from_email"
                             class="block text-gray-700 text-sm font-bold mb-2">{{ __('Email From Email') }}:</label>
                         <input type="text" id="email_from_email" name="email_sent_from_email"
-                            value="{{ $template->email_sent_from_email }}"
+                            value="{{ old('email_sent_from_email', $template->email_sent_from_email) }}"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required>
                     </div>
@@ -56,7 +56,7 @@
                                         {{ __('subject.'.$locale) }}
                                     </label>
                                     <input type="text" id="subject_{{ $locale }}" name="subject[{{ $locale }}]" 
-                                        value="{{ $template->getTranslation('subject', $locale, false) }}"
+                                        value="{{ old('subject.'.$locale, $template->getTranslation('subject', $locale, false)) }}"
                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         required>
                                 </div>
@@ -69,13 +69,13 @@
                         <div class="flex gap-4">
                             <div class="flex items-center">
                                 <input type="radio" id="allow_business_yes" name="allow_business_section" value="1"
-                                    {{ $template->allow_business_section ? 'checked' : '' }}
+                                    {{ old('allow_business_section', $template->allow_business_section) ? 'checked' : '' }}
                                     class="h-4 w-4 text-blue-600 focus:ring-blue-500">
                                 <label for="allow_business_yes" class="ml-2 text-sm text-gray-700">{{ __('Yes') }}</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="radio" id="allow_business_no" name="allow_business_section" value="0"
-                                    {{ !$template->allow_business_section ? 'checked' : '' }}
+                                    {{ old('allow_business_section', $template->allow_business_section) ? '' : 'checked' }}
                                     class="h-4 w-4 text-blue-600 focus:ring-blue-500">
                                 <label for="allow_business_no" class="ml-2 text-sm text-gray-700">{{ __('No') }}</label>
                             </div>
@@ -91,7 +91,7 @@
                                         {{ __('email_body.'.$locale) }}
                                     </label>
                                     <textarea id="editor[{{ $locale }}]" name="email_body[{{ $locale }}]" rows="10"
-                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ $template->getTranslation('email_body', $locale, false) }}</textarea>
+                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{!! old('email_body.'.$locale, $template->getTranslation('email_body', $locale, false)) !!}</textarea>
                                 </div>
                             @endforeach
                         </div>

@@ -36,13 +36,28 @@ class NotificationTemplateController extends Controller
         
         foreach ($translatableFields as $field) {
             if (isset($validated[$field])) {
-                $template->setTranslations($field, $validated[$field]);
+                // For each locale in the translatable field, only update if provided
+                $existingTranslations = $template->getTranslations($field);
+                
+                foreach ($validated[$field] as $locale => $value) {
+                    // Only update non-empty values
+                    if (!empty($value)) {
+                        $existingTranslations[$locale] = $value;
+                    }
+                }
+                
+                // Set the combined translations back to the model
+                $template->setTranslations($field, $existingTranslations);
             }
         }
         
-        // Handle non-translatable fields
+        // Handle non-translatable fields - only update if they exist and are not empty
         $nonTranslatableFields = array_diff(array_keys($validated), $translatableFields);
-        $template->fill(array_intersect_key($validated, array_flip($nonTranslatableFields)));
+        foreach ($nonTranslatableFields as $field) {
+            if (isset($validated[$field]) && !empty($validated[$field])) {
+                $template->$field = $validated[$field];
+            }
+        }
         
         $template->save();
         
