@@ -8,11 +8,14 @@ use App\Http\Requests\StoreUserRequest;
 use App\Models\Country;
 use App\Models\User;
 use App\Notify\NotifyProcess;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Spatie\Permission\Models\Role;
 
@@ -229,5 +232,39 @@ class UsersController extends Controller
         $user->addresses()->delete();
         $user->roles()->detach();
         return back()->with('success', __('User deleted successfully'));
+    }
+
+    /**
+     * Generate a random password for the user and send it via email.
+     *
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function resetPassword(User $user): \Illuminate\Http\RedirectResponse
+    {
+        abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
+        
+        // Generate a random password (8 characters)
+        $password = \Str::random(8);
+        
+        // Update the user's password
+        $user->password = Hash::make($password);
+        $user->force_update_password = true;
+        $user->last_password_updated = now();
+        $user->save();
+        
+        try{
+            Mail::send('mail.temporary_password', [
+                'user' => $user,
+                'password' => $password,
+            ], function ($message) use ($user) {
+                $message->to($user->email);
+                $message->subject(__('Password Reset'));
+            });
+        }catch(Exception $e) {
+            dd($e);
+        }
+        
+        return redirect()->back()->with('success', __('Password has been reset and emailed to the user'));
     }
 }

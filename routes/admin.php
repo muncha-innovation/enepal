@@ -23,6 +23,7 @@ Route::group(['middleware' => ['auth', 'role:super-admin'], 'prefix' => 'admin',
     });
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UsersController::class);
+    Route::post('users/{user}/reset-password', [UsersController::class, 'resetPassword'])->name('users.reset-password');
     Route::resource('businessTypes', BusinessTypesController::class);
     Route::resource('facilities', FacilitiesController::class);
     Route::get('settings', [BusinessSettingController::class, 'index'])->name('settings.index');

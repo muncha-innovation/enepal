@@ -10,6 +10,34 @@
         <div class="wrapper">
             <div class="rounded shadow border-b border-gray-200 sm:rounded-lg bg-white px-6 py-6">
                 <h1 class="mb-4 text-2xl font-semibold text-gray-700">{{ __('User Details') }}</h1>
+                
+                @if(auth()->user()->hasRole('super-admin'))
+                    <div class="flex justify-end mb-4">
+                        <button onclick="confirmResetPassword()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            {{ __('Reset Password & Send Email') }}
+                        </button>
+                    </div>
+                    
+                    <!-- Confirmation Modal -->
+                    <div id="passwordResetModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+                        <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
+                        <div class="bg-white rounded-lg p-8 z-10 max-w-md w-full">
+                            <h3 class="text-xl font-bold mb-4">{{ __('Confirm Password Reset') }}</h3>
+                            <p class="mb-4">{{ __('This will generate a random password for the user and send it via email. Continue?') }}</p>
+                            <div class="flex justify-end">
+                                <button onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2">
+                                    {{ __('Cancel') }}
+                                </button>
+                                <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        {{ __('Confirm') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Tab Navigation -->
                 <div class="border-b border-gray-200 mb-6">
@@ -295,5 +323,13 @@
                 button.classList.add('border-indigo-600', 'text-indigo-600');
             });
         });
+
+        function confirmResetPassword() {
+            document.getElementById('passwordResetModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('passwordResetModal').classList.add('hidden');
+        }
     </script>
 @endsection
