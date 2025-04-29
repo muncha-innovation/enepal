@@ -258,10 +258,6 @@ class NewsController extends Controller
 
     public function addRelated(NewsItem $news, NewsItem $related)
     {
-        $related->update([
-            'is_active' => true,
-            'is_rejected' => false
-        ]);
         DB::transaction(function() use ($news, $related) {
             $related->parentNews()->detach();
 

@@ -212,6 +212,8 @@ class SearchService
                 $query->orderBy('news_items.published_at', 'desc');
         }
 
-        return $query->paginate($perPage);
+        $results = $query->with(['childNews', 'categories', 'tags', 'locations', 'sourceable'])
+        ->paginate($perPage);
+        return $results;
     }
 }
