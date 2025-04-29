@@ -1,4 +1,12 @@
 /*!
+ * Pusher JavaScript Library v8.4.0
+ * https://pusher.com/
+ *
+ * Copyright 2020, Pusher
+ * Released under the MIT licence.
+ */
+
+/*!
  * Sizzle CSS Selector Engine v2.3.9
  * https://sizzlejs.com/
  *
