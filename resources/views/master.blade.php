@@ -25,7 +25,7 @@
 <body>
     @yield('body')
 
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js?v') }}"></script>
 
 
     <script>
