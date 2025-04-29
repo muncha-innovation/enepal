@@ -16,11 +16,6 @@ class ProfileController extends Controller
         $countries = Country::all();
         $user = auth()->user();
         
-        // Always set active tab to general when directly accessing the profile page
-        if (request()->route()->getName() === 'profile') {
-            session()->forget('active_profile_tab');
-        }
-        
         return view('modules.profile.show', compact(['user', 'countries']));
     }
 
@@ -32,7 +27,7 @@ class ProfileController extends Controller
         if ($request->hasFile('profile_picture')) {
             $userData['profile_picture'] = upload('profile/', 'png', $request->file('profile_picture'));
         }
-        if (isset($userData['password']) && $userData['password'] != '') {;
+        if (isset($userData['password']) && $userData['password'] != '') {
             $userData['force_update_password'] = false;
         }
         $user->update($userData);
@@ -163,7 +158,6 @@ class ProfileController extends Controller
         $request->validate([
             'password' => 'required|string|min:8|confirmed',
         ]);
-
         $user = auth()->user();
         $user->update([
             'password' => Hash::make($request->password),

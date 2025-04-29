@@ -576,4 +576,23 @@ class BusinessController extends Controller
         
         return back()->with('success', 'Contact information updated successfully!');
     }
+
+    /**
+     * Display the owner profile for a business
+     * 
+     * @param  \App\Models\Business  $business
+     * @return \Illuminate\Http\Response
+     */
+    public function ownerProfile(Business $business)
+    {
+        // Only super admins can view the owner profile
+        abort_unless(auth()->user()->hasRole('super-admin'), 403);
+        
+        // Get the owner of the business
+        $owner = $business->users()
+            ->wherePivot('role', 'owner')
+            ->first();
+        
+        return view('modules.business.owner-profile', compact('business', 'owner'));
+    }
 }

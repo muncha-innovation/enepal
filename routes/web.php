@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     Route::group(['prefix' => 'business', 'as' => 'business.'], function () {
         Route::get('setting/{business}', [BusinessController::class, 'setting'])->name('setting');
         Route::post('verify/{business}', [BusinessController::class, 'verify'])->name('verify');
+        Route::get('{business}/owner-profile', [BusinessController::class, 'ownerProfile'])->name('owner-profile');
 
         // Section-specific save routes
         Route::post('save-general', [BusinessController::class, 'saveGeneral'])->name('saveGeneral.create');

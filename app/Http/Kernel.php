@@ -79,7 +79,5 @@ class Kernel extends HttpKernel
         'role_or_permission' => RoleOrPermissionMiddleware::class,
         'force.password.update' => ForcePasswordUpdate::class,
         'user.inactive.check' => InactiveUserChecker::class,
-        'verify.tenant' => VerifyTenant::class,
-        'tenant' => \App\Http\Middleware\EnforceTenancy::class,
     ];
 }
