@@ -55,6 +55,8 @@
     "short_description.np": "Short Description (Nepali)",
     "content.en": "Content",
     "content.np": "Content (Nepali)",
-    "Cover Image": "Cover Image"
+    "Cover Image": "Cover Image",
+    "km": "km",
+    "miles": "miles"
     
 }

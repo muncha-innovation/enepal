@@ -99,8 +99,8 @@ class BusinessResource extends JsonResource
             'distance' => $this->when(isset($this->distance), function() use ($distance) {
                 return $distance;
             }),
-            'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel) {
-                return $unitLabel;
+            'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel, $lang) {
+                return trans($unitLabel,'',$lang);
             }),
         ];
     }

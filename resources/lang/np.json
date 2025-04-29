@@ -44,5 +44,7 @@
     "Add Setting": "सेटिङ थप्नुहोस्",
     "Search": "खोज्नुहोस्",
     "max_notification_per_day": "प्रति दिन अधिकतम सूचना",
-    "max_notification_per_month": "प्रति महिना अधिकतम सूचना"
+    "max_notification_per_month": "प्रति महिना अधिकतम सूचना",
+    "km": "किमी",
+    "miles": "माइल"
 }
