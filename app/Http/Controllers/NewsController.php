@@ -100,16 +100,6 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'News created successfully');
     }
 
-    public function edit(NewsItem $news)
-    {
-        $sources = NewsSource::where('is_active', true)->get();
-        $categories = NewsCategory::get()->groupBy('type');
-        $genders = UserGender::all();
-        $ageGroups = AgeGroup::all();
-        $locations = $news->formatted_locations;
-
-        return view('modules.news.edit', compact('news', 'sources', 'categories', 'genders', 'ageGroups', 'locations'));
-    }
 
     public function update(StoreNewsRequest $request, NewsItem $news)
     {
@@ -237,7 +227,9 @@ class NewsController extends Controller
             ->latest()
             ->paginate(10);
 
+        // Filter available news by the same language as the current news item
         $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
+            ->where('language', $news->language) // Filter by the same language
             ->when(request('available_search'), function($query) {
                 $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
             })
