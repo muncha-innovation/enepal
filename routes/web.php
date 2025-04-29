@@ -29,6 +29,21 @@ use Illuminate\Support\Facades\Broadcast;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/pusher-test', function () {
+    try {
+        // This will send a manual broadcast to Pusher
+        broadcast(new \Illuminate\Broadcasting\BroadcastEvent(
+            'test-channel',
+            'test.event',
+            ['message' => 'Hello from Production!']
+        ));
+
+        return 'Test event broadcasted to Pusher.';
+    } catch (\Exception $e) {
+        Log::error('Pusher Test Error: '.$e->getMessage());
+        return 'Error broadcasting: ' . $e->getMessage();
+    }
+});
 
 Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update','user.inactive.check']], function () {
 
