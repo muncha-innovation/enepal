@@ -46,7 +46,13 @@ class MessageSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        
+        Log::info('Broadcasting on channels for message ID: ' . $this->message->id);
+        Log::info('Message details: ', [
+            'id' => $this->message->id,
+            'sender_id' => $this->message->sender_id,
+            'conversation_id' => $this->message->conversation_id,
+            'thread_id' => $this->message->thread_id,
+        ]);
         return [
             // Channel for the thread
             new Channel('thread-' . $this->message->thread_id),
