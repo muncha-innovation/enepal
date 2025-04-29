@@ -309,8 +309,8 @@
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="{{ asset('js/thread-management.js?v=1.0.1') }}"></script>
-<script src="{{ asset('js/communications.js?v=1.0.1') }}"></script>
+<script src="{{ asset('js/thread-management.js?v=1.0.2') }}"></script>
+<script src="{{ asset('js/communications.js?v=1.0.2') }}"></script>
 <script>
   $(document).ready(function() {
     // Initialize Select2 for user selection in New Chat modal

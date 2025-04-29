@@ -54,11 +54,9 @@ window.threadManagement = {
       return;
     }
 
-    // Leave previous channels if they exist
     this.leaveChannels();
 
-    // Subscribe to the PUBLIC conversation channel
-    const conversationChannelName = `conversation-${conversationId}`; // Use hyphen as per backend
+    const conversationChannelName = `conversation-${conversationId}`;
     this.currentEchoChannels.conversation = window.Echo.channel(conversationChannelName) // Use .channel() for public
       .listen('.new.message', (e) => {
         console.log(`Received message on ${conversationChannelName}:`, e);
