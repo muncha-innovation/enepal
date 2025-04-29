@@ -30,6 +30,11 @@ class NewsItem extends Model
         'is_featured' => 'boolean',
     ];
 
+    public function scopeActive()
+    {
+        return $this->where('is_active', true);
+    }
+
     public function parentNews()
     {
         return $this->belongsToMany(NewsItem::class, 'news_relationships', 'child_news_id', 'parent_news_id')

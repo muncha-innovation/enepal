@@ -152,7 +152,8 @@ class SearchService
             ]);
         }
         
-        $query->join('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
+        // Use left join instead of inner join to include news items without locations
+        $query->leftJoin('news_locations', 'news_items.id', '=', 'news_locations.news_item_id')
             ->groupBy([
                 'news_items.id',
                 'news_items.title',
@@ -171,24 +172,43 @@ class SearchService
         
         switch ($locality) {
             case 'nepal':
-                $query->join('countries', 'news_locations.country_id', '=', 'countries.id')
-                    ->whereRaw('LOWER(countries.code) = ?', ['np']);
+                // Use left join for countries as well
+                $query->leftJoin('countries', 'news_locations.country_id', '=', 'countries.id')
+                    ->where(function($q) {
+                        $q->whereRaw('LOWER(countries.code) = ?', ['np'])
+                          ->orWhereNull('news_locations.id'); // Include news without location
+                    });
                 break;
             case 'local':
                 if ($user && $user->primaryAddress) {
                     $query->where(function($q) use ($user) {
                         $q->where('news_locations.country_id', $user->primaryAddress->country_id)
-                            ->orWhere('news_locations.state_id', $user->primaryAddress->state_id);
+                          ->orWhere('news_locations.state_id', $user->primaryAddress->state_id)
+                          ->orWhereNull('news_locations.id'); // Include news without location
                     });
                 } elseif ($point) {
-                    $query->whereNotNull('news_locations.location')
-                        ->orderBy('distance', 'asc');
+                    $query->where(function($q) {
+                        $q->whereNotNull('news_locations.location')
+                          ->orWhereNull('news_locations.id'); // Include news without location
+                    });
+                    
+                    if ($point) {
+                        // Use MIN(news_locations.id) to check for existence of location
+                        $query->orderByRaw('CASE WHEN MIN(news_locations.id) IS NULL THEN 1 ELSE 0 END asc') 
+                              ->orderBy('distance', 'asc');
+                    }
                 }
                 break;
             default:
                 if ($point) {
-                    $query->whereNotNull('news_locations.location')
-                        ->orderBy('distance', 'asc');
+                    $query->where(function($q) {
+                        $q->whereNotNull('news_locations.location')
+                          ->orWhereNull('news_locations.id'); // Include news without location
+                    });
+                    
+                    // Use MIN(news_locations.id) to check for existence of location
+                    $query->orderByRaw('CASE WHEN MIN(news_locations.id) IS NULL THEN 1 ELSE 0 END asc')
+                          ->orderBy('distance', 'asc');
                 }
         }
 
@@ -212,8 +232,12 @@ class SearchService
                 $query->orderBy('news_items.published_at', 'desc');
         }
 
-        $results = $query->with(['childNews', 'categories', 'tags', 'locations', 'sourceable'])
-        ->paginate($perPage);
+        // Include childNews relationship in the results
+        $results = $query->paginate($perPage);
+        
+        // Load the childNews relationship for each news item in the collection
+        $results->getCollection()->load(['childNews', 'categories', 'tags', 'locations']);
+        
         return $results;
     }
 }

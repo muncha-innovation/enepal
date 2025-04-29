@@ -100,7 +100,7 @@ class BusinessResource extends JsonResource
                 return $distance;
             }),
             'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel, $lang) {
-                return trans($unitLabel,'',$lang);
+                return trans($unitLabel,[],$lang);
             }),
         ];
     }
