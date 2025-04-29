@@ -26,7 +26,7 @@
             <a href="#" 
                data-thread-id="{{ $t->id }}" 
                class="thread-tab px-3 py-1 text-sm rounded-full whitespace-nowrap {{ $thread->id == $t->id ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
-               onclick="window.parent.threadManagement.switchThread(event, {{ $t->id }})">
+               onclick="threadManagement.switchThread(event, {{ $t->id }})">
               {{ $t->title }}
             </a>
           </div>
@@ -35,14 +35,14 @@
       <div class="flex items-center">
         <!-- Thread Options Menu -->
         <div class="relative mr-2">
-          <button type="button" onclick="window.parent.threadManagement.toggleThreadMenu(event)" class="thread-menu-btn inline-flex p-1.5 text-gray-500 hover:text-gray-700 focus:outline-none rounded-full hover:bg-gray-200">
+          <button type="button" onclick="threadManagement.toggleThreadMenu(event)" class="thread-menu-btn inline-flex p-1.5 text-gray-500 hover:text-gray-700 focus:outline-none rounded-full hover:bg-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
             </svg>
           </button>
           <div id="thread-menu-options" class="thread-menu hidden absolute z-10 mt-1 bg-white shadow-lg rounded-md py-1 w-48 right-0 text-left" style="top: 100%;">
             <!-- Show delete option only for the active thread -->
-            <a href="#" onclick="window.parent.threadManagement.confirmDeleteThread(event, {{ $conversation->id }}, {{ $thread->id }})" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+            <a href="#" onclick="threadManagement.confirmDeleteThread(event, {{ $conversation->id }}, {{ $thread->id }})" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
               <span class="inline-flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -53,7 +53,7 @@
           </div>
         </div>
         <!-- Create New Thread Button -->
-        <button type="button" onclick="window.parent.threadManagement.showNewThreadModal()" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-full hover:bg-blue-100">
+        <button type="button" onclick="threadManagement.showNewThreadModal()" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-full hover:bg-blue-100">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
@@ -154,14 +154,14 @@
     <div class="mt-3">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-medium text-gray-900">Create New Thread</h3>
-        <button type="button" class="text-gray-400 hover:text-gray-600" onclick="window.parent.threadManagement.hideNewThreadModal()">
+        <button type="button" class="text-gray-400 hover:text-gray-600" onclick="threadManagement.hideNewThreadModal()">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
       
-      <form id="newThreadForm" method="POST" class="space-y-4" onsubmit="window.parent.threadManagement.createNewThread(event)">
+      <form id="newThreadForm" method="POST" class="space-y-4" onsubmit="threadManagement.createNewThread(event)">
         @csrf
         <div>
           <label for="thread_title" class="block text-sm font-medium text-gray-700">Thread Title</label>
@@ -179,7 +179,7 @@
         </div>
         
         <div class="flex justify-end pt-2">
-          <button type="button" onclick="window.parent.threadManagement.hideNewThreadModal()" class="mr-2 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <button type="button" onclick="threadManagement.hideNewThreadModal()" class="mr-2 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Cancel
           </button>
           <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

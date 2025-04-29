@@ -1,24 +1,25 @@
 /**
  * Thread Management Functions
- * Handles all conversation thread interactions
+ * Handles all conversation thread interactions using Laravel Echo
  */
 
 window.threadManagement = {
   activeConversationId: null,
-  pusherClient: null,
-  currentThreadChannel: null,
-  currentConversationChannel: null,
   currentThreadId: null,
+  currentEchoChannels: { // Keep track of Echo channels
+    conversation: null,
+    thread: null
+  },
 
   // Initialize thread management
   init: function() {
     // Set up any initial state or event listeners
     this.getActiveConversationIdFromUrl();
     this.setupEventListeners();
-    
-    // Initialize Pusher if configuration is available
-    if (window.PUSHER_CONFIG) {
-      this.initializePusher();
+
+    // If an initial conversation is active, subscribe via Echo
+    if (this.activeConversationId) {
+      this.subscribeToChannels(this.activeConversationId, this.currentThreadId);
     }
   },
 
@@ -45,135 +46,126 @@ window.threadManagement = {
       });
     }
   },
-  
-  // Initialize Pusher real-time messaging
-  initializePusher: function() {
-    if (!window.PUSHER_CONFIG || !window.PUSHER_CONFIG.key || !window.PUSHER_CONFIG.cluster) {
-      console.error('Pusher configuration is missing');
+
+  // Subscribe to channels using Laravel Echo
+  subscribeToChannels: function(conversationId, threadId) {
+    if (!window.Echo) {
+      console.error('Laravel Echo not initialized.');
+      return;
+    }
+
+    // Leave previous channels if they exist
+    this.leaveChannels();
+
+    // Subscribe to the PUBLIC conversation channel
+    const conversationChannelName = `conversation-${conversationId}`; // Use hyphen as per backend
+    this.currentEchoChannels.conversation = window.Echo.channel(conversationChannelName) // Use .channel() for public
+      .listen('.new.message', (e) => {
+        console.log(`Received message on ${conversationChannelName}:`, e);
+        if (e && e.thread_id != this.currentThreadId) {
+          this.showThreadNotification(e.thread_id);
+        }
+      })
+      .error((error) => {
+        // Note: Public channels don't typically have auth errors like private ones
+        console.error(`Error subscribing to ${conversationChannelName}:`, error);
+      });
+    console.log(`Subscribed to Echo channel: ${conversationChannelName}`);
+
+    // Subscribe to the PUBLIC specific thread channel if a threadId is provided
+    if (threadId) {
+      const threadChannelName = `thread-${threadId}`; // Use hyphen as per backend
+      this.currentEchoChannels.thread = window.Echo.channel(threadChannelName) // Use .channel() for public
+        .listen('.new.message', (e) => {
+          console.log(`Received message on ${threadChannelName}:`, e);
+          if (e && e.thread_id == this.currentThreadId) {
+            const existingMessage = document.querySelector(`[data-message-id="${e.id}"]`);
+            if (!existingMessage) {
+              this.appendNewMessage(e);
+            }
+          }
+        })
+        .error((error) => {
+          console.error(`Error subscribing to ${threadChannelName}:`, error);
+        });
+      console.log(`Subscribed to Echo channel: ${threadChannelName}`);
+      this.currentThreadId = threadId;
+    }
+  },
+
+  // Leave current Echo channels
+  leaveChannels: function() {
+    if (this.currentEchoChannels.conversation) {
+      window.Echo.leaveChannel(this.currentEchoChannels.conversation.name); // Use leaveChannel for public
+      console.log(`Left Echo channel: ${this.currentEchoChannels.conversation.name}`);
+      this.currentEchoChannels.conversation = null;
+    }
+    if (this.currentEchoChannels.thread) {
+      window.Echo.leaveChannel(this.currentEchoChannels.thread.name); // Use leaveChannel for public
+      console.log(`Left Echo channel: ${this.currentEchoChannels.thread.name}`);
+      this.currentEchoChannels.thread = null;
+    }
+    this.currentThreadId = null;
+  },
+
+  // Show notification dot on a thread tab
+  showThreadNotification: function(threadId) {
+    const threadTab = document.querySelector(`.thread-tab[data-thread-id="${threadId}"]`);
+    if (threadTab) {
+      threadTab.classList.add('relative');
+      const existingDot = threadTab.querySelector('.notification-dot');
+      if (existingDot) {
+        existingDot.remove();
+      }
+      const notificationDot = document.createElement('span');
+      notificationDot.className = 'notification-dot absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3';
+      threadTab.appendChild(notificationDot);
+    }
+  },
+
+  // Append a new message to the message list
+  appendNewMessage: function(message) {
+    console.log('Trying to append message:', message);
+    
+    const messageList = document.querySelector('.message-list .space-y-4');
+    console.log('Message list element found:', messageList);
+    
+    if (!messageList) {
+      console.error('Message list container not found. Trying alternative selectors...');
+      // Try different selectors if the original one fails
+      const alternativeContainers = [
+        document.querySelector('.message-list'),
+        document.querySelector('#message-container .space-y-4'),
+        document.querySelector('.messages-content .message-list .space-y-4')
+      ];
+      
+      for (const container of alternativeContainers) {
+        if (container) {
+          console.log('Found alternative container:', container);
+          this.appendMessageToContainer(message, container);
+          return;
+        }
+      }
+      
+      console.error('No suitable message container found. Cannot append message.');
       return;
     }
     
-    if (this.pusherClient) {
-      // If we already have a Pusher instance, disconnect it
-      this.pusherClient.disconnect();
-    }
-    
-    // Create a new Pusher instance
-    this.pusherClient = new Pusher(window.PUSHER_CONFIG.key, {
-      cluster: window.PUSHER_CONFIG.cluster,
-      forceTLS: true,
-      auth: {
-        headers: {
-          'X-CSRF-Token': window.PUSHER_CONFIG.authToken,
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      }
-    });
-    
-    // Log connection events
-    this.pusherClient.connection.bind('connected', () => {
-      console.log('Pusher connected with socket ID:', this.pusherClient.connection.socket_id);
-    });
-    
-    this.pusherClient.connection.bind('error', (err) => {
-      console.error('Pusher connection error:', err);
-    });
-    
-    // Subscribe to active channels if we have conversation and thread IDs
-    if (this.activeConversationId) {
-      this.subscribeToConversationChannel(this.activeConversationId);
-      
-      if (this.currentThreadId) {
-        this.subscribeToThreadChannel(this.currentThreadId);
-      }
-    }
+    this.appendMessageToContainer(message, messageList);
   },
   
-  // Subscribe to conversation channel
-  subscribeToConversationChannel: function(conversationId) {
-    if (!this.pusherClient) return;
-    
-    // Unsubscribe from any existing conversation channel
-    if (this.currentConversationChannel) {
-      this.pusherClient.unsubscribe('conversation-' + this.activeConversationId);
-    }
-    
-    // Subscribe to new conversation channel
-    const channelName = 'conversation-' + conversationId;
-    const conversationChannel = this.pusherClient.subscribe(channelName);
-    this.currentConversationChannel = conversationChannel;
-    
-    // Handle new message events
-    conversationChannel.bind('new.message', (data) => {
-      console.log('Received message in conversation channel:', data);
-      
-      // If the message is for a different thread, show notification
-      if (data.thread_id != this.currentThreadId) {
-        // Add notification dot to thread tab
-        const threadTab = document.querySelector(`.thread-tab[data-thread-id="${data.thread_id}"]`);
-        if (threadTab) {
-          threadTab.classList.add('relative');
-          
-          // Remove existing notification dot if any
-          const existingDot = threadTab.querySelector('.notification-dot');
-          if (existingDot) {
-            existingDot.remove();
-          }
-          
-          // Add new notification dot
-          const notificationDot = document.createElement('span');
-          notificationDot.className = 'notification-dot absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3';
-          threadTab.appendChild(notificationDot);
-        }
-      }
-    });
-  },
-  
-  // Subscribe to thread channel
-  subscribeToThreadChannel: function(threadId) {
-    if (!this.pusherClient) return;
-    
-    // Unsubscribe from any existing thread channel
-    if (this.currentThreadChannel) {
-      this.pusherClient.unsubscribe('thread-' + this.currentThreadId);
-    }
-    
-    // Subscribe to new thread channel
-    const channelName = 'thread-' + threadId;
-    const threadChannel = this.pusherClient.subscribe(channelName);
-    this.currentThreadChannel = threadChannel;
-    this.currentThreadId = threadId;
-    
-    // Handle new message events
-    threadChannel.bind('new.message', (data) => {
-      console.log('Received message in thread channel:', data);
-      
-      // Only process if it's for the current thread
-      if (data.thread_id == this.currentThreadId) {
-        // Check if the message is already in the DOM
-        const existingMessage = document.querySelector(`[data-message-id="${data.id}"]`);
-        if (!existingMessage) {
-          this.appendNewMessage(data);
-        }
-      }
-    });
-  },
-  
-  // Append a new message to the message list
-  appendNewMessage: function(message) {
-    const messageList = document.querySelector('.message-list .space-y-4');
-    if (!messageList) return;
-    
+  // Helper method to append message to a container
+  appendMessageToContainer: function(message, container) {
     const isFromBusiness = message.sender_type === 'App\\Models\\Business';
-    
+
     const messageElement = document.createElement('div');
     messageElement.className = `flex ${isFromBusiness ? 'justify-end' : 'justify-start'}`;
     messageElement.setAttribute('data-message-id', message.id);
-    
+
     let attachmentsHtml = '';
     if (message.attachments && message.attachments.length > 0) {
       let attachmentsContent = '';
-      
+
       message.attachments.forEach(attachment => {
         let imagePreview = '';
         if (attachment.mime && attachment.mime.startsWith('image/')) {
@@ -182,7 +174,7 @@ window.threadManagement = {
                 class="max-h-48 rounded border">
           </div>`;
         }
-        
+
         attachmentsContent += `
           <div class="mb-1">
             ${imagePreview}
@@ -198,16 +190,16 @@ window.threadManagement = {
           </div>
         `;
       });
-      
+
       attachmentsHtml = `
         <div class="mt-2 space-y-2 p-2 bg-white bg-opacity-50 rounded-md">
           ${attachmentsContent}
         </div>
       `;
     }
-    
+
     const timeFormatted = this.formatMessageTime(message.created_at);
-    
+
     messageElement.innerHTML = `
       <div class="max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 ${isFromBusiness ? 'bg-indigo-100 text-gray-800' : 'bg-gray-100 text-gray-800'}">
         <p class="text-sm">${message.content}</p>
@@ -220,25 +212,27 @@ window.threadManagement = {
         </div>
       </div>
     `;
-    
-    messageList.appendChild(messageElement);
+
+    container.appendChild(messageElement);
     this.scrollToBottom();
+    
+    console.log('Message appended successfully');
   },
-  
+
   // Format message time helper
   formatMessageTime: function(timestamp) {
     if (!timestamp) return '';
-    
+
     const date = new Date(timestamp);
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    
+
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   },
-  
+
   // Scroll to bottom of message list
   scrollToBottom: function() {
     const messageList = document.querySelector('.message-list');
@@ -249,43 +243,38 @@ window.threadManagement = {
 
   // Get current conversation ID from URL or active element
   getActiveConversationIdFromUrl: function() {
-    // Try to get from URL
+    
     const pathParts = window.location.pathname.split('/');
     const conversationIndex = pathParts.indexOf('conversation');
     if (conversationIndex !== -1 && pathParts[conversationIndex + 1]) {
       this.activeConversationId = pathParts[conversationIndex + 1];
       return this.activeConversationId;
     }
-    
-    // Try to get from active conversation link
+
     const activeLink = document.querySelector('.user-conversation-link.bg-indigo-50');
     if (activeLink && activeLink.dataset.conversationId) {
       this.activeConversationId = activeLink.dataset.conversationId;
       return this.activeConversationId;
     }
-    
+
     return null;
   },
 
   // Show the new thread modal
   showNewThreadModal: function() {
-    // Make sure we have an active conversation
     const conversationId = this.getActiveConversationIdFromUrl();
-    
+
     if (!conversationId) {
       alert('Please select a conversation first');
       return;
     }
-    
+
     const modal = document.getElementById('newThreadModal');
     if (modal) {
-      // Make sure we have CSRF token in the form
       const form = modal.querySelector('form');
       if (form) {
-        // Get CSRF token
         const token = document.querySelector('meta[name="csrf-token"]')?.content;
         if (token) {
-          // Check if we already have a CSRF token field
           let csrfField = form.querySelector('input[name="_token"]');
           if (!csrfField) {
             csrfField = document.createElement('input');
@@ -298,8 +287,7 @@ window.threadManagement = {
           }
         }
       }
-      
-      // Show the modal
+
       modal.classList.remove('hidden');
     }
   },
@@ -315,28 +303,23 @@ window.threadManagement = {
   // Create a new thread
   createNewThread: function(event) {
     event.preventDefault();
-    
-    // Get the active conversation ID
+
     const conversationId = this.getActiveConversationIdFromUrl();
     if (!conversationId) {
       alert('Please select a conversation first');
       return;
     }
-    
-    // Get the form and form data
+
     const form = event.target;
     const formData = new FormData(form);
-    
-    // Get business ID from URL
+
     const businessId = window.location.pathname.split('/')[2];
-    
-    // Show loading state
+
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.innerHTML = 'Creating...';
     submitBtn.disabled = true;
-    
-    // Make the request to create the thread
+
     fetch(`/business/${businessId}/communications/conversation/${conversationId}/thread`, {
       method: 'POST',
       body: formData,
@@ -351,13 +334,10 @@ window.threadManagement = {
       return response.json();
     })
     .then(data => {
-      // Hide the modal
       this.hideNewThreadModal();
-      
+
       if (data.success) {
         console.log('Thread created successfully:', data);
-        
-        // Reload the conversation with the new thread
         this.loadConversation(conversationId, data.thread_id);
       } else {
         console.error('Error creating thread:', data.message || 'Unknown error');
@@ -369,23 +349,19 @@ window.threadManagement = {
       alert('An error occurred while creating the thread. Please try again.');
     })
     .finally(() => {
-      // Reset form
       form.reset();
-      
-      // Reset button state
       submitBtn.innerHTML = originalBtnText;
       submitBtn.disabled = false;
     });
   },
 
   // Load a conversation
-  loadConversation: function(conversationId, threadId) {
+  loadConversation: function(conversationId, threadId = null) {
     if (!conversationId) {
       console.error('No conversation ID provided');
       return;
     }
-    
-    // Update UI to show active conversation
+
     document.querySelectorAll('.user-conversation-link').forEach(link => {
       if (link.dataset.conversationId == conversationId) {
         link.classList.add('bg-indigo-50');
@@ -393,24 +369,20 @@ window.threadManagement = {
         link.classList.remove('bg-indigo-50');
       }
     });
-    
-    // Set active conversation ID
+
     this.activeConversationId = conversationId;
-    
-    // Build URL for the request
+
     const businessId = window.location.pathname.split('/')[2];
     let url = `/business/${businessId}/communications/conversation/${conversationId}?ajax=1`;
-    
+
     if (threadId) {
       url += `&thread_id=${threadId}`;
     }
-    
-    // Show loading indicator
+
     const messageContainer = document.getElementById('message-container');
     if (messageContainer) {
       messageContainer.innerHTML = '<div class="flex h-full w-full items-center justify-center"><div class="loader"></div></div>';
-      
-      // Make the request to load the conversation
+
       fetch(url, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
@@ -423,25 +395,13 @@ window.threadManagement = {
         return response.text();
       })
       .then(html => {
-        // Update the message container with the new content
         messageContainer.innerHTML = html;
-        
-        // Get current thread ID from the input field
+
         const threadIdInput = document.querySelector('input[name="thread_id"]');
-        if (threadIdInput) {
-          this.currentThreadId = threadIdInput.value;
-        }
-        
-        // Subscribe to Pusher channels for this conversation and thread
-        if (this.pusherClient) {
-          this.subscribeToConversationChannel(conversationId);
-          
-          if (this.currentThreadId) {
-            this.subscribeToThreadChannel(this.currentThreadId);
-          }
-        }
-        
-        // Scroll to the bottom of the message list
+        const loadedThreadId = threadIdInput ? threadIdInput.value : null;
+
+        this.subscribeToChannels(conversationId, loadedThreadId);
+
         this.scrollToBottom();
       })
       .catch(error => {
@@ -464,15 +424,13 @@ window.threadManagement = {
   // Switch to a different thread within the current conversation
   switchThread: function(event, threadId) {
     event.preventDefault();
-    
-    // Get conversation ID
+
     const conversationId = this.activeConversationId || this.getActiveConversationIdFromUrl();
     if (!conversationId) {
       console.error('No active conversation');
       return;
     }
-    
-    // Update thread tab styling
+
     document.querySelectorAll('.thread-tab').forEach(tab => {
       if (tab.dataset.threadId == threadId) {
         tab.classList.add('bg-blue-600', 'text-white');
@@ -482,19 +440,45 @@ window.threadManagement = {
         tab.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
       }
     });
-    
-    // Update current thread ID
-    this.currentThreadId = threadId;
-    
-    // Subscribe to the new thread channel
-    if (this.pusherClient) {
-      this.subscribeToThreadChannel(threadId);
+
+    // Leave the old PUBLIC thread channel
+    if (this.currentEchoChannels.thread && this.currentEchoChannels.thread.name !== `thread-${threadId}`) {
+      window.Echo.leaveChannel(this.currentEchoChannels.thread.name); // Use leaveChannel for public
+      console.log(`Left Echo channel: ${this.currentEchoChannels.thread.name}`);
+      this.currentEchoChannels.thread = null;
     }
-    
-    // Load the thread content
+
+    // Subscribe to the new PUBLIC thread channel
+    if (!this.currentEchoChannels.thread && threadId) {
+      const threadChannelName = `thread-${threadId}`; // Use hyphen as per backend
+      this.currentEchoChannels.thread = window.Echo.channel(threadChannelName) // Use .channel() for public
+        .listen('.new.message', (e) => {
+          console.log(`Received message on ${threadChannelName}:`, e);
+          if (e && e.thread_id == threadId) {
+            const existingMessage = document.querySelector(`[data-message-id="${e.id}"]`);
+            if (!existingMessage) {
+              this.appendNewMessage(e);
+            }
+          }
+        })
+        .error((error) => {
+          console.error(`Error subscribing to ${threadChannelName}:`, error);
+        });
+      console.log(`Subscribed to Echo channel: ${threadChannelName}`);
+    }
+    this.currentThreadId = threadId;
+
+    const activeThreadTab = document.querySelector(`.thread-tab[data-thread-id="${threadId}"]`);
+    if (activeThreadTab) {
+      const notificationDot = activeThreadTab.querySelector('.notification-dot');
+      if (notificationDot) {
+        notificationDot.remove();
+      }
+    }
+
     const businessId = window.location.pathname.split('/')[2];
     const url = `/business/${businessId}/communications/conversation/${conversationId}?thread_id=${threadId}&ajax=1`;
-    
+
     fetch(url, {
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
@@ -507,27 +491,22 @@ window.threadManagement = {
       return response.text();
     })
     .then(html => {
-      // Create a temporary element to parse the HTML
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = html;
-      
-      // Update the message list
+
       const messageContainer = document.querySelector('.message-list');
       const newMessageList = tempDiv.querySelector('.message-list');
       if (messageContainer && newMessageList) {
         messageContainer.innerHTML = newMessageList.innerHTML;
       }
-      
-      // Update the thread_id in the message form
+
       const threadIdInput = document.querySelector('input[name="thread_id"]');
       if (threadIdInput) {
         threadIdInput.value = threadId;
       }
-      
-      // Update the thread delete option with the current thread information
+
       this.updateThreadMenuOptions(threadId);
-      
-      // Scroll to bottom
+
       this.scrollToBottom();
     })
     .catch(error => {
@@ -535,25 +514,21 @@ window.threadManagement = {
       alert('Error loading thread messages. Please try again.');
     });
   },
-  
+
   // Update thread menu options with current thread information
   updateThreadMenuOptions: function(threadId) {
-    // Get the thread name from the active tab
     const activeThreadTab = document.querySelector(`.thread-tab[data-thread-id="${threadId}"]`);
     if (!activeThreadTab) return;
-    
+
     const threadName = activeThreadTab.textContent.trim();
     const conversationId = this.activeConversationId || this.getActiveConversationIdFromUrl();
-    
-    // Find the delete option in the thread menu and update it
+
     const threadMenuOptions = document.getElementById('thread-menu-options');
     if (threadMenuOptions) {
       const deleteLink = threadMenuOptions.querySelector('a');
       if (deleteLink) {
-        // Update the onclick handler with the new threadId
         deleteLink.setAttribute('onclick', `window.parent.threadManagement.confirmDeleteThread(event, ${conversationId}, ${threadId})`);
-        
-        // Update the text inside the link to show the current thread name
+
         const textSpan = deleteLink.querySelector('span');
         if (textSpan) {
           textSpan.innerHTML = `
@@ -566,26 +541,23 @@ window.threadManagement = {
       }
     }
   },
-  
+
   // Toggle thread dropdown menu before the + button
   toggleThreadMenu: function(event) {
     event.preventDefault();
     event.stopPropagation();
-    
-    // Get current active thread information to update menu
+
     const activeThreadTab = document.querySelector('.thread-tab.bg-blue-600');
     if (activeThreadTab) {
       const threadId = activeThreadTab.dataset.threadId;
       this.updateThreadMenuOptions(threadId);
     }
-    
-    // Toggle the dropdown menu
+
     const optionsMenu = document.getElementById('thread-menu-options');
     if (optionsMenu) {
       optionsMenu.classList.toggle('hidden');
     }
-    
-    // Close dropdown when clicking outside
+
     const closeDropdown = function(e) {
       if (!e.target.closest('.thread-menu, .thread-menu-btn')) {
         const menu = document.getElementById('thread-menu-options');
@@ -595,57 +567,51 @@ window.threadManagement = {
         document.removeEventListener('click', closeDropdown);
       }
     };
-    
-    // Add event listener with a slight delay to avoid immediate trigger
+
     setTimeout(() => {
       document.addEventListener('click', closeDropdown);
     }, 100);
   },
-  
+
   // Confirm thread deletion
   confirmDeleteThread: function(event, conversationId, threadId) {
     event.preventDefault();
-    
-    // Store the IDs for later use
+
     this.pendingDeleteConversationId = conversationId;
     this.pendingDeleteThreadId = threadId;
-    
-    // Show confirmation modal
+
     const modal = document.getElementById('confirmDeleteModal');
     if (modal) {
       modal.classList.remove('hidden');
-      
-      // Set up event listeners for confirmation buttons
+
       document.getElementById('cancelDeleteBtn').onclick = () => {
         modal.classList.add('hidden');
         this.pendingDeleteConversationId = null;
         this.pendingDeleteThreadId = null;
       };
-      
+
       document.getElementById('confirmDeleteBtn').onclick = () => {
         this.deleteThread();
       };
     }
   },
-  
+
   // Delete a thread
   deleteThread: function() {
     if (!this.pendingDeleteConversationId || !this.pendingDeleteThreadId) {
       return;
     }
-    
+
     const conversationId = this.pendingDeleteConversationId;
     const threadId = this.pendingDeleteThreadId;
     const businessId = window.location.pathname.split('/')[2];
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
-    
-    // Show loading state on the button
+
     const deleteBtn = document.getElementById('confirmDeleteBtn');
     const originalBtnText = deleteBtn.textContent;
     deleteBtn.textContent = 'Deleting...';
     deleteBtn.disabled = true;
-    
-    // Make the DELETE request
+
     fetch(`/business/${businessId}/communications/conversation/${conversationId}/thread/${threadId}`, {
       method: 'DELETE',
       headers: {
@@ -661,16 +627,12 @@ window.threadManagement = {
       return response.json();
     })
     .then(data => {
-      // Hide the confirmation modal
       document.getElementById('confirmDeleteModal').classList.add('hidden');
-      
+
       if (data.success) {
-        // Check if this was the only thread
         if (data.is_only_thread) {
-          // Go back to conversation list
           window.location.href = `/business/${businessId}/communications`;
         } else if (data.default_thread_id) {
-          // Switch to another thread
           this.loadConversation(conversationId, data.default_thread_id);
         }
       } else {
@@ -683,11 +645,9 @@ window.threadManagement = {
       alert('An error occurred while deleting the thread. Please try again.');
     })
     .finally(() => {
-      // Reset button state
       deleteBtn.textContent = originalBtnText;
       deleteBtn.disabled = false;
-      
-      // Clear pending IDs
+
       this.pendingDeleteConversationId = null;
       this.pendingDeleteThreadId = null;
     });
@@ -697,14 +657,13 @@ window.threadManagement = {
 // Handle message form submission - add data-message-id to new messages
 window.handleMessageSubmit = async function(event) {
   event.preventDefault();
-  
+
   const form = event.target;
   const formData = new FormData(form);
   const submitButton = form.querySelector('button[type="submit"]');
-  
-  // Disable submit button
+
   submitButton.disabled = true;
-  
+
   try {
     const response = await fetch(form.action, {
       method: 'POST',
@@ -713,16 +672,12 @@ window.handleMessageSubmit = async function(event) {
         'X-Requested-With': 'XMLHttpRequest'
       }
     });
-    
+
     const data = await response.json();
-    
+
     if (data.success) {
-      // Clear the form
       form.reset();
       document.getElementById('selected-files').innerHTML = '';
-      
-      // We don't reload messages here as Pusher will handle this
-      // This allows the message to appear in real-time across clients
       console.log('Message sent successfully');
     } else {
       alert('Error sending message: ' + (data.message || 'Unknown error'));
@@ -731,7 +686,6 @@ window.handleMessageSubmit = async function(event) {
     console.error('Error:', error);
     alert('Error sending message. Please try again.');
   } finally {
-    // Re-enable submit button
     submitButton.disabled = false;
   }
 };
@@ -740,15 +694,15 @@ window.handleMessageSubmit = async function(event) {
 window.handleFileSelection = function(input) {
   const fileList = input.files;
   const previewContainer = document.getElementById('selected-files');
-  
+
   if (!previewContainer) return;
-  
+
   previewContainer.innerHTML = '';
-  
+
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
     const fileSize = (file.size / 1024).toFixed(1) + ' KB';
-    
+
     const filePreview = document.createElement('div');
     filePreview.className = 'bg-gray-100 rounded-md p-2 flex items-center justify-between';
     filePreview.innerHTML = `
@@ -765,7 +719,7 @@ window.handleFileSelection = function(input) {
         </svg>
       </button>
     `;
-    
+
     previewContainer.appendChild(filePreview);
   }
 };
@@ -780,5 +734,16 @@ window.scrollToBottom = function() {
 
 // Initialize thread management when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  window.threadManagement.init();
+  if (window.Echo) {
+    window.threadManagement.init();
+  } else {
+    console.warn('Laravel Echo not found at DOMContentLoaded, delaying threadManagement init.');
+    setTimeout(() => {
+      if (window.Echo) {
+        window.threadManagement.init();
+      } else {
+        console.error('Laravel Echo failed to initialize.');
+      }
+    }, 1000);
+  }
 });

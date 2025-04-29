@@ -41,8 +41,7 @@
 
 @section('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
-    <script src="{{ asset('js/thread-management.js') }}"></script>
-    <script>
+   <script>
         $("input[required], select[required], textarea[required]").on("invalid", function() {
             this.setCustomValidity(@json(trans('Please fill out this field')));
         });

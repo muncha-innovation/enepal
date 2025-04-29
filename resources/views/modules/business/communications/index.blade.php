@@ -309,16 +309,9 @@
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script src="{{ asset('js/thread-management.js') }}"></script>
 <script src="{{ asset('js/communications.js') }}"></script>
 <script>
-  // Pusher configuration
-  window.PUSHER_CONFIG = {
-    key: '{{ env('PUSHER_APP_KEY') }}',
-    cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
-    authToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-  };
-  
   $(document).ready(function() {
     // Initialize Select2 for user selection in New Chat modal
     $('#user_select').select2({

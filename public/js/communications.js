@@ -1,1 +1,183 @@
-(()=>{var e={757:(e,t,n)=>{e.exports=n(666)},666:e=>{var t=function(e){"use strict";var t,n=Object.prototype,r=n.hasOwnProperty,o="function"==typeof Symbol?Symbol:{},a=o.iterator||"@@iterator",i=o.asyncIterator||"@@asyncIterator",s=o.toStringTag||"@@toStringTag";function c(e,t,n){return Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}),e[t]}try{c({},"")}catch(e){c=function(e,t,n){return e[t]=n}}function l(e,t,n,r){var o=t&&t.prototype instanceof p?t:p,a=Object.create(o.prototype),i=new M(r||[]);return a._invoke=function(e,t,n){var r=u;return function(o,a){if(r===v)throw new Error("Generator is already running");if(r===f){if("throw"===o)throw a;return _()}for(n.method=o,n.arg=a;;){var i=n.delegate;if(i){var s=L(i,n);if(s){if(s===m)continue;return s}}if("next"===n.method)n.sent=n._sent=n.arg;else if("throw"===n.method){if(r===u)throw r=f,n.arg;n.dispatchException(n.arg)}else"return"===n.method&&n.abrupt("return",n.arg);r=v;var c=d(e,t,n);if("normal"===c.type){if(r=n.done?f:h,c.arg===m)continue;return{value:c.arg,done:n.done}}"throw"===c.type&&(r=f,n.method="throw",n.arg=c.arg)}}}(e,n,i),a}function d(e,t,n){try{return{type:"normal",arg:e.call(t,n)}}catch(e){return{type:"throw",arg:e}}}e.wrap=l;var u="suspendedStart",h="suspendedYield",v="executing",f="completed",m={};function p(){}function g(){}function y(){}var w={};c(w,a,(function(){return this}));var b=Object.getPrototypeOf,x=b&&b(b(S([])));x&&x!==n&&r.call(x,a)&&(w=x);var T=y.prototype=p.prototype=Object.create(w);function C(e){["next","throw","return"].forEach((function(t){c(e,t,(function(e){return this._invoke(t,e)}))}))}function E(e,t){function n(o,a,i,s){var c=d(e[o],e,a);if("throw"!==c.type){var l=c.arg,u=l.value;return u&&"object"==typeof u&&r.call(u,"__await")?t.resolve(u.__await).then((function(e){n("next",e,i,s)}),(function(e){n("throw",e,i,s)})):t.resolve(u).then((function(e){l.value=e,i(l)}),(function(e){return n("throw",e,i,s)}))}s(c.arg)}var o;this._invoke=function(e,r){function a(){return new t((function(t,o){n(e,r,t,o)}))}return o=o?o.then(a,a):a()}}function L(e,n){var r=e.iterator[n.method];if(r===t){if(n.delegate=null,"throw"===n.method){if(e.iterator.return&&(n.method="return",n.arg=t,L(e,n),"throw"===n.method))return m;n.method="throw",n.arg=new TypeError("The iterator does not provide a 'throw' method")}return m}var o=d(r,e.iterator,n.arg);if("throw"===o.type)return n.method="throw",n.arg=o.arg,n.delegate=null,m;var a=o.arg;return a?a.done?(n[e.resultName]=a.value,n.next=e.nextLoc,"return"!==n.method&&(n.method="next",n.arg=t),n.delegate=null,m):a:(n.method="throw",n.arg=new TypeError("iterator result is not an object"),n.delegate=null,m)}function I(e){var t={tryLoc:e[0]};1 in e&&(t.catchLoc=e[1]),2 in e&&(t.finallyLoc=e[2],t.afterLoc=e[3]),this.tryEntries.push(t)}function k(e){var t=e.completion||{};t.type="normal",delete t.arg,e.completion=t}function M(e){this.tryEntries=[{tryLoc:"root"}],e.forEach(I,this),this.reset(!0)}function S(e){if(e){var n=e[a];if(n)return n.call(e);if("function"==typeof e.next)return e;if(!isNaN(e.length)){var o=-1,i=function n(){for(;++o<e.length;)if(r.call(e,o))return n.value=e[o],n.done=!1,n;return n.value=t,n.done=!0,n};return i.next=i}}return{next:_}}function _(){return{value:t,done:!0}}return g.prototype=y,c(T,"constructor",y),c(y,"constructor",g),g.displayName=c(y,s,"GeneratorFunction"),e.isGeneratorFunction=function(e){var t="function"==typeof e&&e.constructor;return!!t&&(t===g||"GeneratorFunction"===(t.displayName||t.name))},e.mark=function(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,y):(e.__proto__=y,c(e,s,"GeneratorFunction")),e.prototype=Object.create(T),e},e.awrap=function(e){return{__await:e}},C(E.prototype),c(E.prototype,i,(function(){return this})),e.AsyncIterator=E,e.async=function(t,n,r,o,a){void 0===a&&(a=Promise);var i=new E(l(t,n,r,o),a);return e.isGeneratorFunction(n)?i:i.next().then((function(e){return e.done?e.value:i.next()}))},C(T),c(T,s,"Generator"),c(T,a,(function(){return this})),c(T,"toString",(function(){return"[object Generator]"})),e.keys=function(e){var t=[];for(var n in e)t.push(n);return t.reverse(),function n(){for(;t.length;){var r=t.pop();if(r in e)return n.value=r,n.done=!1,n}return n.done=!0,n}},e.values=S,M.prototype={constructor:M,reset:function(e){if(this.prev=0,this.next=0,this.sent=this._sent=t,this.done=!1,this.delegate=null,this.method="next",this.arg=t,this.tryEntries.forEach(k),!e)for(var n in this)"t"===n.charAt(0)&&r.call(this,n)&&!isNaN(+n.slice(1))&&(this[n]=t)},stop:function(){this.done=!0;var e=this.tryEntries[0].completion;if("throw"===e.type)throw e.arg;return this.rval},dispatchException:function(e){if(this.done)throw e;var n=this;function o(r,o){return s.type="throw",s.arg=e,n.next=r,o&&(n.method="next",n.arg=t),!!o}for(var a=this.tryEntries.length-1;a>=0;--a){var i=this.tryEntries[a],s=i.completion;if("root"===i.tryLoc)return o("end");if(i.tryLoc<=this.prev){var c=r.call(i,"catchLoc"),l=r.call(i,"finallyLoc");if(c&&l){if(this.prev<i.catchLoc)return o(i.catchLoc,!0);if(this.prev<i.finallyLoc)return o(i.finallyLoc)}else if(c){if(this.prev<i.catchLoc)return o(i.catchLoc,!0)}else{if(!l)throw new Error("try statement without catch or finally");if(this.prev<i.finallyLoc)return o(i.finallyLoc)}}}},abrupt:function(e,t){for(var n=this.tryEntries.length-1;n>=0;--n){var o=this.tryEntries[n];if(o.tryLoc<=this.prev&&r.call(o,"finallyLoc")&&this.prev<o.finallyLoc){var a=o;break}}a&&("break"===e||"continue"===e)&&a.tryLoc<=t&&t<=a.finallyLoc&&(a=null);var i=a?a.completion:{};return i.type=e,i.arg=t,a?(this.method="next",this.next=a.finallyLoc,m):this.complete(i)},complete:function(e,t){if("throw"===e.type)throw e.arg;return"break"===e.type||"continue"===e.type?this.next=e.arg:"return"===e.type?(this.rval=this.arg=e.arg,this.method="return",this.next="end"):"normal"===e.type&&t&&(this.next=t),m},finish:function(e){for(var t=this.tryEntries.length-1;t>=0;--t){var n=this.tryEntries[t];if(n.finallyLoc===e)return this.complete(n.completion,n.afterLoc),k(n),m}},catch:function(e){for(var t=this.tryEntries.length-1;t>=0;--t){var n=this.tryEntries[t];if(n.tryLoc===e){var r=n.completion;if("throw"===r.type){var o=r.arg;k(n)}return o}}throw new Error("illegal catch attempt")},delegateYield:function(e,n,r){return this.delegate={iterator:S(e),resultName:n,nextLoc:r},"next"===this.method&&(this.arg=t),m}},e}(e.exports);try{regeneratorRuntime=t}catch(e){"object"==typeof globalThis?globalThis.regeneratorRuntime=t:Function("r","regeneratorRuntime = r")(t)}}},t={};function n(r){var o=t[r];if(void 0!==o)return o.exports;var a=t[r]={exports:{}};return e[r](a,a.exports,n),a.exports}n.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return n.d(t,{a:t}),t},n.d=(e,t)=>{for(var r in t)n.o(t,r)&&!n.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},n.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),(()=>{"use strict";var e=n(757),t=n.n(e);function r(e,t,n,r,o,a,i){try{var s=e[a](i),c=s.value}catch(e){return void n(e)}s.done?t(c):Promise.resolve(c).then(r,o)}window.threadManagement={activeConversationId:null,pusherClient:null,currentThreadChannel:null,currentConversationChannel:null,currentThreadId:null,init:function(){this.getActiveConversationIdFromUrl(),this.setupEventListeners(),window.PUSHER_CONFIG&&this.initializePusher()},setupEventListeners:function(){var e=this,t=document.querySelectorAll(".user-conversation-link");t&&t.length>0&&t.forEach((function(t){t.addEventListener("click",(function(n){n.preventDefault();var r=t.dataset.conversationId;r&&e.loadConversation(r)}))}));var n=document.getElementById("newThreadForm");n&&n.addEventListener("submit",(function(t){e.createNewThread(t)}))},initializePusher:function(){var e=this;window.PUSHER_CONFIG&&window.PUSHER_CONFIG.key&&window.PUSHER_CONFIG.cluster?(this.pusherClient&&this.pusherClient.disconnect(),this.pusherClient=new Pusher(window.PUSHER_CONFIG.key,{cluster:window.PUSHER_CONFIG.cluster,forceTLS:!0,auth:{headers:{"X-CSRF-Token":window.PUSHER_CONFIG.authToken,"X-Requested-With":"XMLHttpRequest"}}}),this.pusherClient.connection.bind("connected",(function(){console.log("Pusher connected with socket ID:",e.pusherClient.connection.socket_id)})),this.pusherClient.connection.bind("error",(function(e){console.error("Pusher connection error:",e)})),this.activeConversationId&&(this.subscribeToConversationChannel(this.activeConversationId),this.currentThreadId&&this.subscribeToThreadChannel(this.currentThreadId))):console.error("Pusher configuration is missing")},subscribeToConversationChannel:function(e){var t=this;if(this.pusherClient){this.currentConversationChannel&&this.pusherClient.unsubscribe("conversation-"+this.activeConversationId);var n="conversation-"+e,r=this.pusherClient.subscribe(n);this.currentConversationChannel=r,r.bind("new.message",(function(e){if(console.log("Received message in conversation channel:",e),e.thread_id!=t.currentThreadId){var n=document.querySelector('.thread-tab[data-thread-id="'.concat(e.thread_id,'"]'));if(n){n.classList.add("relative");var r=n.querySelector(".notification-dot");r&&r.remove();var o=document.createElement("span");o.className="notification-dot absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3",n.appendChild(o)}}}))}},subscribeToThreadChannel:function(e){var t=this;if(this.pusherClient){this.currentThreadChannel&&this.pusherClient.unsubscribe("thread-"+this.currentThreadId);var n="thread-"+e,r=this.pusherClient.subscribe(n);this.currentThreadChannel=r,this.currentThreadId=e,r.bind("new.message",(function(e){(console.log("Received message in thread channel:",e),e.thread_id==t.currentThreadId)&&(document.querySelector('[data-message-id="'.concat(e.id,'"]'))||t.appendNewMessage(e))}))}},appendNewMessage:function(e){var t=document.querySelector(".message-list .space-y-4");if(t){var n="App\\Models\\Business"===e.sender_type,r=document.createElement("div");r.className="flex ".concat(n?"justify-end":"justify-start"),r.setAttribute("data-message-id",e.id);var o="";if(e.attachments&&e.attachments.length>0){var a="";e.attachments.forEach((function(e){var t="";e.mime&&e.mime.startsWith("image/")&&(t='<div class="mb-1">\n            <img src="'.concat(window.location.origin,"/storage/").concat(e.path,'" alt="').concat(e.name||"Image",'" \n                class="max-h-48 rounded border">\n          </div>')),a+='\n          <div class="mb-1">\n            '.concat(t,'\n            <a href="').concat(window.location.origin,"/storage/").concat(e.path,'" target="_blank" \n               class="flex items-center text-xs text-blue-600 hover:underline">\n              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">\n                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" \n                     d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>\n              </svg>\n              ').concat(e.name||"Attachment","\n              ").concat(e.size?'<span class="text-gray-500 ml-1">('.concat(Math.round(e.size/1024)," KB)</span>"):"","\n            </a>\n          </div>\n        ")})),o='\n        <div class="mt-2 space-y-2 p-2 bg-white bg-opacity-50 rounded-md">\n          '.concat(a,"\n        </div>\n      ")}var i=this.formatMessageTime(e.created_at);r.innerHTML='\n      <div class="max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 '.concat(n?"bg-indigo-100 text-gray-800":"bg-gray-100 text-gray-800",'">\n        <p class="text-sm">').concat(e.content,"</p>\n        \n        ").concat(o,'\n        \n        <div class="mt-1 text-xs text-gray-500 text-right">\n          ').concat(i,"\n          ").concat(e.is_read&&n?'<span class="ml-1 text-green-600">✓</span>':"","\n        </div>\n      </div>\n    "),t.appendChild(r),this.scrollToBottom()}},formatMessageTime:function(e){if(!e)return"";var t=new Date(e),n=t.getHours(),r=t.getMinutes(),o=n>=12?"PM":"AM",a=r<10?"0"+r:r;return"".concat(n%12==0?12:n%12,":").concat(a," ").concat(o)},scrollToBottom:function(){var e=document.querySelector(".message-list");e&&(e.scrollTop=e.scrollHeight)},getActiveConversationIdFromUrl:function(){var e=window.location.pathname.split("/"),t=e.indexOf("conversation");if(-1!==t&&e[t+1])return this.activeConversationId=e[t+1],this.activeConversationId;var n=document.querySelector(".user-conversation-link.bg-indigo-50");return n&&n.dataset.conversationId?(this.activeConversationId=n.dataset.conversationId,this.activeConversationId):null},showNewThreadModal:function(){if(this.getActiveConversationIdFromUrl()){var e=document.getElementById("newThreadModal");if(e){var t=e.querySelector("form");if(t){var n,r=null===(n=document.querySelector('meta[name="csrf-token"]'))||void 0===n?void 0:n.content;if(r){var o=t.querySelector('input[name="_token"]');o?o.value=r:((o=document.createElement("input")).type="hidden",o.name="_token",o.value=r,t.appendChild(o))}}e.classList.remove("hidden")}}else alert("Please select a conversation first")},hideNewThreadModal:function(){var e=document.getElementById("newThreadModal");e&&e.classList.add("hidden")},createNewThread:function(e){var t=this;e.preventDefault();var n=this.getActiveConversationIdFromUrl();if(n){var r=e.target,o=new FormData(r),a=window.location.pathname.split("/")[2],i=r.querySelector('button[type="submit"]'),s=i.innerHTML;i.innerHTML="Creating...",i.disabled=!0,fetch("/business/".concat(a,"/communications/conversation/").concat(n,"/thread"),{method:"POST",body:o,headers:{"X-Requested-With":"XMLHttpRequest"}}).then((function(e){if(!e.ok)throw new Error("Network response was not ok: "+e.statusText);return e.json()})).then((function(e){t.hideNewThreadModal(),e.success?(console.log("Thread created successfully:",e),t.loadConversation(n,e.thread_id)):(console.error("Error creating thread:",e.message||"Unknown error"),alert("Error creating thread: "+(e.message||"Unknown error")))})).catch((function(e){console.error("Error creating thread:",e),alert("An error occurred while creating the thread. Please try again.")})).finally((function(){r.reset(),i.innerHTML=s,i.disabled=!1}))}else alert("Please select a conversation first")},loadConversation:function(e,t){var n=this;if(e){document.querySelectorAll(".user-conversation-link").forEach((function(t){t.dataset.conversationId==e?t.classList.add("bg-indigo-50"):t.classList.remove("bg-indigo-50")})),this.activeConversationId=e;var r=window.location.pathname.split("/")[2],o="/business/".concat(r,"/communications/conversation/").concat(e,"?ajax=1");t&&(o+="&thread_id=".concat(t));var a=document.getElementById("message-container");a&&(a.innerHTML='<div class="flex h-full w-full items-center justify-center"><div class="loader"></div></div>',fetch(o,{headers:{"X-Requested-With":"XMLHttpRequest"}}).then((function(e){if(!e.ok)throw new Error("Network response was not ok: "+e.statusText);return e.text()})).then((function(t){a.innerHTML=t;var r=document.querySelector('input[name="thread_id"]');r&&(n.currentThreadId=r.value),n.pusherClient&&(n.subscribeToConversationChannel(e),n.currentThreadId&&n.subscribeToThreadChannel(n.currentThreadId)),n.scrollToBottom()})).catch((function(e){console.error("Error loading conversation:",e),a.innerHTML='\n          <div class="flex flex-col p-3 overflow-y-auto fw-scrollbar flex-grow">\n            <div class="flex h-full w-full items-center justify-center flex-col">\n              <svg class="w-16 h-16 text-red-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">\n                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>\n              </svg>\n              <h2 class="text-xl text-red-500">Error loading conversation</h2>\n              <p class="text-gray-400 mt-2">Please try again or contact support</p>\n            </div>\n          </div>\n        '})))}else console.error("No conversation ID provided")},switchThread:function(e,t){var n=this;e.preventDefault();var r=this.activeConversationId||this.getActiveConversationIdFromUrl();if(r){document.querySelectorAll(".thread-tab").forEach((function(e){e.dataset.threadId==t?(e.classList.add("bg-blue-600","text-white"),e.classList.remove("bg-gray-200","text-gray-700","hover:bg-gray-300")):(e.classList.remove("bg-blue-600","text-white"),e.classList.add("bg-gray-200","text-gray-700","hover:bg-gray-300"))})),this.currentThreadId=t,this.pusherClient&&this.subscribeToThreadChannel(t);var o=window.location.pathname.split("/")[2],a="/business/".concat(o,"/communications/conversation/").concat(r,"?thread_id=").concat(t,"&ajax=1");fetch(a,{headers:{"X-Requested-With":"XMLHttpRequest"}}).then((function(e){if(!e.ok)throw new Error("Network response was not ok: "+e.statusText);return e.text()})).then((function(e){var r=document.createElement("div");r.innerHTML=e;var o=document.querySelector(".message-list"),a=r.querySelector(".message-list");o&&a&&(o.innerHTML=a.innerHTML);var i=document.querySelector('input[name="thread_id"]');i&&(i.value=t),n.updateThreadMenuOptions(t),n.scrollToBottom()})).catch((function(e){console.error("Error switching thread:",e),alert("Error loading thread messages. Please try again.")}))}else console.error("No active conversation")},updateThreadMenuOptions:function(e){var t=document.querySelector('.thread-tab[data-thread-id="'.concat(e,'"]'));if(t){var n=t.textContent.trim(),r=this.activeConversationId||this.getActiveConversationIdFromUrl(),o=document.getElementById("thread-menu-options");if(o){var a=o.querySelector("a");if(a){a.setAttribute("onclick","window.parent.threadManagement.confirmDeleteThread(event, ".concat(r,", ").concat(e,")"));var i=a.querySelector("span");i&&(i.innerHTML='\n            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">\n              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />\n            </svg>\n            Delete "'.concat(n,'"\n          '))}}}},toggleThreadMenu:function(e){e.preventDefault(),e.stopPropagation();var t=document.querySelector(".thread-tab.bg-blue-600");if(t){var n=t.dataset.threadId;this.updateThreadMenuOptions(n)}var r=document.getElementById("thread-menu-options");r&&r.classList.toggle("hidden");var o=function e(t){if(!t.target.closest(".thread-menu, .thread-menu-btn")){var n=document.getElementById("thread-menu-options");n&&n.classList.add("hidden"),document.removeEventListener("click",e)}};setTimeout((function(){document.addEventListener("click",o)}),100)},confirmDeleteThread:function(e,t,n){var r=this;e.preventDefault(),this.pendingDeleteConversationId=t,this.pendingDeleteThreadId=n;var o=document.getElementById("confirmDeleteModal");o&&(o.classList.remove("hidden"),document.getElementById("cancelDeleteBtn").onclick=function(){o.classList.add("hidden"),r.pendingDeleteConversationId=null,r.pendingDeleteThreadId=null},document.getElementById("confirmDeleteBtn").onclick=function(){r.deleteThread()})},deleteThread:function(){var e,t=this;if(this.pendingDeleteConversationId&&this.pendingDeleteThreadId){var n=this.pendingDeleteConversationId,r=this.pendingDeleteThreadId,o=window.location.pathname.split("/")[2],a=null===(e=document.querySelector('meta[name="csrf-token"]'))||void 0===e?void 0:e.content,i=document.getElementById("confirmDeleteBtn"),s=i.textContent;i.textContent="Deleting...",i.disabled=!0,fetch("/business/".concat(o,"/communications/conversation/").concat(n,"/thread/").concat(r),{method:"DELETE",headers:{"X-CSRF-TOKEN":a,"X-Requested-With":"XMLHttpRequest","Content-Type":"application/json"}}).then((function(e){if(!e.ok)throw new Error("Network response was not ok: "+e.statusText);return e.json()})).then((function(e){document.getElementById("confirmDeleteModal").classList.add("hidden"),e.success?e.is_only_thread?window.location.href="/business/".concat(o,"/communications"):e.default_thread_id&&t.loadConversation(n,e.default_thread_id):(console.error("Error deleting thread:",e.message||"Unknown error"),alert("Error deleting thread: "+(e.message||"Unknown error")))})).catch((function(e){console.error("Error deleting thread:",e),alert("An error occurred while deleting the thread. Please try again.")})).finally((function(){i.textContent=s,i.disabled=!1,t.pendingDeleteConversationId=null,t.pendingDeleteThreadId=null}))}}},window.handleMessageSubmit=function(){var e,n=(e=t().mark((function e(n){var r,o,a,i,s;return t().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n.preventDefault(),r=n.target,o=new FormData(r),(a=r.querySelector('button[type="submit"]')).disabled=!0,e.prev=5,e.next=8,fetch(r.action,{method:"POST",body:o,headers:{"X-Requested-With":"XMLHttpRequest"}});case 8:return i=e.sent,e.next=11,i.json();case 11:(s=e.sent).success?(r.reset(),document.getElementById("selected-files").innerHTML="",console.log("Message sent successfully")):alert("Error sending message: "+(s.message||"Unknown error")),e.next=19;break;case 15:e.prev=15,e.t0=e.catch(5),console.error("Error:",e.t0),alert("Error sending message. Please try again.");case 19:return e.prev=19,a.disabled=!1,e.finish(19);case 22:case"end":return e.stop()}}),e,null,[[5,15,19,22]])})),function(){var t=this,n=arguments;return new Promise((function(o,a){var i=e.apply(t,n);function s(e){r(i,o,a,s,c,"next",e)}function c(e){r(i,o,a,s,c,"throw",e)}s(void 0)}))});return function(e){return n.apply(this,arguments)}}(),window.handleFileSelection=function(e){var t=e.files,n=document.getElementById("selected-files");if(n){n.innerHTML="";for(var r=0;r<t.length;r++){var o=t[r],a=(o.size/1024).toFixed(1)+" KB",i=document.createElement("div");i.className="bg-gray-100 rounded-md p-2 flex items-center justify-between",i.innerHTML='\n      <div class="flex items-center">\n        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">\n          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>\n        </svg>\n        <span class="text-xs truncate max-w-[150px]">'.concat(o.name,'</span>\n        <span class="text-xs text-gray-500 ml-2">').concat(a,'</span>\n      </div>\n      <button type="button" class="text-gray-500 hover:text-red-500" onclick="this.parentNode.remove()">\n        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">\n          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>\n        </svg>\n      </button>\n    '),n.appendChild(i)}}},window.scrollToBottom=function(){var e=document.querySelector(".message-list");e&&(e.scrollTop=e.scrollHeight)},document.addEventListener("DOMContentLoaded",(function(){window.threadManagement.init()})),window.handleFileSelection=function(e){var t=document.getElementById("selected-files");if(t.innerHTML="",e.files.length>0)for(var n=0;n<e.files.length;n++){var r=e.files[n],o=(r.size/1024).toFixed(0)+" KB",a=document.createElement("div");a.className="flex items-center bg-gray-100 rounded-md p-1 text-xs",a.innerHTML='\n                <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">\n                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>\n                </svg>\n                <span class="truncate max-w-[150px]">'.concat(r.name,'</span>\n                <span class="ml-1 text-gray-500">(').concat(o,")</span>\n            "),t.appendChild(a)}},window.scrollToBottom=function(){var e=document.querySelector(".message-list");e&&(e.scrollTop=e.scrollHeight)},window.markAsRead=function(e,t){t&&t.preventDefault();var n=t?t.target:null,r=n?n.closest("li"):null;fetch(e,{method:"POST",headers:{"X-CSRF-TOKEN":document.querySelector('meta[name="csrf-token"]').getAttribute("content"),Accept:"application/json","Content-Type":"application/json"}}).then((function(e){return e.json()})).then((function(e){if(e.success&&r){r.classList.remove("bg-blue-50"),r.classList.add("bg-white"),n&&n.remove();var t=document.querySelector('a[href*="notifications"] span');if(t){var o=parseInt(t.textContent);o>1?t.textContent=o-1:t.remove()}}})).catch((function(e){console.error("Error marking notification as read:",e)}))},document.addEventListener("DOMContentLoaded",(function(){var e=document.querySelectorAll('input[name="recipient_type"]');if(e.length>0&&e.forEach((function(e){e.addEventListener("change",(function(){var e=document.getElementById("user-selection"),t=document.getElementById("segment-selection");"users"===this.value?(e.classList.remove("hidden"),t.classList.add("hidden")):(e.classList.add("hidden"),t.classList.remove("hidden"))}))})),void 0!==$.fn.select2&&document.getElementById("select-users")){$("#select-users").select2({placeholder:"Select users",allowClear:!0,ajax:{url:function(){var e=window.location.pathname.split("/")[2];return"/business/".concat(e,"/communications/search-users")},dataType:"json",delay:250,data:function(e){return{q:e.term,page:e.page}},processResults:function(e,t){return t.page=t.page||1,{results:e.results,pagination:{more:!1}}},cache:!0}});var t=new Option("All Users","all_users",!1,!1);$("#select-users").append(t)}var n=document.querySelectorAll(".user-conversation-link");if(n&&n.length>0&&n.forEach((function(e){e.addEventListener("click",(function(t){t.preventDefault();var n=e.dataset.conversationId;n&&window.threadManagement&&window.threadManagement.loadConversation(n)}))})),sessionStorage.getItem("notification_modal_open")){var r=document.getElementById("newNotificationModal");r&&r.classList.remove("hidden"),sessionStorage.removeItem("notification_modal_open")}}))})()})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!****************************************!*\
+  !*** ./resources/js/communications.js ***!
+  \****************************************/
+// Remove duplicate global loadConversation implementation because thread-management.js handles it
+
+/**
+ * Handle file selection for message attachments
+ * @param {HTMLInputElement} input - The file input element
+ */
+window.handleFileSelection = function (input) {
+  var selectedFilesContainer = document.getElementById('selected-files');
+  selectedFilesContainer.innerHTML = '';
+
+  if (input.files.length > 0) {
+    for (var i = 0; i < input.files.length; i++) {
+      var file = input.files[i];
+      var fileSize = (file.size / 1024).toFixed(0) + ' KB';
+      var fileElement = document.createElement('div');
+      fileElement.className = 'flex items-center bg-gray-100 rounded-md p-1 text-xs';
+      fileElement.innerHTML = "\n                <svg class=\"w-4 h-4 mr-1 text-gray-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n                    <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13\"></path>\n                </svg>\n                <span class=\"truncate max-w-[150px]\">".concat(file.name, "</span>\n                <span class=\"ml-1 text-gray-500\">(").concat(fileSize, ")</span>\n            ");
+      selectedFilesContainer.appendChild(fileElement);
+    }
+  }
+};
+/**
+ * Scroll to the bottom of the message list
+ * Ensures this function is available globally
+ */
+
+
+window.scrollToBottom = function () {
+  var messageList = document.querySelector('.message-list');
+
+  if (messageList) {
+    messageList.scrollTop = messageList.scrollHeight;
+  }
+};
+/**
+ * Mark notification as read
+ * @param {string} url - The URL to send the mark as read request to
+ * @param {Event} event - The click event
+ */
+
+
+window.markAsRead = function (url, event) {
+  // Prevent default behavior if event is provided
+  if (event) {
+    event.preventDefault();
+  } // Store the button element before making the async call
+
+
+  var button = event ? event.target : null;
+  var listItem = button ? button.closest('li') : null;
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    if (data.success && listItem) {
+      // Update the UI for this notification
+      listItem.classList.remove('bg-blue-50');
+      listItem.classList.add('bg-white'); // Remove the button
+
+      if (button) {
+        button.remove();
+      } // Update the unread count badge in the tab
+
+
+      var badgeElement = document.querySelector('a[href*="notifications"] span');
+
+      if (badgeElement) {
+        var currentCount = parseInt(badgeElement.textContent);
+
+        if (currentCount > 1) {
+          badgeElement.textContent = currentCount - 1;
+        } else {
+          badgeElement.remove();
+        }
+      }
+    }
+  })["catch"](function (error) {
+    console.error('Error marking notification as read:', error);
+  });
+}; // Initialize event listeners when the DOM is loaded
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize recipient type toggle for notification modal
+  var recipientTypeRadios = document.querySelectorAll('input[name="recipient_type"]');
+
+  if (recipientTypeRadios.length > 0) {
+    recipientTypeRadios.forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var userSelection = document.getElementById('user-selection');
+        var segmentSelection = document.getElementById('segment-selection');
+
+        if (this.value === 'users') {
+          userSelection.classList.remove('hidden');
+          segmentSelection.classList.add('hidden');
+        } else {
+          userSelection.classList.add('hidden');
+          segmentSelection.classList.remove('hidden');
+        }
+      });
+    });
+  } // Initialize Select2 for user selection if available
+
+
+  if (typeof $.fn.select2 !== 'undefined' && document.getElementById('select-users')) {
+    $('#select-users').select2({
+      placeholder: 'Select users',
+      allowClear: true,
+      ajax: {
+        url: function url() {
+          // Get the business ID from the URL
+          var path = window.location.pathname.split('/');
+          var businessId = path[2]; // business ID should be at index 2
+
+          return "/business/".concat(businessId, "/communications/search-users");
+        },
+        dataType: 'json',
+        delay: 250,
+        data: function data(params) {
+          return {
+            q: params.term,
+            page: params.page
+          };
+        },
+        processResults: function processResults(data, params) {
+          params.page = params.page || 1;
+          return {
+            results: data.results,
+            pagination: {
+              more: false
+            }
+          };
+        },
+        cache: true
+      }
+    }); // Add "Select All Users" option when initializing
+
+    var allOption = new Option('All Users', 'all_users', false, false);
+    $('#select-users').append(allOption);
+  } // Make sure conversation-related functionality is properly connected
+
+
+  var conversationLinks = document.querySelectorAll('.user-conversation-link');
+
+  if (conversationLinks && conversationLinks.length > 0) {
+    conversationLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        var conversationId = link.dataset.conversationId; // Check if window.threadManagement exists before calling
+
+        if (conversationId && window.threadManagement) {
+          window.threadManagement.loadConversation(conversationId);
+        }
+      });
+    });
+  } // Show notification modal only when explicitly requested, not for validation errors
+
+
+  var hasModalOpenRequest = sessionStorage.getItem('notification_modal_open');
+
+  if (hasModalOpenRequest) {
+    var modal = document.getElementById('newNotificationModal');
+
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+
+    sessionStorage.removeItem('notification_modal_open');
+  }
+});
+/******/ })()
+;

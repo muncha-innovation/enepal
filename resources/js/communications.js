@@ -1,7 +1,3 @@
-/**
- * Communications module for handling messaging functionality
- */
-import { threadManagement } from '../../public/js/thread-management.js';
 
 // Remove duplicate global loadConversation implementation because thread-management.js handles it
 
@@ -163,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const conversationId = link.dataset.conversationId;
+                // Check if window.threadManagement exists before calling
                 if (conversationId && window.threadManagement) {
                     window.threadManagement.loadConversation(conversationId);
                 }
