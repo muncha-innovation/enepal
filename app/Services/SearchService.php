@@ -233,10 +233,8 @@ class SearchService
         }
 
         // Include childNews relationship in the results
-        $results = $query->paginate($perPage);
+        $results = $query->with(['childNews', 'categories', 'tags', 'locations'])->paginate($perPage);
         
-        // Load the childNews relationship for each news item in the collection
-        $results->getCollection()->load(['childNews', 'categories', 'tags', 'locations']);
         
         return $results;
     }
