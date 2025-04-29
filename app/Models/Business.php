@@ -55,7 +55,7 @@ class Business extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot(['role', 'position']);
+        return $this->belongsToMany(User::class)->withPivot(['role', 'position', 'created_at', 'updated_at'])->withTimestamps();
     }
     
     public function notifications()

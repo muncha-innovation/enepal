@@ -28,5 +28,14 @@
     <li class="me-2">
       <a href="{{ route('business.communications.segments.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.communications.segments*') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.communications.segments*') ? 'page' : '' }}">Segments</a>
     </li>
+    @if(auth()->user()->hasRole('super-admin'))
+    <li class="me-2">
+        <a href="{{ route('business.owner-profile', ['business' => $business]) }}"
+           class="inline-block p-3 {{ request()->routeIs('business.owner-profile') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
+           aria-current="{{ request()->routeIs('business.owner-profile') ? 'page' : '' }}">
+            Owner Profile
+        </a>
+    </li>
+    @endif
   </ul>
 </section>

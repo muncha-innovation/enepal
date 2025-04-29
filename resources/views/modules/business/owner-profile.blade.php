@@ -5,12 +5,7 @@
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="border-b border-gray-200">
-            <!-- Include the business tabs -->
-            <div class="border-b border-gray-200 mb-6">
-                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
-                    @include('modules.business._tabs')
-                </ul>
-            </div>
+           
         </div>
 
         <div class="px-4 py-5 sm:px-6">
@@ -57,6 +52,7 @@
                             {{ ucfirst($owner->pivot->role) }}
                         </dd>
                     </div>
+                    @if($owner->pivot->created_by!=null)
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">
                             {{ __('Joined Date') }}
@@ -65,6 +61,7 @@
                             {{ $owner->pivot->created_at->format('F j, Y') }}
                         </dd>
                     </div>
+                    @endif
                 </dl>
             </div>
         @else

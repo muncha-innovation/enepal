@@ -136,7 +136,7 @@ class User extends Authenticatable
 
     public function businesses()
     {
-        return $this->belongsToMany(Business::class);
+        return $this->belongsToMany(Business::class)->withTimestamps();
     }
 
 
