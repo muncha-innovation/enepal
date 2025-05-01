@@ -1,68 +1,95 @@
 <div class="mb-6">
     <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Business Hours') }}</h3>
-    <div class="space-y-4">
+
+    <div class="mb-4">
+        <button type="button"
+                onclick="copyMondayToAll()"
+                class="text-sm text-blue-600 hover:underline">
+            {{ __('Copy Monday hours to all days') }}
+        </button>
+    </div>
+
+    @php
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $hours = $business->hours ?? collect();
+    @endphp
+
+    @foreach($days as $day)
         @php
-            $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            $hours = $business->hours ?? collect();
+            $dayHours = $hours->where('day', $day)->first();
+            $isOpen = $dayHours ? $dayHours->is_open : false;
         @endphp
 
-        @foreach($days as $day)
-            @php
-                $dayHours = $hours->where('day', $day)->first();
-                // Only set isOpen to true if we have a record and it's explicitly marked as open
-                $isOpen = $dayHours ? $dayHours->is_open : false;
-            @endphp
-            <div class="flex items-center space-x-4">
-                <div class="w-32">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" 
-                               name="hours[{{ $day }}][is_open]" 
-                               class="form-checkbox" 
-                               value="1"
-                               {{ $isOpen ? 'checked' : '' }}
-                               onchange="toggleTimeInputs('{{ $day }}', this.checked)">
-                        <span class="ml-2">{{ $day }}</span>
-                    </label>
-                </div>
-                
-                <div id="{{ $day }}_times" class="flex items-center space-x-2 {{ !$isOpen ? 'hidden' : '' }}">
-                    <input type="time" 
-                           name="hours[{{ $day }}][open_time]" 
-                           class="form-input rounded-md shadow-sm mt-1 block"
-                           value="{{ $dayHours && $isOpen ? \Carbon\Carbon::parse($dayHours->open_time)->format('H:i') : '' }}"
-                           {{ !$isOpen ? 'disabled' : '' }}
-                           data-field="open_time">
-                    
-                    <span>to</span>
-                    
-                    <input type="time" 
-                           name="hours[{{ $day }}][close_time]" 
-                           class="form-input rounded-md shadow-sm mt-1 block"
-                           value="{{ $dayHours && $isOpen ? \Carbon\Carbon::parse($dayHours->close_time)->format('H:i') : '' }}"
-                           {{ !$isOpen ? 'disabled' : '' }}
-                           data-field="close_time">
+        <div class="bg-gray-50 p-4 rounded-md mb-2">
+            <div class="flex items-center justify-between">
+                <label class="font-medium">
+                    <input type="checkbox"
+                           name="hours[{{ $day }}][is_open]"
+                           class="form-checkbox mr-2"
+                           value="1"
+                           {{ $isOpen ? 'checked' : '' }}
+                           onchange="toggleTimeRow(this)">
+                    {{ $day }}
+                </label>
+
+                <div class="flex items-center gap-2 time-row {{ !$isOpen ? 'hidden' : '' }}">
+                    <input type="time"
+                           class="form-input rounded-md"
+                           data-day="{{ $day }}"
+                           data-type="open"
+                           name="hours[{{ $day }}][open_time]"
+                           value="{{ $dayHours && $isOpen ? \Carbon\Carbon::parse($dayHours->open_time)->format('H:i') : '' }}">
+                    <span>–</span>
+                    <input type="time"
+                           class="form-input rounded-md"
+                           data-day="{{ $day }}"
+                           data-type="close"
+                           name="hours[{{ $day }}][close_time]"
+                           value="{{ $dayHours && $isOpen ? \Carbon\Carbon::parse($dayHours->close_time)->format('H:i') : '' }}">
                 </div>
             </div>
-        @endforeach
-    </div>
+        </div>
+    @endforeach
 </div>
 
 <script>
-function toggleTimeInputs(day, isChecked) {
-    const timesDiv = document.getElementById(day + '_times');
-    const inputs = timesDiv.querySelectorAll('input[type="time"]');
-    
-    timesDiv.classList.toggle('hidden', !isChecked);
-    
+function toggleTimeRow(checkbox) {
+    const parent = checkbox.closest('.flex');
+    const timeRow = parent.querySelector('.time-row');
+    const inputs = timeRow.querySelectorAll('input[type="time"]');
+
+    timeRow.classList.toggle('hidden', !checkbox.checked);
+
     inputs.forEach(input => {
-        if (!isChecked) {
-            input.value = ''; // Clear the time when unchecked
-            input.name = ''; // Remove from form submission
-            input.disabled = true;
-        } else {
-            input.name = `hours[${day}][${input.getAttribute('data-field')}]`;
-            input.disabled = false;
+        input.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+            input.value = '';
         }
+    });
+}
+
+function copyMondayToAll() {
+    const open = document.querySelector('[data-day="Monday"][data-type="open"]')?.value;
+    const close = document.querySelector('[data-day="Monday"][data-type="close"]')?.value;
+    const isOpen = document.querySelector('input[name="hours[Monday][is_open]"]')?.checked;
+
+    if (!isOpen || !open || !close) {
+        alert('Please set Monday\'s hours first.');
+        return;
+    }
+
+    const days = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    days.forEach(day => {
+        document.querySelector(`input[name="hours[${day}][is_open]"]`).checked = true;
+        const openInput = document.querySelector(`[data-day="${day}"][data-type="open"]`);
+        const closeInput = document.querySelector(`[data-day="${day}"][data-type="close"]`);
+        const timeRow = openInput.closest('.time-row');
+        
+        openInput.disabled = false;
+        closeInput.disabled = false;
+        openInput.value = open;
+        closeInput.value = close;
+        timeRow.classList.remove('hidden');
     });
 }
 </script>
