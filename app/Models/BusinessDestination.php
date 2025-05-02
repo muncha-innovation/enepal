@@ -9,4 +9,6 @@ class BusinessDestination extends Model
 {
     use HasFactory;
     protected $table = 'business_destinations';
+    protected $fillable = [
+    ];
 }

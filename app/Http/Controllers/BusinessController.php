@@ -167,20 +167,7 @@ class BusinessController extends Controller
      * @param  \App\Models\Business  $business
      * @return \Illuminate\Http\Response
      */
-    public function edit(Business $business)
-    {
-        //
-        $businessTypes = BusinessType::all();
-        $countries = Country::all();
-        $languages = Language::all();
-        $business->load(['address', 'settings', 'taughtLanguages', 'destinations']);
-        $socialNetworks = \App\Models\SocialNetwork::all();
-        
-        // Get facilities for the current business type
-        $typeFacilities = BusinessType::with('facilities')->find($business->type_id)->facilities;
-        
-        return view('modules.business.createOrEdit', compact(['business', 'businessTypes', 'countries', 'languages', 'socialNetworks', 'typeFacilities']));
-    }
+   
 
     /**
      * Update the specified resource in storage.
@@ -192,7 +179,6 @@ class BusinessController extends Controller
     public function update(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
-        // dd($data);
         if (isset($data['address']['location'])) {
             // Convert POINT string to Point object
             preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
@@ -320,6 +306,7 @@ class BusinessController extends Controller
         $businessTypes = BusinessType::all();
         $countries = Country::all();
         $business->load(['address', 'settings','destinations','taughtLanguages']);
+        
         $languages = Language::all();
         $typeFacilities = BusinessType::with('facilities')->find($business->type_id)->facilities;
         $showSettings = true;
@@ -431,15 +418,55 @@ class BusinessController extends Controller
                 ]);
             }
             
-            // Success message for new business
-            return redirect()->route('business.edit', $business)->with('success', 'Business created successfully! Please complete the other sections.');
+            // Handle description translations if present
+            if (isset($data['description'])) {
+                foreach ($data['description'] as $locale => $text) {
+                    $business->setTranslation('description', $locale, $text);
+                }
+                $business->save();
+            }
+            
+            // Handle file uploads
+            if ($request->hasFile('logo')) {
+                $business->logo = upload('business/logo', 'png', $request->file('logo'));
+                $business->save();
+            }
+            
+            if ($request->hasFile('cover_image')) {
+                $business->cover_image = upload('business/cover_image', 'png', $request->file('cover_image'));
+                $business->save();
+            }
+            
+            // Handle other fields
+            $business->established_year = $data['established_year'] ?? null;
+            $business->custom_email_message = $data['custom_email_message'] ?? null;
+            $business->is_active = $data['is_active'] ?? true;
+            $business->save();
+            
+            // Check if Ajax request
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Business created successfully!',
+                    'business_id' => $business->id,
+                    'redirect' => route('business.setting', $business) . '#details'
+                ]);
+            }
+            
+            // Success message for non-Ajax request
+            return redirect()->route('business.setting', $business)->with('success', 'Business created successfully! Please complete the other sections.');
         } 
         // For existing business update
         else {
-            $business->update([
+            $updates = [
                 'name' => $data['name'],
                 'type_id' => $data['type_id'],
-            ]);
+                'established_year' => $data['established_year'] ?? null,
+                'custom_email_message' => $data['custom_email_message'] ?? null,
+                'is_active' => $data['is_active'] ?? true,
+            ];
+            
+            $business->update($updates);
             
             // Handle description translations if present
             if (isset($data['description'])) {
@@ -447,6 +474,25 @@ class BusinessController extends Controller
                     $business->setTranslation('description', $locale, $text);
                 }
                 $business->save();
+            }
+            
+            // Handle file uploads
+            if ($request->hasFile('logo')) {
+                $business->logo = upload('business/logo', 'png', $request->file('logo'));
+                $business->save();
+            }
+            
+            if ($request->hasFile('cover_image')) {
+                $business->cover_image = upload('business/cover_image', 'png', $request->file('cover_image'));
+                $business->save();
+            }
+            
+            // Check if Ajax request
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'General information updated successfully!'
+                ]);
             }
             
             return back()->with('success', 'General information updated successfully!');
@@ -490,6 +536,14 @@ class BusinessController extends Controller
             $this->updateBusinessHours($business, $request->hours);
         }
         
+        // Return JSON response for Ajax requests
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Business details updated successfully!'
+            ]);
+        }
+        
         return back()->with('success', 'Business details updated successfully!');
     }
     
@@ -509,6 +563,13 @@ class BusinessController extends Controller
             }
         }
         
+        // Update basic contact information
+        $business->update([
+            'email' => $data['email'] ?? $business->email,
+            'phone_1' => $data['phone_1'] ?? $business->phone_1,
+            'phone_2' => $data['phone_2'] ?? null,
+        ]);
+        
         // Update or create address
         if ($business->address) {
             $business->address->update($data['address']);
@@ -516,7 +577,15 @@ class BusinessController extends Controller
             $business->address()->create($data['address']);
         }
         
-        return back()->with('success', 'Business address updated successfully!');
+        // Return JSON response for Ajax requests
+        if ($request->ajax() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Address and contact information updated successfully!'
+            ]);
+        }
+        
+        return back()->with('success', 'Address and contact information updated successfully!');
     }
     
     /**
@@ -575,6 +644,93 @@ class BusinessController extends Controller
         }
         
         return back()->with('success', 'Contact information updated successfully!');
+    }
+
+    /**
+     * Save or update business social media information
+     */
+    public function saveSocialMedia(Request $request, Business $business)
+    {
+        $data = $request->validate([
+            'social_networks' => 'nullable|array',
+            'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
+            'social_networks.*.url' => 'nullable|string',
+            'social_networks.*.is_active' => 'boolean',
+        ]);
+        
+        // Process social networks data
+        if (isset($data['social_networks'])) {
+            $socialNetworks = collect($data['social_networks'])
+                ->filter(function ($item) {
+                    return !empty($item['url']) && isset($item['network_id']);
+                })
+                ->mapWithKeys(function ($item) {
+                    return [$item['network_id'] => [
+                        'url' => $item['url'], 
+                        'is_active' => $item['is_active'] ?? true
+                    ]];
+                })
+                ->all();
+                
+            // Sync the social networks
+            $business->socialNetworks()->sync($socialNetworks);
+        } else {
+            // If no social networks provided, detach all
+            $business->socialNetworks()->detach();
+        }
+        
+        // Return JSON response for Ajax requests
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Social media information updated successfully!'
+            ]);
+        }
+        
+        return back()->with('success', 'Social media information updated successfully!');
+    }
+    
+    /**
+     * Save or update business manpower/consultancy information
+     */
+    public function saveManpowerConsultancy(StoreBusinessRequest $request, Business $business)
+    {
+        $data = $request->validated();
+        $business->destinations()->detach();
+        $business->taughtLanguages()->detach();
+
+        // Handle languages
+        if (isset($data['languages'])) {
+            foreach ($data['languages'] as $language) {
+                if (!isset($language['id']) || empty($language['id'])) continue;
+                
+                $business->taughtLanguages()->attach($language['id'], [
+                    'currency' => $language['currency'],
+                    'price' => $language['price'] ?? null,
+                ]);
+            }
+        }
+        
+        // Handle destinations
+        if (isset($data['destinations'])) {
+            foreach ($data['destinations'] as $destination) {
+                if (!isset($destination['country_id']) || empty($destination['country_id'])) continue;
+                
+                $business->destinations()->attach($destination['country_id'], [
+                    'num_people_sent' => $destination['num_people_sent'] ?? null,
+                ]);
+            }
+        }
+        
+        // Return JSON response for Ajax requests
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Manpower/consultancy information updated successfully!'
+            ]);
+        }
+        
+        return back()->with('success', 'Manpower/consultancy information updated successfully!');
     }
 
     /**

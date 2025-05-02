@@ -49,6 +49,12 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::put('{business}/save-general', [BusinessController::class, 'saveGeneral'])->name('saveGeneral.update');
         Route::put('{business}/save-details', [BusinessController::class, 'saveDetails'])->name('saveDetails');
         Route::put('{business}/save-address', [BusinessController::class, 'saveAddress'])->name('saveAddress');
+        Route::put('{business}/save-social-media', [BusinessController::class, 'saveSocialMedia'])->name('saveSocialMedia');
+        Route::put('{business}/save-manpower-consultancy', [BusinessController::class, 'saveManpowerConsultancy'])->name('saveManpowerConsultancy');
+        Route::get('language-row/{index}', [BusinessController::class, 'getLanguageRow'])->name('getLanguageRow');
+        Route::get('destination-row/{index}', [BusinessController::class, 'getDestinationRow'])->name('getDestinationRow');
+        
+        // Deprecated - keeping for backward compatibility
         Route::put('{business}/save-contact', [BusinessController::class, 'saveContact'])->name('saveContact');
     });
 
