@@ -20,13 +20,10 @@
       <a href="{{ route('business.setting', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.setting') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.setting') ? 'page' : '' }}">Setting</a>
     </li>
     <li class="me-2">
-      <a href="{{ route('members.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.members') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('members.index') ? 'page' : '' }}">Members</a>
+      <a href="{{ route('members.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.members') || request()->routeIs('members.index') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('members.index') ? 'page' : '' }}">Members</a>
     </li>
     <li class="me-2">
       <a href="{{ route('business.communications.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.communications*') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.communications*') ? 'page' : '' }}">Communication</a>
-    </li>
-    <li class="me-2">
-      <a href="{{ route('business.communications.segments.index', $business) }}" class="inline-block p-3 {{ request()->routeIs('business.communications.segments*') ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ request()->routeIs('business.communications.segments*') ? 'page' : '' }}">Segments</a>
     </li>
     @if(auth()->user()->hasRole('super-admin'))
     <li class="me-2">

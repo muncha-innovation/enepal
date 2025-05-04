@@ -199,7 +199,7 @@ class Business extends Model
         return $this->hasMany(Conversation::class);
     }
 
-    public function userSegments()
+    public function segments()
     {
         return $this->hasMany(UserSegment::class);
     }

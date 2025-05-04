@@ -257,9 +257,6 @@
               @foreach($segments as $segment)
                 <option value="custom_{{ $segment->id }}" {{ old('segment_id') == 'custom_'.$segment->id ? 'selected' : '' }}>{{ $segment->name }}</option>
               @endforeach
-              @foreach($predefinedSegments as $segment)
-                <option value="{{ $segment['id'] }}" {{ old('segment_id') == $segment['id'] ? 'selected' : '' }}>{{ $segment['name'] }}</option>
-              @endforeach
             </select>
             @error('segment_id')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

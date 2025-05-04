@@ -1,5 +1,6 @@
 {
-    "/js/app.js": "/js/app.js?id=c96cfc73eda136ed0f0159afc52c52d8",
-    "/js/communications.js": "/js/communications.js?id=3303dd3e9ab47be65acdf2415b8a75ea",
-    "/css/app.css": "/css/app.css?id=28c1f0e1c5962da0bdb25400623ff23e"
+    "/js/app.js": "/js/app.js",
+    "/js/communications.js": "/js/communications.js",
+    "/js/segments.js": "/js/segments.js",
+    "/css/app.css": "/css/app.css"
 }

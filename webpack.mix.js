@@ -12,15 +12,17 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .version()
     .js('resources/js/communications.js', 'public/js')
-    
+    .js('resources/js/segments.js', 'public/js')
     .postCss('resources/css/app.css', 'public/css', [
-    require('postcss-import'),
-    require('tailwindcss'),
-    require('autoprefixer'),
-])
-    .version();
+        require('postcss-import'),
+        require('tailwindcss'),
+        require('autoprefixer'),
+    ]);
+
+if (mix.inProduction()) {
+    mix.version();
+}
 
 mix.disableNotifications();
 

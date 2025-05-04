@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\SegmentController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 
@@ -65,6 +66,18 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{user}', [MembersController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{user}', [MembersController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{user}', [MembersController::class, 'destroy'])->name('destroy');
+        
+        // Segment management routes
+        Route::get('{business}/segments', [SegmentController::class, 'index'])->name('segments.index');
+        Route::post('{business}/segments', [SegmentController::class, 'store'])->name('segments.store');
+        Route::put('{business}/segments/{segment}', [SegmentController::class, 'update'])->name('segments.update');
+        Route::delete('{business}/segments/{segment}', [SegmentController::class, 'destroy'])->name('segments.destroy');
+        Route::get('{business}/segments/{segment}/preview', [SegmentController::class, 'preview'])->name('segments.preview');
+        Route::post('{business}/segments/{segment}/users', [SegmentController::class, 'addUsers'])->name('segments.users.add');
+        Route::delete('{business}/segments/{segment}/users', [SegmentController::class, 'removeUsers'])->name('segments.users.remove');
+        
+        // User-segment management route
+        Route::post('{business}/user-segments/{user}', [SegmentController::class, 'updateUserSegments'])->name('user.segments.update');
     });
 
     Route::group(['prefix' => 'posts', 'as' => 'posts.'], function() {
@@ -81,7 +94,6 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
     // Business Communication Routes
     Route::prefix('business/{business}/communications')->group(function () {
         Route::get('/', [CommunicationsController::class, 'getConversations'])->name('business.communications.index');
-        Route::get('/segments', [CommunicationsController::class, 'manageSegments'])->name('business.communications.segments.index');
         Route::post('/chat/create', [CommunicationsController::class, 'createChat'])->name('business.communications.createChat');
         Route::post('/notification/send', [BusinessNotificationController::class, 'sendNotification'])->name('business.communications.sendNotification');
         Route::get('conversation/{conversation}', [CommunicationsController::class, 'getMessages'])->name('business.communications.messages');

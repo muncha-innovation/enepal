@@ -99,14 +99,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 });
 
-// User Segment Management Routes
-// Route::prefix('business/{business}/segments')->group(function () {
-//     Route::get('preview/{segmentId}', [SegmentController::class, 'previewCount']);
-//     Route::post('/', [SegmentController::class, 'store']);
-//     Route::put('{segment}', [SegmentController::class, 'update']);
-//     Route::delete('{segment}', [SegmentController::class, 'destroy']);
-// });
-
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
 

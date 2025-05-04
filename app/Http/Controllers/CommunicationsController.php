@@ -7,7 +7,6 @@ use App\Models\Business;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
-use App\Services\UserSegmentationService;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -25,41 +24,13 @@ class CommunicationsController extends Controller
     {
         $type = $request->get('type', 'chat');
         
-        // Get user segments and predefined segments for both chat and notifications tabs
-        $segments = $business->userSegments()->where('is_active', true)->get();
-        
-        // Get predefined segments
-        $predefinedSegments = [
-            [
-                'id' => 'recently_active',
-                'name' => 'Recently Active Users',
-                'conditions' => [['type' => 'last_active', 'operator' => 'less_than', 'value' => 7]]
-            ],
-            [
-                'id' => 'inactive',
-                'name' => 'Inactive Users (30+ days)',
-                'conditions' => [['type' => 'last_active', 'operator' => 'more_than', 'value' => 30]]
-            ],
-            [
-                'id' => 'engaged',
-                'name' => 'Engaged Users',
-                'conditions' => [['type' => 'notification_opened', 'value' => 7]]
-            ],
-            [
-                'id' => 'students',
-                'name' => 'Students',
-                'conditions' => [['type' => 'user_type', 'value' => 'student']]
-            ],
-            [
-                'id' => 'job_seekers',
-                'name' => 'Job Seekers',
-                'conditions' => [['type' => 'user_type', 'value' => 'job_seeker']]
-            ]
-        ];
-        
         // Get users with pagination and search query support
         $usersPaginated = $this->getPaginatedUsers($request);
         
+        $segments = $business->segments()
+        ->with('users') 
+        ->active()
+        ->get();
         if ($type === 'chat') {
             $conversations = $business->conversations()
                 ->with(['messages' => function($query) {
@@ -77,9 +48,8 @@ class CommunicationsController extends Controller
                 'business', 
                 'conversations', 
                 'unreadChats', 
-                'segments', 
-                'predefinedSegments', 
-                'usersPaginated'
+                'usersPaginated',
+                'segments'
             ));
         } else {
             // Get notifications for the notifications tab
@@ -102,7 +72,7 @@ class CommunicationsController extends Controller
             }
             
             return view('modules.business.communications.index', 
-                compact('business', 'usersPaginated', 'segments', 'predefinedSegments', 'notifications', 'unreadNotifications'));
+                compact('business', 'usersPaginated', 'notifications', 'unreadNotifications','segments'));
         }
     }
 
@@ -188,10 +158,10 @@ class CommunicationsController extends Controller
         return redirect()->back();
     }
 
-    public function sendNotification(Business $business, Request $request, UserSegmentationService $segmentationService)
+    public function sendNotification(Business $business, Request $request)
     {
         // Delegate to BusinessNotificationController
-        return $this->businessNotificationController->sendNotification($business, $request, $segmentationService);
+        return $this->businessNotificationController->sendNotification($business, $request);
     }
 
     public function getMessages(Business $business, Conversation $conversation, Request $request)
@@ -371,26 +341,6 @@ class CommunicationsController extends Controller
         }
 
         return back()->with('success', 'Message sent successfully');
-    }
-
-    public function manageSegments(Business $business)
-    {
-        $segments = $business->userSegments()->latest()->get();
-        
-        // Get some basic user stats for segment creation guidance
-        $userStats = [
-            'total_users' => \App\Models\User::count(),
-            'active_users' => \App\Models\User::where('last_active_at', '>', now()->subDays(7))->count(),
-            'student_users' => \App\Models\User::whereHas('preference', function($q) {
-                $q->where('user_type', 'student');
-            })->count(),
-            'job_seeker_users' => \App\Models\User::whereHas('preference', function($q) {
-                $q->where('user_type', 'job_seeker');
-            })->count()
-        ];
-        
-        return view('modules.business.communications.segments.index', 
-            compact('business', 'segments', 'userStats'));
     }
 
     /**

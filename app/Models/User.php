@@ -203,4 +203,9 @@ class User extends Authenticatable
     {
         return $this->hasRole('super-admin') && $this->hasVerifiedEmail();
     }
+
+    public function segments()
+    {
+        return $this->belongsToMany(UserSegment::class, 'segment_user');
+    }
 }
