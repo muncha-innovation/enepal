@@ -16,7 +16,7 @@
            class="w-1/4 py-4 px-1 text-center border-b-2 {{ request()->get('type', 'chat') === 'chat' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
           <div class="flex items-center justify-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
             Chat
             @if($unreadChats ?? 0 > 0)
@@ -26,6 +26,7 @@
             @endif
           </div>
         </a>
+        
         <a href="{{ route('business.communications.index', ['business' => $business, 'type' => 'notifications']) }}" 
            class="w-1/4 py-4 px-1 text-center border-b-2 {{ request()->get('type') === 'notifications' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} font-medium text-sm">
           <div class="flex items-center justify-center">
@@ -60,8 +61,8 @@
         <div class="w-72">
           @forelse($conversations ?? [] as $conv)
           <a href="#" 
-             data-conversation-id="{{ $conv->id }}" 
-             class="user-conversation-link flex cursor-pointer hover:bg-gray-200 py-3 px-2 border-b {{ request()->segment(4) == 'conversation' && request()->segment(5) == $conv->id ? 'bg-indigo-50' : '' }}">
+             onclick="loadConversation('{{ route('business.communications.messages', ['business' => $business, 'conversation' => $conv->id]) }}')" 
+             class="flex cursor-pointer hover:bg-gray-200 py-3 px-2 border-b {{ request()->segment(4) == 'conversation' && request()->segment(5) == $conv->id ? 'bg-indigo-50' : '' }}">
             <div class="w-8 h-8 bg-gray-300 rounded-full mr-3">
               <img class="w-8 h-8 rounded-full" src="https://placehold.co/600x400?text={{ substr($conv->user->first_name ?? 'U', 0, 1) }}" alt="{{ $conv->user->first_name ?? 'User' }}">
             </div>
@@ -97,8 +98,7 @@
         <div class="flex flex-col p-3 overflow-y-auto fw-scrollbar flex-grow">
           <div class="flex h-full w-full items-center justify-center flex-col">
             <svg class="w-24 h-24 text-gray-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {{-- Use a standard chat bubble path --}}
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1-2 2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <h2 class="text-xl text-gray-500">Select a conversation to view messages</h2>
             <p class="text-gray-400 mt-2">Or start a new conversation</p>
@@ -119,7 +119,7 @@
       </div>
       <ul role="list" class="divide-y divide-gray-200">
         @forelse($notifications ?? [] as $notification)
-          <li class="px-4 py-4 sm:px-6 {{ $notification->isReadBy(auth()->user()) ? 'bg-white' : 'bg-blue-50' }}">
+          <li class="px-4 py-4 sm:px-6 {{ $notification->read_at ? 'bg-white' : 'bg-blue-50' }}">
             <div class="flex items-center justify-between">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center">
@@ -138,7 +138,7 @@
                 </div>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500">
-                    {{ $notification->content }}
+                    {{ $notification->message }}
                   </p>
                 </div>
               </div>
@@ -146,13 +146,11 @@
                 <p class="text-xs text-gray-500">
                   {{ $notification->created_at->diffForHumans() }}
                 </p>
-                @if(auth()->check() && !$notification->isReadBy(auth()->user()))
-                  <button type="button" 
-                          onclick="markAsRead('{{ route('business.communications.markRead', ['business' => $business, 'notification' => $notification->id]) }}', event)"
-                          class="mt-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                @unless($notification->read_at)
+                  <button type="button" class="mt-2 bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
                     Mark as read
                   </button>
-                @endif
+                @endunless
               </div>
             </div>
           </li>
@@ -180,12 +178,16 @@
           @csrf
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Select User</label>
-            <select id="user_select" name="user_id" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <select name="user_id" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              <option value="">Select a user...</option>
+              @foreach($users ?? [] as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+              @endforeach
             </select>
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Message</label>
-            <textarea name="message" required rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+            <textarea name="message" required rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"></textarea>
           </div>
           <div class="flex justify-end gap-3">
             <button type="button" onclick="document.getElementById('newChatModal').classList.add('hidden')" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -205,89 +207,54 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
       <div class="mt-3">
         <h3 class="text-lg leading-6 font-medium text-gray-900">Send Notification</h3>
-        
-        @if ($errors->any())
-        <div class="mt-2 bg-red-50 text-red-800 p-3 rounded-md">
-          <p class="font-medium text-sm">Please fix the following errors:</p>
-          <ul class="mt-1 list-disc list-inside text-sm">
-            @foreach ($errors->all() as $error)
-              <li>{{ $error }}</li>
-            @endforeach
-          </ul>
-        </div>
-        @endif
-        
-        <form action="{{ route('business.communications.sendNotification', $business) }}" method="POST" class="mt-4" enctype="multipart/form-data">
+        <form action="{{ route('business.communications.sendNotification', $business) }}" method="POST" class="mt-4">
           @csrf
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Recipient Type</label>
             <div class="flex items-center space-x-4 mt-2">
               <label class="inline-flex items-center">
-                <input type="radio" name="recipient_type" value="users" {{ old('recipient_type', 'users') == 'users' ? 'checked' : '' }} class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                <input type="radio" name="recipient_type" value="users" checked class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
                 <span class="ml-2 text-sm text-gray-700">Select Users</span>
               </label>
               <label class="inline-flex items-center">
-                <input type="radio" name="recipient_type" value="segment" {{ old('recipient_type') == 'segment' ? 'checked' : '' }} class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                <input type="radio" name="recipient_type" value="segment" class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
                 <span class="ml-2 text-sm text-gray-700">Select Segment</span>
               </label>
             </div>
-            @error('recipient_type')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
           </div>
 
           <!-- Enhanced Select Users Input -->
-          <div id="user-selection" class="mb-4 {{ old('recipient_type') == 'segment' ? 'hidden' : '' }}">
+          <div id="user-selection" class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Select Users</label>
-            <select name="users[]" multiple="multiple" id="select-users" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm {{ $errors->has('users') ? 'border-red-300' : '' }}">
-              <option value="all" {{ (is_array(old('users')) && in_array('all', old('users'))) ? 'selected' : '' }}>All Users</option>
-            </select>
-            @error('users')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
-            @error('users.*')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
-          </div>
-
-          <div id="segment-selection" class="mb-4 {{ old('recipient_type') != 'segment' ? 'hidden' : '' }}">
-            <label for="segment" class="block text-sm font-medium text-gray-700">Select Segment</label>
-            <select name="segment_id" id="segment" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md {{ $errors->has('segment_id') ? 'border-red-300' : '' }}">
-              <option value="">-- Select a Segment --</option>
-              @foreach($segments as $segment)
-                <option value="custom_{{ $segment->id }}" {{ old('segment_id') == 'custom_'.$segment->id ? 'selected' : '' }}>{{ $segment->name }}</option>
+            <select name="users[]" multiple="multiple" id="select-users" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+              <option value="all" selected>All Users</option>
+              @foreach($users ?? [] as $user)
+                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
               @endforeach
             </select>
-            @error('segment_id')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
           </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Title</label>
-            <input type="text" name="title" value="{{ old('title') }}" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md {{ $errors->has('title') ? 'border-red-300' : '' }}">
-            @error('title')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+
+          <div id="segment-selection" class="mb-4 hidden">
+            <label for="segment" class="block text-sm font-medium text-gray-700">Select Segment</label>
+            <select name="segment_id" id="segment" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              <option value="">-- Select a Segment --</option>
+              @foreach($segments as $segment)
+                <option value="custom_{{ $segment->id }}">{{ $segment->name }}</option>
+              @endforeach
+              
+            </select>
           </div>
-          
+
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">{{__('Title')}}</label>
+            <input type="text" name="title" required class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Message</label>
-            <textarea name="message" required rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md {{ $errors->has('message') ? 'border-red-300' : '' }}">{{ old('message') }}</textarea>
-            @error('message')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
+            <textarea name="message" required rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"></textarea>
           </div>
-          
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Image (optional)</label>
-            <input type="file" name="image" accept="image/*" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm {{ $errors->has('image') ? 'border-red-300' : '' }}">
-            <p class="mt-1 text-xs text-gray-500">Only image files (JPG, PNG, GIF, etc.) are allowed.</p>
-            @error('image')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-            @enderror
-          </div>
-          
           <div class="flex justify-end gap-3">
             <button type="button" onclick="document.getElementById('newNotificationModal').classList.add('hidden')" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               Cancel
@@ -304,121 +271,5 @@
 @endsection
 
 @push('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="{{ asset('js/thread-management.js?v=1.0.2') }}"></script>
-<script src="{{ asset('js/communications.js?v=1.0.2') }}"></script>
-<script>
-  $(document).ready(function() {
-    // Initialize Select2 for user selection in New Chat modal
-    $('#user_select').select2({
-      placeholder: 'Search for a user',
-      minimumInputLength: 2,
-      ajax: {
-        url: '{{ route("business.communications.search-users", $business) }}',
-        dataType: 'json',
-        delay: 250,
-        data: function(params) {
-          return {
-            q: params.term,
-            page: params.page
-          };
-        },
-        processResults: function(data, params) {
-          params.page = params.page || 1;
-          return {
-            results: data.results,
-            pagination: {
-              more: false
-            }
-          };
-        },
-        cache: true
-      },
-      escapeMarkup: function(markup) {
-        return markup;
-      },
-      templateResult: formatUser,
-      templateSelection: formatUserSelection
-    });
-
-    // Initialize Select2 for users in notification modal
-    $('#select-users').select2({
-      placeholder: 'Select users or choose "All Users"',
-      minimumInputLength: 0, // Allow showing All Users option without typing
-      ajax: {
-        url: '{{ route("business.communications.search-users", $business) }}',
-        dataType: 'json',
-        delay: 250,
-        data: function(params) {
-          return {
-            q: params.term,
-            page: params.page
-          };
-        },
-        processResults: function(data, params) {
-          params.page = params.page || 1;
-          
-          // If this is the initial load or empty search, prepend "All Users" option
-          if (!params.term) {
-            return {
-              results: [
-                { id: 'all', text: 'All Users (Send to everyone)' },
-                ...data.results
-              ]
-            };
-          }
-          
-          return {
-            results: data.results,
-            pagination: {
-              more: false
-            }
-          };
-        },
-        cache: true
-      }
-    });
-    
-    // Add special handling for "All Users" option
-    $('#select-users').on('select2:selecting', function(e) {
-      if (e.params.args.data.id === 'all') {
-        // If selecting "All Users", clear any other selections
-        $(this).val(null).trigger('change');
-      } else {
-        // If selecting another user, remove "All Users" if it's selected
-        var selectedValues = $(this).val() || [];
-        if (selectedValues.includes('all')) {
-          var filteredValues = selectedValues.filter(val => val !== 'all');
-          $(this).val(filteredValues).trigger('change');
-        }
-      }
-    });
-
-    // Handle recipient type radio button change
-    $('input[name="recipient_type"]').change(function() {
-      if ($(this).val() === 'users') {
-        $('#user-selection').show();
-        $('#segment-selection').hide();
-      } else {
-        $('#user-selection').hide();
-        $('#segment-selection').show();
-      }
-    });
-
-    // Format user display in dropdown
-    function formatUser(user) {
-      if (user.loading) return user.text;
-      var markup = "<div class='select2-result-user clearfix'>";
-      markup += "<div class='select2-result-user__name'>" + user.text + "</div>";
-      markup += "</div>";
-      return markup;
-    }
-
-    // Format selected user display
-    function formatUserSelection(user) {
-      return user.text || user.id;
-    }
-  });
-</script>
+<script src="{{ asset('js/communications.js') }}"></script>
 @endpush
