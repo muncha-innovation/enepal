@@ -18,364 +18,130 @@ use Illuminate\Support\Facades\Cache;
 class BusinessController extends Controller
 {
 
-   public function getBusinesses(Request $request)
-    {
-        $cacheKey = 'businesses:' . md5(json_encode([
-            'per_page' => $request->get('per_page', 10),
-            'type_id' => $request->get('type_id'),
-            'featured' => $request->get('featured'),
-            'query' => $request->get('query'),
-            'filter' => $request->get('filter', 'latest'),
-            'lat' => $request->header('Latitude'),
-            'lng' => $request->header('Longitude'),
-            'user_id' => auth()->id(),
-            'page' => $request->get('page', 1),
-        ]));
+public function getBusinesses(Request $request)
+{
+    $cacheKey = 'businesses:' . md5(json_encode([
+        'per_page' => $request->get('per_page', 10),
+        'type_id' => $request->get('type_id'),
+        'featured' => $request->get('featured'),
+        'query' => $request->get('query'),
+        'filter' => $request->get('filter', 'latest'),
+        'lat' => $request->header('Latitude'),
+        'lng' => $request->header('Longitude'),
+        'user_id' => auth()->id(),
+        'page' => $request->get('page', 1),
+    ]));
 
-        $cacheTTL = 300; // Cache for 5 minutes
+    $cacheTTL = 300; // Cache for 5 minutes
 
-        $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($request) {
-            $query = Business::query()
-                ->select('businesses.*')
-                ->with(['address', 'type']);
-            $perPage = $request->get('per_page', 10);
-            $typeId = $request->get('type_id');
-            $featured = $request->get('featured');
-            $keyword = $request->get('query');
-            $filter = $request->get('filter', 'latest');
+    $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($request) {
+        $query = Business::query()
+            ->select('businesses.*')
+            ->with(['address', 'type']);
 
-            $lat = $request->header('Latitude');
-            $lng = $request->header('Longitude');
+        $perPage = $request->get('per_page', 10);
+        $typeId = $request->get('type_id');
+        $featured = $request->get('featured');
+        $keyword = $request->get('query');
+        $filter = $request->get('filter', 'latest');
 
-            if ($lat && $lng) {
-                $query->leftJoin('addresses', function ($join) {
-                    $join->on('addresses.addressable_id', '=', 'businesses.id')
-                        ->where('addresses.addressable_type', '=', Business::class);
-                })
-                    ->selectRaw(
-                        "ROUND(ST_Distance_Sphere(point(?, ?), addresses.location) / 1000, 2) as distance",
-                        [$lng, $lat]
-                    )
-                    ->whereNotNull('addresses.location');
-            } elseif (auth()->check()) {
+        $lat = $request->header('Latitude');
+        $lng = $request->header('Longitude');
+        $radius = 10; // radius in km, adjust if you want to pass from request
+
+        $primaryAddress = null;
+        if (!$lat || !$lng) {
+            if (auth()->check()) {
                 $primaryAddress = auth()->user()->addresses()
                     ->where('address_type', 'primary')
                     ->first();
 
                 if ($primaryAddress && $primaryAddress->location) {
-                    $userLat = $primaryAddress->location->getLat();
-                    $userLng = $primaryAddress->location->getLng();
-
-                    $query->leftJoin('addresses', function ($join) {
-                        $join->on('addresses.addressable_id', '=', 'businesses.id')
-                            ->where('addresses.addressable_type', '=', Business::class);
-                    })
-                        ->selectRaw(
-                            "ROUND(ST_Distance_Sphere(point(?, ?), addresses.location) / 1000, 2) as distance",
-                            [$userLng, $userLat]
-                        )
-                        ->whereNotNull('addresses.location');
+                    $lat = $primaryAddress->location->getLat();
+                    $lng = $primaryAddress->location->getLng();
                 }
             }
-
-            if ($typeId) {
-                $query->where('type_id', $typeId);
-            }
-
-            if ($featured) {
-                $query->where('is_featured', true);
-            }
-
-            if ($keyword) {
-                $query->where(function ($q) use ($keyword) {
-                    $q->where('name', 'LIKE', "%{$keyword}%")
-                        ->orWhere('description', 'LIKE', "%{$keyword}%")
-                        ->orWhereHas('type', function ($q) use ($keyword) {
-                            $q->where('name', 'LIKE', "%{$keyword}%");
-                        });
-                });
-            }
-
-            switch ($filter) {
-                case 'popular':
-                    $query->withCount('users as followers_count')
-                        ->orderBy('followers_count', 'desc');
-                    break;
-
-                case 'nearyou':
-                    if (isset($lat, $lng) || (auth()->check() && $primaryAddress && $primaryAddress->location)) {
-                        $query->orderBy('distance', 'asc');
-                    } else {
-                        $query->orderBy('businesses.created_at', 'desc');
-                    }
-                    break;
-
-                case 'latest':
-                default:
-                    $query->orderBy('businesses.created_at', 'desc');
-                    break;
-            }
-
-            return $query->paginate($perPage);
-        });
-
-        return response()->json([
-            'data' => BusinessResource::collection($businesses),
-            'meta' => [
-                'current_page' => $businesses->currentPage(),
-                'last_page' => $businesses->lastPage(),
-                'per_page' => $businesses->perPage(),
-                'total' => $businesses->total()
-            ]
-        ]);
-    }
-
-    public function getBusinessType(Request $request)
-    {
-        $request->validate(['id' => 'required|integer']);
-        $cacheKey = 'business_type:' . $request->id;
-        $cacheTTL = 300;
-
-        $type = Cache::remember($cacheKey, $cacheTTL, function () use ($request) {
-            $type = BusinessType::findOrFail($request->id);
-            $type->businesses = $type->businesses()->get();
-            return $type;
-        });
-
-        return response()->json($type);
-    }
-
-
-    public function products(Request $request)
-    {
-        $request->validate([
-            'business_id' => 'required|integer',
-            'limit' => 'sometimes|integer',
-            'page' => 'sometimes|integer'
-        ]);
-
-        $limit = $request->get('limit', 10);
-        $page = $request->get('page', 1);
-        $cacheKey = "business:{$request->business_id}:products:limit:{$limit}:page:{$page}";
-        $cacheTTL = 300;
-
-        $products = Cache::remember($cacheKey, $cacheTTL, function () use ($request, $limit, $page) {
-            $business = Business::findOrFail($request->business_id);
-            $offset = ($page - 1) * $limit;
-            return $business->products()->limit($limit)->offset($offset)->get();
-        });
-
-        return response()->json($products);
-    }
-
-
-    public function galleries(Request $request)
-    {
-        $request->validate([
-            'business_id' => 'required|integer',
-            'limit' => 'sometimes|integer',
-            'page' => 'sometimes|integer'
-        ]);
-
-        $limit = $request->get('limit', 10);
-        $page = $request->get('page', 1);
-        $cacheKey = "business:{$request->business_id}:galleries:limit:{$limit}:page:{$page}";
-        $cacheTTL = 300;
-
-        $galleries = Cache::remember($cacheKey, $cacheTTL, function () use ($request, $limit, $page) {
-            $business = Business::findOrFail($request->business_id);
-            $offset = ($page - 1) * $limit;
-            return $business->galleries()->limit($limit)->offset($offset)->get();
-        });
-
-        return response()->json($galleries);
-    }
-     public function getById($id)
-    {
-        $cacheKey = "business:full:{$id}";
-        $cacheTTL = 300;
-
-        $business = Cache::remember($cacheKey, $cacheTTL, function () use ($id) {
-            return Business::with(['type', 'address', 'posts', 'products', 'galleries'])->findOrFail($id);
-        });
-
-        return new BusinessResource($business);
-    }
-
-    public function followUnfollow($businessId)
-    {
-        $business = Business::findOrFail($businessId);
-        $userId = auth()->id();
-        Cache::forget("user:{$userId}:following_businesses");
-        
-
-        
-        $user = $business->users()->where('user_id', auth()->id())->first();
-        if (!$user) {
-            $business->users()->attach(auth()->id(), [
-                'role' => 'member',
-                'position' => 'follower'
-            ]);
-            return response()->json([
-                'message' => 'Business followed successfully'
-            ]);
-        } else {
-            if ($user->pivot->role == 'member') {
-                $business->users()->detach(auth()->id());
-                return response()->json([
-                    'message' => 'Business unfollowed successfully'
-                ]);
-            } else {
-                return response()->json([
-                    'message' => 'You are not allowed to unfollow this business'
-                ], 403);
-            }
         }
-    }
 
-    
-    public function following()
-    {
-        $userId = auth()->id();
-        $cacheKey = "user:{$userId}:following_businesses";
-        $cacheTTL = 300;
+        if ($lat && $lng) {
+            // Calculate bounding box (approx)
+            $latDiff = $radius / 111; // ~1 deg latitude = 111 km
+            $lngDiff = $radius / (111 * cos(deg2rad($lat)));
 
-        $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($userId) {
-            return Business::whereHas('users', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })->with(['type'])->get();
-        });
+            $minLat = $lat - $latDiff;
+            $maxLat = $lat + $latDiff;
+            $minLng = $lng - $lngDiff;
+            $maxLng = $lng + $lngDiff;
 
-        return BusinessResource::collection($businesses);
-    }
+            $polygonWKT = "POLYGON(($minLng $minLat, $maxLng $minLat, $maxLng $maxLat, $minLng $maxLat, $minLng $minLat))";
 
-    public function getMyBusinesses(Request $request)
-    {
-        $query = Business::query()
-            ->select('businesses.*')
-            ->join('business_user', function ($join) {
-                $join->on('businesses.id', '=', 'business_user.business_id')
-                    ->where('business_user.user_id', '=', auth()->id())
-                    ->where('business_user.role', '=', 'owner');
+            $query->leftJoin('addresses', function ($join) {
+                $join->on('addresses.addressable_id', '=', 'businesses.id')
+                    ->where('addresses.addressable_type', '=', Business::class);
             })
-            ->with(['address', 'type']);
-
-        $perPage = $request->get('per_page', 10);
-        $businesses = $query->paginate($perPage);
-
-        return response()->json([
-            'data' => BusinessResource::collection($businesses),
-            'meta' => [
-                'current_page' => $businesses->currentPage(),
-                'last_page' => $businesses->lastPage(),
-                'per_page' => $businesses->perPage(),
-                'total' => $businesses->total()
-            ]
-        ]);
-    }
-
-    public function addBusiness(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'type_id' => 'required|integer|exists:business_types,id',
-        ]);
-        $business = Business::create([
-            'name' => $request->name,
-            'type_id' => $request->type_id,
-            'created_by' => auth()->id()
-        ]);
-        $business->users()->attach(auth()->id(), ['role' => 'owner']);
-
-        return response()->json([
-            'message' => trans('Business added successfully', [], $request->get('lang', 'en')),
-            'data' => new BusinessResource($business)
-        ]);
-    }
-
-    public function addMember(Request $request)
-    {
-        $request->validate([
-            'business_id' => 'required|integer|exists:businesses,id',
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email',
-            'phone_number' => 'required|string',
-            'role' => 'required|string|in:member,admin',
-        ]);
-
-        $business = Business::findOrFail($request->business_id);
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $existingUser = $business->users()->where('user_id', $user->id)->first();
-            if ($existingUser) {
-                return response()->json([
-                    'message' => 'User is already a member of this business'
-                ], 400);
-            }
-            $business->users()->detach($user->id);
-            $business->users()->attach($user->id, [
-                'role' => $request->role,
-                'has_joined' => true,
-            ]);
-
-            $notify = new NotifyProcess();
-            $notify->setTemplate(SettingKeys::EXISTING_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
-                ->setUser($user)
-                ->withShortCodes([
-                    'role' => $request->role,
-                    'business_name' => $business->name,
-                    'site_name' => config('app.name'),
-                    'business_message' => $business->custom_email_message,
-                    'first_name' => $user->first_name,
-                    'last_name' => $user->last_name,
-                    'email' => $user->email,
-                ]);
-            $notify->send();
-            return response()->json([
-                'message' => 'Member added successfully',
-                'member' => UserResource::make($user),
-            ]);
-        }
-        else {
-            $password = \Str::random(8);
-            $user = User::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone_number,
-                'password' => bcrypt($password),
-                'force_update_password' => true,
-            ]);
-            $user->assignRole(User::User);
-
-            $business->users()->attach($user->id, [
-                'role' => $request->role,
-                'has_joined' => false,
-            ]);
-            try {
-                $notify = new NotifyProcess();
-                $notify->setTemplate(SettingKeys::NEW_MEMBER_OUTSIDE_NEPAL_ADDED_TO_BUSINESS_EMAIL)
-                    ->setUser($user)
-                    ->withShortCodes([
-                        'role' => $request->role,
-                        'business_name' => $business->name,
-                        'site_name' => config('app.name'),
-                        'password' => $password,
-                        'business_message' => $business->custom_email_message,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'email' => $user->email,
-                    ]);
-                $notify->send();
-            } catch (Exception $e) {
-                Log::error($e->getMessage());
-            }
+            ->selectRaw(
+                "ROUND(ST_Distance_Sphere(point(?, ?), addresses.location) / 1000, 2) as distance",
+                [$lng, $lat]
+            )
+            ->whereNotNull('addresses.location')
+            ->whereRaw("MBRContains(ST_GeomFromText(?), addresses.location)", [$polygonWKT]);
+        } else {
+            // If no lat/lng, just join addresses normally without distance
+            $query->leftJoin('addresses', function ($join) {
+                $join->on('addresses.addressable_id', '=', 'businesses.id')
+                    ->where('addresses.addressable_type', '=', Business::class);
+            });
         }
 
-        return response()->json([
-            'message' => 'Member added successfully',
-            'member' => UserResource::make($user),
-        ]);
-    }
+        if ($typeId) {
+            $query->where('type_id', $typeId);
+        }
+
+        if ($featured) {
+            $query->where('is_featured', true);
+        }
+
+        if ($keyword) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%")
+                    ->orWhereHas('type', function ($q) use ($keyword) {
+                        $q->where('name', 'LIKE', "%{$keyword}%");
+                    });
+            });
+        }
+
+        switch ($filter) {
+            case 'popular':
+                $query->withCount('users as followers_count')
+                    ->orderBy('followers_count', 'desc');
+                break;
+
+            case 'nearyou':
+                if (isset($lat, $lng)) {
+                    $query->orderBy('distance', 'asc');
+                } else {
+                    $query->orderBy('businesses.created_at', 'desc');
+                }
+                break;
+
+            case 'latest':
+            default:
+                $query->orderBy('businesses.created_at', 'desc');
+                break;
+        }
+
+        return $query->paginate($perPage);
+    });
+
+    return response()->json([
+        'data' => BusinessResource::collection($businesses),
+        'meta' => [
+            'current_page' => $businesses->currentPage(),
+            'last_page' => $businesses->lastPage(),
+            'per_page' => $businesses->perPage(),
+            'total' => $businesses->total()
+        ]
+    ]);
+}
 }
