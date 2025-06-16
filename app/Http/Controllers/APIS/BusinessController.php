@@ -37,6 +37,7 @@ public function getBusinesses(Request $request)
 
     $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($request) {
         $query = Business::query()
+        ->verified()
             ->select('businesses.*')
             ->with(['address', 'type']);
 
@@ -197,7 +198,7 @@ public function getBusinesses(Request $request)
     $cacheTTL = 300; // 5 minutes
 
     $business = Cache::remember($cacheKey, $cacheTTL, function () use ($id) {
-        return Business::with(['type', 'address', 'posts', 'products', 'galleries'])->findOrFail($id);
+        return Business::verified()->with(['type', 'address', 'posts', 'products', 'galleries'])->findOrFail($id);
     });
 
     return new BusinessResource($business);
@@ -231,7 +232,7 @@ public function getBusinesses(Request $request)
 
     public function following()
     {
-        $businesses = Business::whereHas('users', function ($query) {
+        $businesses = Business::verified()->whereHas('users', function ($query) {
             $query->where('user_id', auth()->id());
         })->with(['type'])->get();
 
