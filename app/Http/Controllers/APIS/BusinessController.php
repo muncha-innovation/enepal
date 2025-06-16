@@ -48,7 +48,7 @@ public function getBusinesses(Request $request)
 
         $lat = $request->header('Latitude');
         $lng = $request->header('Longitude');
-        $radius = 200;
+        $radius = 1000;
 
         $primaryAddress = null;
         if (!$lat || !$lng) {
