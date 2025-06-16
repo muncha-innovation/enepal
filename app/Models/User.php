@@ -76,6 +76,13 @@ class User extends Authenticatable
     {
         return $this->profile_picture ? Storage::url($this->profile_picture) : '';
     }
+    public function scopeInactive($query) {
+        return $query->where('is_active', false);
+
+    }
+    public function scopeActive($query) {
+        return $query->where('is_active', true);
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

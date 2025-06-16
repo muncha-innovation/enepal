@@ -10,10 +10,7 @@
                     <a href="#" class="inline-block p-3 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active"
                         aria-current="page">{{ __('Active') }}</a>
                 </li>
-                <li class="me-2">
-                    <a href="#"
-                        class="inline-block p-3 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">{{ __('Inactive') }}</a>
-                </li>
+             
             </ul>
         </div>
 

@@ -16,7 +16,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+
 use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
@@ -28,8 +29,15 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with(['addresses.country','workExperience','education'])->paginate(10);
-        return view('admin.users.index', compact(['users']));
+        $tab = $request->get('tab', 'active');
+        if($tab=='inactive') {
+            $users = 
+        $users = User::inactive()->with(['addresses.country','workExperience','education'])->paginate(10);
+        } else {
+
+    $users = User::active()->with(['addresses.country','workExperience','education'])->paginate(10);
+        }
+        return view('admin.users.index', compact(['users', 'tab']));
     }
 
     /**
