@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
+use Illuminate\Support\Facades\Cache;
 
 class BusinessController extends Controller
 {
@@ -178,7 +179,10 @@ class BusinessController extends Controller
      */
     public function update(StoreBusinessRequest $request, Business $business)
     {
+        
         $data = $request->validated();
+        $this->removeCache($business->id);
+
         if (isset($data['address']['location'])) {
             // Convert POINT string to Point object
             preg_match('/POINT\((.*?)\)/', $data['address']['location'], $matches);
@@ -317,6 +321,8 @@ class BusinessController extends Controller
     {
         abort_unless(auth()->user()->hasRole('super-admin'), 403);
         $business->update(['is_verified' => !$business->is_verified]);
+        $this->removeCache($business->id);
+
         if ($business->is_verified) {
             $notify = new NotifyProcess();
             $notify->setTemplate(SettingKeys::BUSINESS_VERIFICATION_EMAIL)
@@ -333,6 +339,8 @@ class BusinessController extends Controller
     public function featured(Request $request, Business $business)
     {
         $business->update(['is_featured' => !$business->is_featured]);
+        $this->removeCache($business->id);
+
         return back()->with('success', 'Business Featured Successfully');
     }
     public function uploadImage(Request $request)
@@ -341,6 +349,7 @@ class BusinessController extends Controller
             'upload' => 'required|image',
         ]);
         $path = upload('content/', 'png', $request->file('upload'));
+        $this->removeCache($business->id);
 
         return response()->json(['url' => getImage($path, 'content/')]);
     }
@@ -365,6 +374,7 @@ class BusinessController extends Controller
     private function updateBusinessHours($business, $hoursData)
     {
         if (!$hoursData) return;
+        $this->removeCache($business->id);
 
         // First, mark all existing hours as closed
         $business->hours()->update(['is_open' => false]);
@@ -506,6 +516,7 @@ class BusinessController extends Controller
     {
         $data = $request->validated();
         $updates = [];
+        $this->removeCache($business->id);
         
         // Handle logo upload
         if ($request->hasFile('logo')) {
@@ -553,6 +564,7 @@ class BusinessController extends Controller
     public function saveAddress(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
+        $this->removeCache($business->id);
         
         // Process location data
         if (isset($data['address']['location'])) {
@@ -594,6 +606,8 @@ class BusinessController extends Controller
     public function saveContact(StoreBusinessRequest $request, Business $business)
     {
         $data = $request->validated();
+        $this->removeCache($business->id);
+
         // Update basic contact information
         $business->update([
             'email' => $data['email'],
@@ -657,6 +671,7 @@ class BusinessController extends Controller
             'social_networks.*.url' => 'nullable|string',
             'social_networks.*.is_active' => 'boolean',
         ]);
+        $this->removeCache($business->id);
         
         // Process social networks data
         if (isset($data['social_networks'])) {
@@ -699,7 +714,6 @@ class BusinessController extends Controller
         $business->destinations()->detach();
         $business->taughtLanguages()->detach();
 
-        // Handle languages
         if (isset($data['languages'])) {
             foreach ($data['languages'] as $language) {
                 if (!isset($language['id']) || empty($language['id'])) continue;
@@ -721,7 +735,7 @@ class BusinessController extends Controller
                 ]);
             }
         }
-        
+        $this->removeCache($business->id);
         // Return JSON response for Ajax requests
         if ($request->ajax()) {
             return response()->json([
@@ -750,5 +764,10 @@ class BusinessController extends Controller
             ->first();
         
         return view('modules.business.owner-profile', compact('business', 'owner'));
+    }
+
+    private function removeCache($id) {
+        $cacheKey = "business:full:{$id}";
+        Cache::forget($cacheKey);
     }
 }
