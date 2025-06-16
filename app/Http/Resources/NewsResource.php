@@ -17,27 +17,27 @@ class NewsResource extends JsonResource
             'published_at' => $this->published_at,
             'is_active' => $this->is_active,
             'source' => [
-                'id' => $this->sourceable->id,
-                'name' => $this->sourceable->name,
+                'id' => $this->sourceable?->id,
+                'name' => $this->sourceable?->name,
                 'logo' => $this->sourceable?->logo,
             ],
             'categories' => $this->categories->map(function($category) {
                 return [
-                    'id' => $category->id,
+                    'id' => $category?->id,
                     'name' => $category->name,
                     'type' => $category->type,
                 ];
             }),
             'tags' => $this->tags->map(function($tag) {
                 return [
-                    'id' => $tag->id,
+                    'id' => $tag?->id,
                     'name' => $tag->name,
                 ];
             }),
             'locations' => $this->locations->map(function($location) {
                 return [
-                    'id' => $location->id,
-                    'name' => $location->name,
+                    'id' => $location?->id,
+                    'name' => $location?->name,
                     'coordinates' => [
                         'lat' => $location->location ? $location->location->getLat() : null,
                         'lng' => $location->location ? $location->location->getLng() : null,
