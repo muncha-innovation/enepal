@@ -28,7 +28,7 @@ class PostsController extends Controller
     $cacheTags = ['posts_index'];
 
     $posts = Cache::tags($cacheTags)->remember($cacheKey, now()->addDays(2), function () use ($request, $limit) {
-        $query = Post::with(['user:id,name,email', 'business:id,type_id,name', 'likes:id,post_id,user_id']);
+        $query = Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name', 'likes:id,post_id,user_id']);
 
         // Search filter
         if ($request->filled('query')) {
