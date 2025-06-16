@@ -9,92 +9,83 @@ use App\Models\Business;
 use App\Models\Post;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class PostsController extends Controller
 {
     public function index(Request $request)
-    {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 10);
-        $queryParams = $request->all();
+{
+    $page = $request->get('page', 1);
+    $limit = $request->get('limit', 10);
+    $queryParams = $request->all();
 
-        // Create a cache key based on all request parameters and pagination
-        $cacheKey = 'posts_index_' . md5(json_encode($queryParams) . "_page{$page}_limit{$limit}");
+    // Cache key includes all params and pagination info
+    $cacheKey = 'posts_index_' . md5(json_encode($queryParams) . "_page{$page}_limit{$limit}");
 
-        $posts = Cache::remember($cacheKey, 60 * 60 * 24 * 2, function () use ($request, $limit) {
-            $query = Post::with(['user', 'business', 'likes']);
+    // Recommended cache tagging if possible (e.g., Redis)
+    $cacheTags = ['posts_index'];
 
-            if ($request->has('query')) {
-                $searchTerm = $request->query('query');
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('title', 'LIKE', "%{$searchTerm}%")
-                        ->orWhere('short_description', 'LIKE', "%{$searchTerm}%");
-                });
-            }
+    $posts = Cache::tags($cacheTags)->remember($cacheKey, now()->addDays(2), function () use ($request, $limit) {
+        $query = Post::with(['user:id,name,email', 'business:id,type_id,name', 'likes:id,post_id,user_id']);
 
-            $filter = $request->get('filter', 'latest');
-
-            switch ($filter) {
-                case 'foryou':
-                    if (auth()->check() && auth()->user()->primaryAddress?->location) {
-                        $userLocation = auth()->user()->primaryAddress->location;
-                        $query->select('posts.*')
-                            ->join('businesses', 'posts.business_id', '=', 'businesses.id')
-                            ->join('addresses', function ($join) {
-                                $join->on('businesses.id', '=', 'addresses.addressable_id')
-                                    ->where('addresses.addressable_type', Business::class);
-                            })
-                            ->whereNotNull('addresses.location')
-                            ->orderByDistance('addresses.location', $userLocation);
-                    }
-                    break;
-
-                case 'popular':
-                    $query->withCount('likes')
-                        ->orderBy('likes_count', 'desc');
-                    break;
-
-                case 'trending':
-                    $query->withCount(['likes' => function ($q) {
-                        $q->where('created_at', '>=', now()->subDays(7));
-                    }])
-                    ->orderBy('likes_count', 'desc');
-                    break;
-
-                default:
-                    $query->latest();
-                    break;
-            }
-
-            if ($request->has('businessTypeId')) {
-                $query->select('posts.*')
-                    ->join('businesses', 'posts.business_id', '=', 'businesses.id')
-                    ->where('businesses.type_id', $request->businessTypeId);
-            }
-
-            $query->when($request->has('businessId'), function ($query) use ($request) {
-                return $query->where('posts.business_id', $request->businessId);
-            })
-            ->when($request->has('userId'), function ($query) use ($request) {
-                return $query->where('posts.user_id', $request->userId);
+        // Search filter
+        if ($request->filled('query')) {
+            $searchTerm = $request->query('query');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('short_description', 'LIKE', "%{$searchTerm}%");
             });
+        }
 
-            return $query->paginate($limit);
-        });
+        // Filter types
+        $filter = $request->get('filter', 'latest');
 
-        return response()->json([
-            'data' => PostResource::collection($posts),
-            'meta' => [
-                'current_page' => $posts->currentPage(),
-                'last_page' => $posts->lastPage(),
-                'per_page' => $posts->perPage(),
-                'total' => $posts->total(),
-            ],
-        ]);
-    }
+        if ($filter === 'foryou' && auth()->check() && auth()->user()->primaryAddress?->location) {
+            $userLocation = auth()->user()->primaryAddress->location;
+            $query->select('posts.*')
+                  ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+                  ->join('addresses', function ($join) {
+                      $join->on('businesses.id', '=', 'addresses.addressable_id')
+                          ->where('addresses.addressable_type', Business::class);
+                  })
+                  ->whereNotNull('addresses.location')
+                  ->orderByDistance('addresses.location', $userLocation);
+        } elseif ($filter === 'popular') {
+            $query->withCount('likes')->orderBy('likes_count', 'desc');
+        } elseif ($filter === 'trending') {
+            $query->withCount(['likes' => function ($q) {
+                $q->where('created_at', '>=', Carbon::now()->subDays(7));
+            }])->orderBy('likes_count', 'desc');
+        } else {
+            $query->latest();
+        }
 
+        // businessTypeId filter with join only if needed and not already joined in 'foryou'
+        if ($request->filled('businessTypeId') && $filter !== 'foryou') {
+            $query->select('posts.*')
+                ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+                ->where('businesses.type_id', $request->businessTypeId);
+        }
+
+        // Additional filters
+        $query->when($request->filled('businessId'), fn($q) => $q->where('posts.business_id', $request->businessId));
+        $query->when($request->filled('userId'), fn($q) => $q->where('posts.user_id', $request->userId));
+
+        return $query->paginate($limit);
+    });
+
+    return response()->json([
+        'data' => PostResource::collection($posts),
+        'meta' => [
+            'current_page' => $posts->currentPage(),
+            'last_page' => $posts->lastPage(),
+            'per_page' => $posts->perPage(),
+            'total' => $posts->total(),
+        ],
+    ]);
+}
     public function addComment(Request $request)
     {
         $request->validate([
@@ -115,34 +106,37 @@ class PostsController extends Controller
         return CommentResource::make($comment);
     }
 
-    public function getById(Request $request, $id)
-    {
-        $cacheKey = "post_{$id}_details";
+   public function getById(Request $request, $id)
+{
+    $postCacheKey = "post_{$id}_details";
+    $similarPostsCacheKey = "post_{$id}_similar_posts";
 
-        $data = Cache::remember($cacheKey, 60 * 60 * 24 * 2, function () use ($id) {
-            $post = Post::with(['user', 'user.addresses', 'business', 'business.address'])
-                ->findOrFail($id);
+    // Use tags for better cache management (requires Redis or compatible driver)
+    $post = Cache::tags(['post_'.$id])->remember($postCacheKey, now()->addDays(2), function () use ($id) {
+        return Post::with(['user:id,name,email', 'user.addresses:id,user_id,address_line', 'business:id,type_id,name', 'business.address:id,business_id,address_line'])
+            ->findOrFail($id);
+    });
 
-            $similarPosts = Post::with(['user', 'business'])
-                ->where('id', '!=', $post->id)
-                ->where(function ($query) use ($post) {
-                    $query->whereHas('business', function ($q) use ($post) {
-                        $q->where('type_id', $post->business->type_id);
-                    })
-                    ->orWhere('business_id', $post->business_id);
-                })
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get();
+    $similarPosts = Cache::tags(['post_'.$id])->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
+        return Post::with(['user:id,name,email', 'business:id,type_id,name'])
+            ->where('id', '!=', $post->id)
+            ->where(function ($query) use ($post) {
+                $query->whereHas('business', function ($q) use ($post) {
+                    $q->where('type_id', $post->business->type_id);
+                })->orWhere('business_id', $post->business_id);
+            })
+            ->latest('created_at')
+            ->limit(5)
+            ->get();
+    });
 
-            return [
-                'post' => new PostResource($post),
-                'similar_posts' => PostResource::collection($similarPosts),
-            ];
-        });
-
-        return response()->json(['data' => $data]);
-    }
+    return response()->json([
+        'data' => [
+            'post' => new PostResource($post),
+            'similar_posts' => PostResource::collection($similarPosts),
+        ]
+    ]);
+}
 
     public function likeUnlike($id)
     {
