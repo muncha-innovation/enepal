@@ -769,5 +769,6 @@ class BusinessController extends Controller
     private function removeCache($id) {
         $cacheKey = "business:full:{$id}";
         Cache::forget($cacheKey);
+        Cache::tags(['businesses'])->flush();
     }
 }

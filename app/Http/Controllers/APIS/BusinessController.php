@@ -31,12 +31,11 @@ class BusinessController extends Controller
             'lng' => $request->header('Longitude'),
             'user_id' => auth()->id(),
             'page' => $request->get('page', 1),
-            'dd-' => time()
         ]));
 
         $cacheTTL = 300; // Cache for 5 minutes
 
-        $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($request) {
+        $businesses = Cache::tags(['businesses'])->remember($cacheKey, $cacheTTL, function () use ($request) {
             $query = Business::query()
                 ->verified()
                 ->select('businesses.*')
