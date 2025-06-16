@@ -39,7 +39,7 @@ class BusinessController extends Controller
             $query = Business::query()
                 ->verified()
                 ->select('businesses.*')
-                ->with(['address', 'type']);
+                ->with(['address', 'type', 'socialNetworks']);
 
             $perPage = $request->get('per_page', 10);
             $typeId = $request->get('type_id');
