@@ -15,42 +15,40 @@ use Illuminate\Http\JsonResponse;
 
 class AddressPreferencesController extends Controller
 {
-    public function fetch(Request $request): array {
+    public function fetch(Request $request): array
+    {
         $data = [];
         $data['countries'] = Country::with(relations: ['states'])->get();
-        
+
         $data['addresses'] = AddressResource::collection(resource: auth()->user()->addresses()->get());
-        
+
 
         // todo: refactor
         $data['businesses'] = BusinessResource::collection(resource: Business::following()->with(relations: ['type'])->get());
         $data['categories'] = CategoryResource::collection(resource: NewsCategory::all());
         return $data;
-        
     }
-    public function updateAddress(Request $request): JsonResponse {
-    {
-        $request->validate(rules: [
-            'addresses' => 'required',
-        ]);
-        $addresses = $request->addresses;
-        $user = auth()->user();
-        foreach ($addresses as $type => $addressData) {
-            // todo: refactor
-            // make sure array key exists and set default otherwise
-            $user->addresses()->updateOrCreate(
-                attributes: ['address_type' => $type],
-                values: [
-                    'country_id' => $addressData['country'],
-                    'state_id' => $addressData['state'] ?? null,
-                    'city' => $addressData['city']?? '',
-                ]
-            );
+    public function updateAddress(Request $request): JsonResponse
+    { {
+            $request->validate(rules: [
+                'addresses' => 'required',
+            ]);
+            $addresses = $request->addresses;
+            $user = auth()->user();
+            foreach ($addresses as $type => $addressData) {
+                // todo: refactor
+                // make sure array key exists and set default otherwise
+                $user->addresses()->updateOrCreate(
+                    attributes: ['address_type' => $type],
+                    values: [
+                        'country_id' => $addressData['country'],
+                        'state_id' => $addressData['state'] ?? null,
+                        'city' => $addressData['city'] ?? '',
+                    ]
+                );
+            }
+
+            return response()->json(data: ['message' => 'Addresses updated successfully']);
         }
-
-        return response()->json(data: ['message' => 'Addresses updated successfully']);
-    
     }
-}
-
 }
