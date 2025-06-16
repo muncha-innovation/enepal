@@ -77,7 +77,7 @@ class BusinessController extends Controller
                 'businesses.created_at',
             ])
             ->with([
-                'address:id,addressable_id,addressable_type,address_line1,address_line2,city,state_id,country_id',
+                'address:id,addressable_id,addressable_type,address_line_1,address_line_2,city,state_id,country_id',
                 'type:id,name',
             ])
             ->leftJoin('addresses', function ($join) {
