@@ -30,6 +30,7 @@ public function getBusinesses(Request $request)
         'lng' => $request->header('Longitude'),
         'user_id' => auth()->id(),
         'page' => $request->get('page', 1),
+        'dd-' => time()
     ]));
 
     $cacheTTL = 300; // Cache for 5 minutes
