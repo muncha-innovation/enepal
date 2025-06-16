@@ -27,6 +27,11 @@ class RegistrationController extends Controller
             $user->addresses()->save($address);
             $user->load('addresses.country');
         }
-        return UserResource::make($user)->response()->setStatusCode(200);
+        $token = $user->createToken('enepal')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => new UserResource($user)
+        ], 200);
     }
 }

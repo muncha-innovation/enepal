@@ -18,7 +18,6 @@ class UserResource extends JsonResource
         $lang = $lang ?? 'en';
         return [
             'id' => $this->id,
-            'token' => $this->createToken('enepal')->plainTextToken,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,
