@@ -78,7 +78,7 @@ class BusinessController extends Controller
             ])
             ->with([
                 'address:id,addressable_id,addressable_type,address_line_1,address_line_2,city,state_id,country_id',
-                'type:id,name',
+                'type:id,title',
             ])
             ->leftJoin('addresses', function ($join) {
                 $join->on('addresses.addressable_id', '=', 'businesses.id')
