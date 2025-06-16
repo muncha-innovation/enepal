@@ -212,7 +212,11 @@ Route::prefix('news')->name('news.')->group(function () {
     Route::get('/category/{category}', [NewsController::class, 'publicCategory'])->name('public.category');
 });
 
-
+Route::get('/telescope-status', fn() => [
+    'enabled' => config('telescope.enabled'),
+    'app_env' => app()->environment(),
+    'telescope_service_provider_registered' => class_exists(\Laravel\Telescope\TelescopeServiceProvider::class),
+]);
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
