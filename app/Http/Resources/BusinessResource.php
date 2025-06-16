@@ -15,7 +15,7 @@ class BusinessResource extends JsonResource
     public function toArray($request)
     {
         $lang = $request->query('lang') ?? 'en';
-        
+
         // Get social networks from the relationship
         $socialLinks = [
             'facebook' => ['url' => null, 'icon' => null],
@@ -60,28 +60,28 @@ class BusinessResource extends JsonResource
             'email' => $this->email,
             'website' => $this->website,
             'has_followed' => $this->has_followed,
-            'is_admin' => $this->hasAdmin($user) || $this->hasOwner($user),
-            
+            'is_admin' => $user != null ? ($this->hasAdmin($user) || $this->hasOwner($user)) : false,
+
             // Only include facilities with value = true
             'facilities' => $this->facilities
-                ->filter(function($facility) {
+                ->filter(function ($facility) {
                     return filter_var($facility->pivot->value, FILTER_VALIDATE_BOOLEAN);
                 })
-                ->map(function($facility) {
+                ->map(function ($facility) {
                     return [
                         'id' => $facility->id,
                         'title' => $facility->name,
                         'icon' => getImage($facility->icon)
                     ];
                 }),
-            
+
             // Social media links from dedicated relationship
             'social_links' => $socialLinks,
-            
+
             // Hours formatting
             'formatted_hours' => $this->formatted_hours,
-            'hours' => $this->whenLoaded('hours', function() {
-                return $this->hours->map(function($hour) {
+            'hours' => $this->whenLoaded('hours', function () {
+                return $this->hours->map(function ($hour) {
                     return [
                         'day' => $hour->day,
                         'is_open' => $hour->is_open,
@@ -90,17 +90,17 @@ class BusinessResource extends JsonResource
                     ];
                 });
             }),
-            
+
             // Relationships and other fields
             'address' => new AddressResource($this->whenLoaded('address')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'type' => BusinessTypesResource::make($this->whenLoaded('type')),
             'galleries' => GalleryResource::collection($this->whenLoaded('galleries')),
-            'distance' => $this->when(isset($this->distance), function() use ($distance) {
+            'distance' => $this->when(isset($this->distance), function () use ($distance) {
                 return $distance;
             }),
-            'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel, $lang) {
-                return trans($unitLabel,[],$lang);
+            'distance_unit' => $this->when(isset($this->distance), function () use ($unitLabel, $lang) {
+                return trans($unitLabel, [], $lang);
             }),
             'posts' => PostResource::collection(($this->whenLoaded('posts')))
         ];
