@@ -102,6 +102,7 @@ class BusinessResource extends JsonResource
             'distance_unit' => $this->when(isset($this->distance), function() use ($unitLabel, $lang) {
                 return trans($unitLabel,[],$lang);
             }),
+            'posts' => PostResource::collection(($this->whenLoaded('posts')))
         ];
     }
 }
