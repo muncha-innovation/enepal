@@ -10,6 +10,7 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
@@ -31,16 +32,19 @@ class UsersController extends Controller
 
     //     $user = auth()->user();
     //     $user->toggleNewsPreference($category->id);
-//     return response()->json([
+    //     return response()->json([
     //         'success' => true
     //     ]);
     // }
 
     public function user()
     {
-        $countries = Country::with(['states'])->get();
+        $countries = Cache::rememberForever('countries_with_states', function () {
+            return Country::with('states')->get();
+        });
 
-        $user = User::with(['addresses'])->find(auth()->id());
+        $user = User::with('addresses')->find(auth()->id());
+
         return response()->json([
             'countries' => CountryResource::collection($countries),
             'user' => UserResource::make($user)
@@ -73,11 +77,11 @@ class UsersController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
-        
+
         // Update addresses
         foreach ($request->addresses as $addressInput) {
             $addressType = $addressInput['address_type'];
-            
+
             $addressData = [
                 'country_id' => $addressInput['country_id'],
                 'state_id' => $addressInput['state_id'],
@@ -85,7 +89,7 @@ class UsersController extends Controller
                 'address_line_1' => $addressInput['address_line_1'] ?? null,
                 'address_line_2' => $addressInput['address_line_2'] ?? null,
             ];
-            
+
             // Add location point if latitude and longitude are provided
             if (!empty($addressInput['latitude']) && !empty($addressInput['longitude'])) {
                 $addressData['location'] = new \Grimzy\LaravelMysqlSpatial\Types\Point(
@@ -93,7 +97,7 @@ class UsersController extends Controller
                     $addressInput['longitude']
                 );
             }
-            
+
             // Use updateOrCreate for each address type
             $user->addresses()->updateOrCreate(
                 ['address_type' => $addressType],
@@ -105,7 +109,8 @@ class UsersController extends Controller
         return UserResource::make($user->fresh('addresses'));
     }
 
-    public function updatePassword(Request $request) {
+    public function updatePassword(Request $request)
+    {
         $request->validate([
             'current_password' => 'required',
             'password' => 'required|confirmed|min:6',
@@ -135,18 +140,19 @@ class UsersController extends Controller
         ]);
     }
 
-    public function updateImage(Request $request) {
+    public function updateImage(Request $request)
+    {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user = auth()->user();
         $path = upload('profile/', 'png', $request->file('image'));
-        
+
         $user->update([
             'profile_picture' => $path
         ]);
-        
+
         $user->load('addresses');
 
         return UserResource::make($user);

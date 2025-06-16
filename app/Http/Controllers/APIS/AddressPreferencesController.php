@@ -12,13 +12,16 @@ use App\Models\Country;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class AddressPreferencesController extends Controller
 {
     public function fetch(Request $request): array
     {
         $data = [];
-        $data['countries'] = Country::with(relations: ['states'])->get();
+        $data['countries'] = Cache::rememberForever('countries_with_states', function () {
+            return Country::with('states')->get();
+        });
 
         $data['addresses'] = AddressResource::collection(resource: auth()->user()->addresses()->get());
 
