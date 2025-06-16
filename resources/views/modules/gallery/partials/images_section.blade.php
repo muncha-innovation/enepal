@@ -12,7 +12,7 @@
                 </div>
                 <input type="text" name="existing_images_titles[{{ $image->id }}]"
                     class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center"
-                    placeholder={{ __('Image title') }} value="{{ $image->title }}">
+                    placeholder={{ __('Image caption') }} value="{{ $image->title }}">
                 {{-- <input type="hidden" name="existing_images_paths[{{ $image->id }}]" value="{{ $image->image }}"> --}}
                 <div class="mt-4 flex flex-col gap-3">
 

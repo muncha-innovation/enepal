@@ -25,7 +25,7 @@
           <img src="${extension=='pdf'?@json(asset('pfd_icon.png')):event.target.result}" alt="" class="w-full h-full rounded-lg object-cover">
         </div>
 
-        <input type="text" name="images_title[${counter}]" class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center" placeholder=@json(trans('Image title'))>
+        <input type="text" name="images_title[${counter}]" class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center" placeholder=@json(trans('Image caption'))>
         
         <button type="button" class="delete-image w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
           ${removeText}
