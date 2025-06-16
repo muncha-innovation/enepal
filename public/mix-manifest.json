@@ -1,6 +1,6 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/js/communications.js": "/js/communications.js",
-    "/js/segments.js": "/js/segments.js",
-    "/css/app.css": "/css/app.css"
+    "/js/app.js": "/js/app.js?id=f9d5276dde859ebb4817a843a02d2919",
+    "/js/communications.js": "/js/communications.js?id=b6f81a19f340ce9b3386a86f517e0c3b",
+    "/js/segments.js": "/js/segments.js?id=82d3e687f533e908a9903bebe93dac36",
+    "/css/app.css": "/css/app.css?id=d89829196ee2c0887b8cd1729b2798c4"
 }

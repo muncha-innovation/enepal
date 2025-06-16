@@ -70,7 +70,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         // Segment management routes
         Route::get('{business}/segments', [SegmentController::class, 'index'])->name('segments.index');
         Route::post('{business}/segments', [SegmentController::class, 'store'])->name('segments.store');
-        Route::put('{business}/segments/{segment}', [SegmentController::class, 'update'])->name('segments.update');
+    Route::put('{business}/segments/{segment}', [SegmentController::class, 'update'])->name('segments.update');
         Route::delete('{business}/segments/{segment}', [SegmentController::class, 'destroy'])->name('segments.destroy');
         Route::get('{business}/segments/{segment}/preview', [SegmentController::class, 'preview'])->name('segments.preview');
         Route::post('{business}/segments/{segment}/users', [SegmentController::class, 'addUsers'])->name('segments.users.add');
@@ -102,8 +102,8 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('/conversation/{conversation}/thread/{thread}', [CommunicationsController::class, 'deleteThread'])->name('business.communications.deleteThread');
         Route::post('/notifications/{notification}/read', [BusinessNotificationController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
         Route::post('/notifications/read-all', [BusinessNotificationController::class, 'markAllNotificationsAsRead'])->name('business.communications.markAllRead');
-        Route::get('/search-users', [CommunicationsController::class, 'searchUsers'])->name('business.communications.search-users');
     });
+    Route::get('/search-users', [CommunicationsController::class, 'searchUsers'])->name('search-users');
     
     Route::post('{business}/restore', [BusinessController::class, 'restore'])->name('business.restore');
     Route::post('business/{business}/featured', [BusinessController::class, 'featured'])->name('business.featured');

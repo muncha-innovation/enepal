@@ -27,7 +27,7 @@ Route::post('/register', RegistrationController::class);
 Route::post('/password/reset', ResetPasswordController::class);
 Route::get('/countries/{country}/states', [CountryController::class, 'states']);
 Route::get('business/types', [BusinessTypesController::class, 'index']);
-
+// Route::get('feed', )
 Route::get('post/{id}/comments', [PostsController::class, 'getComments']);
 Route::get('posts/nearby', [PostsController::class, 'nearby']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -142,3 +142,4 @@ Route::prefix('search')->group(function () {
     Route::get('/news', [SearchController::class, 'searchNews']); 
     Route::get('/businesses', [SearchController::class, 'searchBusinesses']);
 });
+

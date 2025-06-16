@@ -11,7 +11,7 @@ function getActiveTab() {
     return sessionStorage.getItem('activeTab') || 'members';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Get the business ID from the data attribute
     const businessId = document.querySelector('meta[name="business-id"]')?.content;
     baseApiUrl = `/members/${businessId}`;
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const form = e.target;
             const formData = new FormData(form);
-            
+
             try {
                 const response = await fetch(`${baseApiUrl}/segments`, {
                     method: 'POST',
@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: formData
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 if (data.success) {
                     // Reload with fragment to maintain tab state
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for tab switching if we're on the members page
     const mobileTabSelect = document.getElementById('mobile-tabs');
     if (mobileTabSelect) {
-        mobileTabSelect.addEventListener('change', function() {
+        mobileTabSelect.addEventListener('change', function () {
             switchTab(this.value);
         });
     }
@@ -86,15 +86,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to handle tab switching
-window.switchTab = function(tabName) {
+window.switchTab = function (tabName) {
     // Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
     });
-    
+
     // Show selected tab content
     document.getElementById(tabName + '-tab').classList.remove('hidden');
-    
+
     // Update tab button styles
     document.querySelectorAll('.tab-button').forEach(button => {
         if (button.dataset.tab === tabName) {
@@ -122,7 +122,7 @@ window.switchTab = function(tabName) {
 };
 
 // Function to view segment members with pagination
-window.viewSegmentMembers = async function(segmentId) {
+window.viewSegmentMembers = async function (segmentId) {
     try {
         const response = await fetch(`${baseApiUrl}/segments/${segmentId}/preview`, {
             headers: {
@@ -133,9 +133,9 @@ window.viewSegmentMembers = async function(segmentId) {
         if (!response.ok) {
             throw new Error(`HTTP error: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         // Create and show modal with users list
         const modalHtml = `
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
@@ -180,12 +180,12 @@ window.viewSegmentMembers = async function(segmentId) {
                 </div>
             </div>
         `;
-        
+
         const modalContainer = document.getElementById('modal-container');
         if (modalContainer) {
             modalContainer.innerHTML = modalHtml;
             modalContainer.classList.remove('hidden');
-            
+
             // Handle closing modal
             modalContainer.querySelectorAll('.close-modal').forEach(button => {
                 button.addEventListener('click', () => {
@@ -193,21 +193,21 @@ window.viewSegmentMembers = async function(segmentId) {
                     modalContainer.innerHTML = '';
                 });
             });
-            
+
             // Implement infinite scroll for members list
             const membersList = document.getElementById('segment-members-list');
             let offset = data.users.length;
             const limit = 20;
             const loadingIndicator = document.getElementById('members-loading-more');
-            
+
             // Simple infinite scroll implementation
             if (membersList) {
-                membersList.addEventListener('scroll', async function() {
+                membersList.addEventListener('scroll', async function () {
                     // If we're near the bottom, load more
                     if (membersList.scrollTop + membersList.clientHeight >= membersList.scrollHeight - 50) {
                         if (loadingIndicator.style.display === 'none' && offset < data.count) {
                             loadingIndicator.style.display = 'block';
-                            
+
                             try {
                                 const moreResponse = await fetch(`${baseApiUrl}/segments/${segmentId}/preview?offset=${offset}&limit=${limit}`, {
                                     headers: {
@@ -216,7 +216,7 @@ window.viewSegmentMembers = async function(segmentId) {
                                     }
                                 });
                                 if (!moreResponse.ok) throw new Error('Failed to load more members');
-                                
+
                                 const moreData = await moreResponse.json();
                                 if (moreData.users.length > 0) {
                                     const fragment = document.createDocumentFragment();
@@ -257,25 +257,27 @@ window.viewSegmentMembers = async function(segmentId) {
 };
 
 // Function for editing segments
-window.editSegment = async function(segmentId) {
+window.editSegment = async function (segmentId) {
     try {
         // Get segment data from the DOM
         const segmentItem = document.querySelector(`.segment-item[data-segment-id="${segmentId}"]`);
         if (!segmentItem) {
             throw new Error("Segment element not found");
         }
-        
+
         const name = segmentItem.querySelector('.segment-name').textContent.trim();
         const description = segmentItem.querySelector('.segment-description')?.textContent.trim() || '';
         const type = segmentItem.querySelector('.segment-type').textContent.trim().toLowerCase();
-        
+        const businessId = document.querySelector('meta[name="business-id"]')?.content;
+
+        const url = `/members/${businessId}/segments/${segmentId}`;
         // Create and show edit modal
         const modalHtml = `
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
             <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                        <form id="editSegmentForm">
+                        <form id="editSegmentForm" action=${url} >
                             <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                             <div class="space-y-4">
                                 <div>
@@ -312,20 +314,22 @@ window.editSegment = async function(segmentId) {
                 </div>
             </div>
         `;
-        
+
         const modalContainer = document.getElementById('modal-container');
         modalContainer.innerHTML = modalHtml;
         modalContainer.classList.remove('hidden');
-        
+
         // Handle form submission
         const form = modalContainer.querySelector('form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            
+            formData.append('_method', 'PUT');
             try {
-                const response = await fetch(`${baseApiUrl}/segments/${segmentId}`, {
-                    method: 'PUT',
+                console.log('url is ')
+                console.log(url);
+                const response = await fetch(`${url}`, {
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
@@ -333,11 +337,11 @@ window.editSegment = async function(segmentId) {
                     },
                     body: formData
                 });
-                
+                console.log('yeta tira aayo');
                 if (!response.ok) {
                     throw new Error(`HTTP error: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 if (data.success) {
                     window.location.href = window.location.pathname + '?tab=segments';
@@ -349,7 +353,7 @@ window.editSegment = async function(segmentId) {
                 alert('Failed to update segment. Please try again.');
             }
         });
-        
+
         // Handle modal closing
         modalContainer.querySelectorAll('.close-modal').forEach(button => {
             button.addEventListener('click', () => {
@@ -362,13 +366,77 @@ window.editSegment = async function(segmentId) {
         alert('Failed to edit segment. Please try again.');
     }
 };
+window.showAddUsersModal = function (segmentId) {
+    const modal = document.getElementById('assign-users-modal-container');
 
+    document.getElementById('assign-segment-id').value = segmentId;
+
+    // Clear previous select2 if needed
+    $('#assign-users-select').empty().select2({
+        placeholder: 'Search users...',
+        width: '100%',
+        ajax: {
+            url: '/search-users',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { q: params.term };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.results 
+                };
+            },
+            cache: true
+        }
+    });
+
+    modal.classList.remove('hidden');
+};
+
+window.closeAssignUsersModal = function () {
+    document.getElementById('assign-users-modal-container').classList.add('hidden');
+    $('#assign-users-select').select2('destroy');
+};
+
+document.getElementById('assign-users-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const segmentId = document.getElementById('assign-segment-id').value;
+    const user_ids = $('#assign-users-select').val();  // Select2 selected user IDs
+    const businessId = document.querySelector('meta[name="business-id"]')?.content;
+    console.log(JSON.stringify({ user_ids }));
+    try {
+        const response = await fetch(`/members/${businessId}/segments/${segmentId}/users`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_ids })
+        });
+
+        if (!response.ok) throw new Error('Request failed');
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Users assigned successfully.');
+            closeAssignUsersModal();
+        } else {
+            alert(result.message || 'Failed to assign users.');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Error assigning users.');
+    }
+});
 // Function to delete a segment
-window.deleteSegment = async function(segmentId) {
+window.deleteSegment = async function (segmentId) {
     if (!confirm('Are you sure you want to delete this segment? This action cannot be undone.')) {
         return;
     }
-    
+
     try {
         const response = await fetch(`${baseApiUrl}/segments/${segmentId}`, {
             method: 'DELETE',
@@ -378,11 +446,11 @@ window.deleteSegment = async function(segmentId) {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error: ${response.status}`);
         }
-        
+
         const data = await response.json();
         if (data.success) {
             window.location.href = window.location.pathname + '?tab=segments';
@@ -396,21 +464,22 @@ window.deleteSegment = async function(segmentId) {
 };
 
 // Functions for create/close segment form
-window.openCreateSegmentForm = function() {
+window.openCreateSegmentForm = function () {
+
     const form = document.getElementById('create-segment-form');
     form.classList.remove('hidden');
 };
 
-window.closeCreateSegmentForm = function() {
+window.closeCreateSegmentForm = function () {
     const form = document.getElementById('create-segment-form');
     form.classList.add('hidden');
 };
 
 // Function to assign segments to users
-window.assignSegments = async function(userId) {
+window.assignSegments = async function (userId) {
     try {
         const businessId = document.querySelector('meta[name="business-id"]')?.content;
-        
+
         // Get all segments
         const response = await fetch(`${baseApiUrl}/segments`, {
             headers: {
@@ -419,13 +488,13 @@ window.assignSegments = async function(userId) {
             }
         });
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        
+
         const allSegments = await response.json();
-        
+
         // Get user's current segments
         const userRow = document.querySelector(`[data-user-id="${userId}"]`);
         const userSegments = JSON.parse(userRow.dataset.segments || '[]');
-        
+
         // Create and show modal
         const modalHtml = `
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
@@ -476,18 +545,18 @@ window.assignSegments = async function(userId) {
                 </div>
             </div>
         `;
-        
+
         const modalContainer = document.getElementById('modal-container');
         modalContainer.innerHTML = modalHtml;
         modalContainer.classList.remove('hidden');
-        
+
         // Handle form submission
         const form = modalContainer.querySelector('form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const selectedSegments = formData.getAll('segments[]').map(id => parseInt(id));
-            
+
             try {
                 // Update user segments
                 const updateResponse = await fetch(`${baseApiUrl}/user-segments/${userId}`, {
@@ -500,18 +569,18 @@ window.assignSegments = async function(userId) {
                     },
                     body: JSON.stringify({ segment_ids: selectedSegments })
                 });
-                
+
                 if (!updateResponse.ok) {
                     throw new Error(`HTTP error: ${updateResponse.status}`);
                 }
-                
+
                 window.location.reload();
             } catch (error) {
                 console.error('Error updating user segments:', error);
                 alert('Failed to update user segments. Please try again.');
             }
         });
-        
+
         // Handle modal closing
         modalContainer.querySelectorAll('.close-modal').forEach(button => {
             button.addEventListener('click', () => {

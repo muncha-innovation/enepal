@@ -17,7 +17,7 @@ class MembersController extends Controller
     {
         // Get users belonging to this business
         $users = $business->users()
-            ->with(['segments' => function($query) use ($business) {
+            ->with(['segments' => function ($query) use ($business) {
                 $query->where('business_id', $business->id);
             }])
             ->get();
@@ -103,7 +103,7 @@ class MembersController extends Controller
                 ->whereIn('id', $validated['segments'])
                 ->pluck('id')
                 ->toArray();
-            
+
             $user->segments()->syncWithoutDetaching($segmentIds);
         }
 
@@ -123,14 +123,14 @@ class MembersController extends Controller
     public function edit(Business $business, User $user)
     {
         $segments = $business->segments()->active()->get();
-        
+
         // Get only segments belonging to this business
         $userSegments = $user->segments()
             ->where('business_id', $business->id)
             ->get()
             ->pluck('id')
             ->toArray();
-            
+
         $countries = Country::all();
         return view('modules.members.createOrEdit', compact('business', 'user', 'segments', 'userSegments', 'countries'));
     }
@@ -161,29 +161,29 @@ class MembersController extends Controller
 
         // We'll handle segment syncing only for this business's segments
         $businessSegmentIds = $business->segments()->pluck('id')->toArray();
-        
+
         // Get current user segments for this business
         $currentUserSegments = $user->segments()
             ->where('business_id', $business->id)
             ->pluck('id')
             ->toArray();
-            
+
         // Segments to add (new segments for this business)
         $segmentsToAdd = array_intersect(
             array_diff($segmentIds, $currentUserSegments),
             $businessSegmentIds
         );
-        
+
         if (count($segmentsToAdd) > 0) {
             $user->segments()->syncWithoutDetaching($segmentsToAdd);
         }
-        
+
         // Segments to remove (segments to be removed only for this business)
         $segmentsToRemove = array_intersect(
             array_diff($currentUserSegments, $segmentIds),
             $businessSegmentIds
         );
-        
+
         if (count($segmentsToRemove) > 0) {
             $user->segments()->detach($segmentsToRemove);
         }
@@ -193,6 +193,13 @@ class MembersController extends Controller
 
     public function destroy(Business $business, User $user)
     {
+        // Prevent the owner from removing themselves
+        if ($user->id === auth()->id() && $business->is_owner) {
+            return redirect()
+                ->route('members.index', $business)
+                ->with('error', 'You cannot remove yourself as the business owner.');
+        }
+
         // Remove user from all segments of this business
         $businessSegmentIds = $business->segments()->pluck('id')->toArray();
         $user->segments()->detach($businessSegmentIds);
@@ -200,6 +207,8 @@ class MembersController extends Controller
         // Remove user from business
         $business->users()->detach($user->id);
 
-        return redirect()->route('members.index', $business)->with('success', 'Member removed successfully');
+        return redirect()
+            ->route('members.index', $business)
+            ->with('success', 'Member removed successfully');
     }
 }

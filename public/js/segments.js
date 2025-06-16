@@ -1177,7 +1177,7 @@ window.viewSegmentMembers = /*#__PURE__*/function () {
 
 window.editSegment = /*#__PURE__*/function () {
   var _ref4 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(segmentId) {
-    var _segmentItem$querySel, segmentItem, name, description, type, modalHtml, modalContainer, form;
+    var _segmentItem$querySel, _document$querySelect2, segmentItem, name, description, type, businessId, url, modalHtml, modalContainer, form;
 
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
       while (1) {
@@ -1197,9 +1197,11 @@ window.editSegment = /*#__PURE__*/function () {
           case 4:
             name = segmentItem.querySelector('.segment-name').textContent.trim();
             description = ((_segmentItem$querySel = segmentItem.querySelector('.segment-description')) === null || _segmentItem$querySel === void 0 ? void 0 : _segmentItem$querySel.textContent.trim()) || '';
-            type = segmentItem.querySelector('.segment-type').textContent.trim().toLowerCase(); // Create and show edit modal
+            type = segmentItem.querySelector('.segment-type').textContent.trim().toLowerCase();
+            businessId = (_document$querySelect2 = document.querySelector('meta[name="business-id"]')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.content;
+            url = "/members/".concat(businessId, "/segments/").concat(segmentId); // Create and show edit modal
 
-            modalHtml = "\n            <div class=\"fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity\"></div>\n            <div class=\"fixed inset-0 z-10 overflow-y-auto\">\n                <div class=\"flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0\">\n                    <div class=\"relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6\">\n                        <form id=\"editSegmentForm\">\n                            <input type=\"hidden\" name=\"_token\" value=\"".concat(document.querySelector('meta[name="csrf-token"]').content, "\">\n                            <div class=\"space-y-4\">\n                                <div>\n                                    <label for=\"edit-name\" class=\"block text-sm font-medium text-gray-700\">Name</label>\n                                    <input type=\"text\" name=\"name\" id=\"edit-name\" value=\"").concat(name, "\" required\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">\n                                </div>\n                                <div>\n                                    <label for=\"edit-description\" class=\"block text-sm font-medium text-gray-700\">Description</label>\n                                    <textarea name=\"description\" id=\"edit-description\" rows=\"3\"\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">").concat(description, "</textarea>\n                                </div>\n                                <div>\n                                    <label for=\"edit-type\" class=\"block text-sm font-medium text-gray-700\">Type</label>\n                                    <select name=\"type\" id=\"edit-type\" required\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">\n                                        <option value=\"custom\" ").concat(type === 'custom' ? 'selected' : '', ">Custom</option>\n                                        <option value=\"member\" ").concat(type === 'member' ? 'selected' : '', ">Member</option>\n                                        <option value=\"admin\" ").concat(type === 'admin' ? 'selected' : '', ">Admin</option>\n                                    </select>\n                                </div>\n                            </div>\n                            <div class=\"mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3\">\n                                <button type=\"submit\"\n                                    class=\"inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2\">\n                                    Save Changes\n                                </button>\n                                <button type=\"button\" class=\"close-modal mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0\">\n                                    Cancel\n                                </button>\n                            </div>\n                        </form>\n                    </div>\n                </div>\n            </div>\n        ");
+            modalHtml = "\n            <div class=\"fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity\"></div>\n            <div class=\"fixed inset-0 z-10 overflow-y-auto\">\n                <div class=\"flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0\">\n                    <div class=\"relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6\">\n                        <form id=\"editSegmentForm\" action=".concat(url, " >\n                            <input type=\"hidden\" name=\"_token\" value=\"").concat(document.querySelector('meta[name="csrf-token"]').content, "\">\n                            <div class=\"space-y-4\">\n                                <div>\n                                    <label for=\"edit-name\" class=\"block text-sm font-medium text-gray-700\">Name</label>\n                                    <input type=\"text\" name=\"name\" id=\"edit-name\" value=\"").concat(name, "\" required\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">\n                                </div>\n                                <div>\n                                    <label for=\"edit-description\" class=\"block text-sm font-medium text-gray-700\">Description</label>\n                                    <textarea name=\"description\" id=\"edit-description\" rows=\"3\"\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">").concat(description, "</textarea>\n                                </div>\n                                <div>\n                                    <label for=\"edit-type\" class=\"block text-sm font-medium text-gray-700\">Type</label>\n                                    <select name=\"type\" id=\"edit-type\" required\n                                        class=\"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm\">\n                                        <option value=\"custom\" ").concat(type === 'custom' ? 'selected' : '', ">Custom</option>\n                                        <option value=\"member\" ").concat(type === 'member' ? 'selected' : '', ">Member</option>\n                                        <option value=\"admin\" ").concat(type === 'admin' ? 'selected' : '', ">Admin</option>\n                                    </select>\n                                </div>\n                            </div>\n                            <div class=\"mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3\">\n                                <button type=\"submit\"\n                                    class=\"inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2\">\n                                    Save Changes\n                                </button>\n                                <button type=\"button\" class=\"close-modal mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0\">\n                                    Cancel\n                                </button>\n                            </div>\n                        </form>\n                    </div>\n                </div>\n            </div>\n        ");
             modalContainer = document.getElementById('modal-container');
             modalContainer.innerHTML = modalHtml;
             modalContainer.classList.remove('hidden'); // Handle form submission
@@ -1214,10 +1216,13 @@ window.editSegment = /*#__PURE__*/function () {
                       case 0:
                         e.preventDefault();
                         formData = new FormData(e.target);
-                        _context4.prev = 2;
-                        _context4.next = 5;
-                        return fetch("".concat(baseApiUrl, "/segments/").concat(segmentId), {
-                          method: 'PUT',
+                        formData.append('_method', 'PUT');
+                        _context4.prev = 3;
+                        console.log('url is ');
+                        console.log(url);
+                        _context4.next = 8;
+                        return fetch("".concat(url), {
+                          method: 'POST',
                           headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json',
@@ -1226,21 +1231,22 @@ window.editSegment = /*#__PURE__*/function () {
                           body: formData
                         });
 
-                      case 5:
+                      case 8:
                         response = _context4.sent;
+                        console.log('yeta tira aayo');
 
                         if (response.ok) {
-                          _context4.next = 8;
+                          _context4.next = 12;
                           break;
                         }
 
                         throw new Error("HTTP error: ".concat(response.status));
 
-                      case 8:
-                        _context4.next = 10;
+                      case 12:
+                        _context4.next = 14;
                         return response.json();
 
-                      case 10:
+                      case 14:
                         data = _context4.sent;
 
                         if (data.success) {
@@ -1249,21 +1255,21 @@ window.editSegment = /*#__PURE__*/function () {
                           alert(data.message || 'Error updating segment');
                         }
 
-                        _context4.next = 18;
+                        _context4.next = 22;
                         break;
 
-                      case 14:
-                        _context4.prev = 14;
-                        _context4.t0 = _context4["catch"](2);
+                      case 18:
+                        _context4.prev = 18;
+                        _context4.t0 = _context4["catch"](3);
                         console.error('Error updating segment:', _context4.t0);
                         alert('Failed to update segment. Please try again.');
 
-                      case 18:
+                      case 22:
                       case "end":
                         return _context4.stop();
                     }
                   }
-                }, _callee4, null, [[2, 14]]);
+                }, _callee4, null, [[3, 18]]);
               }));
 
               return function (_x4) {
@@ -1277,46 +1283,154 @@ window.editSegment = /*#__PURE__*/function () {
                 modalContainer.innerHTML = '';
               });
             });
-            _context5.next = 20;
+            _context5.next = 22;
             break;
 
-          case 16:
-            _context5.prev = 16;
+          case 18:
+            _context5.prev = 18;
             _context5.t0 = _context5["catch"](0);
             console.error('Error editing segment:', _context5.t0);
             alert('Failed to edit segment. Please try again.');
 
-          case 20:
+          case 22:
           case "end":
             return _context5.stop();
         }
       }
-    }, _callee5, null, [[0, 16]]);
+    }, _callee5, null, [[0, 18]]);
   }));
 
   return function (_x3) {
     return _ref4.apply(this, arguments);
   };
-}(); // Function to delete a segment
+}();
 
+window.showAddUsersModal = function (segmentId) {
+  var modal = document.getElementById('assign-users-modal-container');
+  document.getElementById('assign-segment-id').value = segmentId; // Clear previous select2 if needed
 
-window.deleteSegment = /*#__PURE__*/function () {
-  var _ref6 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6(segmentId) {
-    var response, data;
+  $('#assign-users-select').empty().select2({
+    placeholder: 'Search users...',
+    width: '100%',
+    ajax: {
+      url: '/search-users',
+      dataType: 'json',
+      delay: 250,
+      data: function data(params) {
+        return {
+          q: params.term
+        };
+      },
+      processResults: function processResults(data) {
+        return {
+          results: data.results
+        };
+      },
+      cache: true
+    }
+  });
+  modal.classList.remove('hidden');
+};
+
+window.closeAssignUsersModal = function () {
+  document.getElementById('assign-users-modal-container').classList.add('hidden');
+  $('#assign-users-select').select2('destroy');
+};
+
+document.getElementById('assign-users-form').addEventListener('submit', /*#__PURE__*/function () {
+  var _ref6 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6(e) {
+    var _document$querySelect3;
+
+    var segmentId, user_ids, businessId, response, result;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
-            if (confirm('Are you sure you want to delete this segment? This action cannot be undone.')) {
-              _context6.next = 2;
+            e.preventDefault();
+            segmentId = document.getElementById('assign-segment-id').value;
+            user_ids = $('#assign-users-select').val(); // Select2 selected user IDs
+
+            businessId = (_document$querySelect3 = document.querySelector('meta[name="business-id"]')) === null || _document$querySelect3 === void 0 ? void 0 : _document$querySelect3.content;
+            console.log(JSON.stringify({
+              user_ids: user_ids
+            }));
+            _context6.prev = 5;
+            _context6.next = 8;
+            return fetch("/members/".concat(businessId, "/segments/").concat(segmentId, "/users"), {
+              method: 'POST',
+              headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                user_ids: user_ids
+              })
+            });
+
+          case 8:
+            response = _context6.sent;
+
+            if (response.ok) {
+              _context6.next = 11;
               break;
             }
 
-            return _context6.abrupt("return");
+            throw new Error('Request failed');
+
+          case 11:
+            _context6.next = 13;
+            return response.json();
+
+          case 13:
+            result = _context6.sent;
+
+            if (result.success) {
+              alert('Users assigned successfully.');
+              closeAssignUsersModal();
+            } else {
+              alert(result.message || 'Failed to assign users.');
+            }
+
+            _context6.next = 21;
+            break;
+
+          case 17:
+            _context6.prev = 17;
+            _context6.t0 = _context6["catch"](5);
+            console.error(_context6.t0);
+            alert('Error assigning users.');
+
+          case 21:
+          case "end":
+            return _context6.stop();
+        }
+      }
+    }, _callee6, null, [[5, 17]]);
+  }));
+
+  return function (_x5) {
+    return _ref6.apply(this, arguments);
+  };
+}()); // Function to delete a segment
+
+window.deleteSegment = /*#__PURE__*/function () {
+  var _ref7 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7(segmentId) {
+    var response, data;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+      while (1) {
+        switch (_context7.prev = _context7.next) {
+          case 0:
+            if (confirm('Are you sure you want to delete this segment? This action cannot be undone.')) {
+              _context7.next = 2;
+              break;
+            }
+
+            return _context7.abrupt("return");
 
           case 2:
-            _context6.prev = 2;
-            _context6.next = 5;
+            _context7.prev = 2;
+            _context7.next = 5;
             return fetch("".concat(baseApiUrl, "/segments/").concat(segmentId), {
               method: 'DELETE',
               headers: {
@@ -1327,21 +1441,21 @@ window.deleteSegment = /*#__PURE__*/function () {
             });
 
           case 5:
-            response = _context6.sent;
+            response = _context7.sent;
 
             if (response.ok) {
-              _context6.next = 8;
+              _context7.next = 8;
               break;
             }
 
             throw new Error("HTTP error: ".concat(response.status));
 
           case 8:
-            _context6.next = 10;
+            _context7.next = 10;
             return response.json();
 
           case 10:
-            data = _context6.sent;
+            data = _context7.sent;
 
             if (data.success) {
               window.location.href = window.location.pathname + '?tab=segments';
@@ -1349,25 +1463,25 @@ window.deleteSegment = /*#__PURE__*/function () {
               alert(data.message || 'Error deleting segment');
             }
 
-            _context6.next = 18;
+            _context7.next = 18;
             break;
 
           case 14:
-            _context6.prev = 14;
-            _context6.t0 = _context6["catch"](2);
-            console.error('Error deleting segment:', _context6.t0);
+            _context7.prev = 14;
+            _context7.t0 = _context7["catch"](2);
+            console.error('Error deleting segment:', _context7.t0);
             alert('Failed to delete segment. Please try again.');
 
           case 18:
           case "end":
-            return _context6.stop();
+            return _context7.stop();
         }
       }
-    }, _callee6, null, [[2, 14]]);
+    }, _callee7, null, [[2, 14]]);
   }));
 
-  return function (_x5) {
-    return _ref6.apply(this, arguments);
+  return function (_x6) {
+    return _ref7.apply(this, arguments);
   };
 }(); // Functions for create/close segment form
 
@@ -1384,17 +1498,17 @@ window.closeCreateSegmentForm = function () {
 
 
 window.assignSegments = /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8(userId) {
-    var _document$querySelect2, businessId, response, allSegments, userRow, userSegments, modalHtml, modalContainer, form;
+  var _ref8 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9(userId) {
+    var _document$querySelect4, businessId, response, allSegments, userRow, userSegments, modalHtml, modalContainer, form;
 
-    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
       while (1) {
-        switch (_context8.prev = _context8.next) {
+        switch (_context9.prev = _context9.next) {
           case 0:
-            _context8.prev = 0;
-            businessId = (_document$querySelect2 = document.querySelector('meta[name="business-id"]')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.content; // Get all segments
+            _context9.prev = 0;
+            businessId = (_document$querySelect4 = document.querySelector('meta[name="business-id"]')) === null || _document$querySelect4 === void 0 ? void 0 : _document$querySelect4.content; // Get all segments
 
-            _context8.next = 4;
+            _context9.next = 4;
             return fetch("".concat(baseApiUrl, "/segments"), {
               headers: {
                 'Accept': 'application/json',
@@ -1403,21 +1517,21 @@ window.assignSegments = /*#__PURE__*/function () {
             });
 
           case 4:
-            response = _context8.sent;
+            response = _context9.sent;
 
             if (response.ok) {
-              _context8.next = 7;
+              _context9.next = 7;
               break;
             }
 
             throw new Error("HTTP error: ".concat(response.status));
 
           case 7:
-            _context8.next = 9;
+            _context9.next = 9;
             return response.json();
 
           case 9:
-            allSegments = _context8.sent;
+            allSegments = _context9.sent;
             // Get user's current segments
             userRow = document.querySelector("[data-user-id=\"".concat(userId, "\"]"));
             userSegments = JSON.parse(userRow.dataset.segments || '[]'); // Create and show modal
@@ -1431,19 +1545,19 @@ window.assignSegments = /*#__PURE__*/function () {
 
             form = modalContainer.querySelector('form');
             form.addEventListener('submit', /*#__PURE__*/function () {
-              var _ref8 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7(e) {
+              var _ref9 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8(e) {
                 var formData, selectedSegments, updateResponse;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
                   while (1) {
-                    switch (_context7.prev = _context7.next) {
+                    switch (_context8.prev = _context8.next) {
                       case 0:
                         e.preventDefault();
                         formData = new FormData(e.target);
                         selectedSegments = formData.getAll('segments[]').map(function (id) {
                           return parseInt(id);
                         });
-                        _context7.prev = 3;
-                        _context7.next = 6;
+                        _context8.prev = 3;
+                        _context8.next = 6;
                         return fetch("".concat(baseApiUrl, "/user-segments/").concat(userId), {
                           method: 'POST',
                           headers: {
@@ -1458,10 +1572,10 @@ window.assignSegments = /*#__PURE__*/function () {
                         });
 
                       case 6:
-                        updateResponse = _context7.sent;
+                        updateResponse = _context8.sent;
 
                         if (updateResponse.ok) {
-                          _context7.next = 9;
+                          _context8.next = 9;
                           break;
                         }
 
@@ -1469,25 +1583,25 @@ window.assignSegments = /*#__PURE__*/function () {
 
                       case 9:
                         window.location.reload();
-                        _context7.next = 16;
+                        _context8.next = 16;
                         break;
 
                       case 12:
-                        _context7.prev = 12;
-                        _context7.t0 = _context7["catch"](3);
-                        console.error('Error updating user segments:', _context7.t0);
+                        _context8.prev = 12;
+                        _context8.t0 = _context8["catch"](3);
+                        console.error('Error updating user segments:', _context8.t0);
                         alert('Failed to update user segments. Please try again.');
 
                       case 16:
                       case "end":
-                        return _context7.stop();
+                        return _context8.stop();
                     }
                   }
-                }, _callee7, null, [[3, 12]]);
+                }, _callee8, null, [[3, 12]]);
               }));
 
-              return function (_x7) {
-                return _ref8.apply(this, arguments);
+              return function (_x8) {
+                return _ref9.apply(this, arguments);
               };
             }()); // Handle modal closing
 
@@ -1497,25 +1611,25 @@ window.assignSegments = /*#__PURE__*/function () {
                 modalContainer.innerHTML = '';
               });
             });
-            _context8.next = 25;
+            _context9.next = 25;
             break;
 
           case 21:
-            _context8.prev = 21;
-            _context8.t0 = _context8["catch"](0);
-            console.error('Error assigning segments:', _context8.t0);
+            _context9.prev = 21;
+            _context9.t0 = _context9["catch"](0);
+            console.error('Error assigning segments:', _context9.t0);
             alert('Failed to open segment assignment. Please try again.');
 
           case 25:
           case "end":
-            return _context8.stop();
+            return _context9.stop();
         }
       }
-    }, _callee8, null, [[0, 21]]);
+    }, _callee9, null, [[0, 21]]);
   }));
 
-  return function (_x6) {
-    return _ref7.apply(this, arguments);
+  return function (_x7) {
+    return _ref8.apply(this, arguments);
   };
 }();
 })();
