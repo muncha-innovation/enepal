@@ -28,55 +28,55 @@ class UpdateSocialNetworks extends Command
      */
     public function __construct()
     {
-        parent::__construct();
-        $socialNetworks = [
-            [
-                'name' => 'Facebook',
-                'icon' => asset('images/socials/facebook.png'),
-            ],
-            [
-                'name' => 'Instagram',
-                'icon' => asset('images/socials/instagram.png'),
-            ],
-            [
-                'name' => 'TikTok',
-                'icon' => asset('images/socials/tiktok.png'),
-            ],
-            [
-                'name' => 'X',
-                'icon' => asset('images/socials/x.png'),
-            ],
-            [
-                'name' => 'LinkedIn',
-                'icon' => asset('images/socials/linkedin.png'),
-            ],
-            [
-                'name' => 'YouTube',
-                'icon' => asset('images/socials/youtube.png'),
-            ],
+        // parent::__construct();
+        // $socialNetworks = [
+        //     [
+        //         'name' => 'Facebook',
+        //         'icon' => asset('images/socials/facebook.png'),
+        //     ],
+        //     [
+        //         'name' => 'Instagram',
+        //         'icon' => asset('images/socials/instagram.png'),
+        //     ],
+        //     [
+        //         'name' => 'TikTok',
+        //         'icon' => asset('images/socials/tiktok.png'),
+        //     ],
+        //     [
+        //         'name' => 'X',
+        //         'icon' => asset('images/socials/x.png'),
+        //     ],
+        //     [
+        //         'name' => 'LinkedIn',
+        //         'icon' => asset('images/socials/linkedin.png'),
+        //     ],
+        //     [
+        //         'name' => 'YouTube',
+        //         'icon' => asset('images/socials/youtube.png'),
+        //     ],
            
-            [
-                'name' => 'Snapchat',
-                'icon' => asset('images/socials/snapchat.png'),
-            ],
-            [
-                'name' => 'WhatsApp',
-                'icon' => asset('images/socials/whatsapp.png'),
-            ],
-            [
-                'name' => 'Viber',
-                'icon' => asset('images/socials/viber.png'),
-            ]
-        ];
-        foreach ($socialNetworks as $network) {
-            $exists = SocialNetwork::where('name', $network['name'])->exists();
-            if ($exists) {
-                continue;
-            }
-            $network = SocialNetwork::create(
-                $network
-            );
-        }
+        //     [
+        //         'name' => 'Snapchat',
+        //         'icon' => asset('images/socials/snapchat.png'),
+        //     ],
+        //     [
+        //         'name' => 'WhatsApp',
+        //         'icon' => asset('images/socials/whatsapp.png'),
+        //     ],
+        //     [
+        //         'name' => 'Viber',
+        //         'icon' => asset('images/socials/viber.png'),
+        //     ]
+        // ];
+        // foreach ($socialNetworks as $network) {
+        //     $exists = SocialNetwork::where('name', $network['name'])->exists();
+        //     if ($exists) {
+        //         continue;
+        //     }
+        //     $network = SocialNetwork::create(
+        //         $network
+        //     );
+        // }
     }
 
     /**
