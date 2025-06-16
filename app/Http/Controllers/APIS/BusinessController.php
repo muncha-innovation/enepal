@@ -238,30 +238,38 @@ public function getBusinesses(Request $request)
         return BusinessResource::collection($businesses);
     }
 
-    public function getMyBusinesses(Request $request)
-    {
+ public function getMyBusinesses(Request $request)
+{
+    $userId = auth()->id();
+    $perPage = $request->get('per_page', 10);
+    $page = $request->get('page', 1);
+
+    $cacheKey = "user:{$userId}:my_businesses:perpage:{$perPage}:page:{$page}";
+    $cacheTTL = 300; // 5 minutes
+
+    $businesses = Cache::remember($cacheKey, $cacheTTL, function () use ($userId, $perPage) {
         $query = Business::query()
             ->select('businesses.*')
-            ->join('business_user', function ($join) {
+            ->join('business_user', function ($join) use ($userId) {
                 $join->on('businesses.id', '=', 'business_user.business_id')
-                    ->where('business_user.user_id', '=', auth()->id())
+                    ->where('business_user.user_id', '=', $userId)
                     ->where('business_user.role', '=', 'owner');
             })
             ->with(['address', 'type']);
 
-        $perPage = $request->get('per_page', 10);
-        $businesses = $query->paginate($perPage);
+        return $query->paginate($perPage);
+    });
 
-        return response()->json([
-            'data' => BusinessResource::collection($businesses),
-            'meta' => [
-                'current_page' => $businesses->currentPage(),
-                'last_page' => $businesses->lastPage(),
-                'per_page' => $businesses->perPage(),
-                'total' => $businesses->total()
-            ]
-        ]);
-    }
+    return response()->json([
+        'data' => BusinessResource::collection($businesses),
+        'meta' => [
+            'current_page' => $businesses->currentPage(),
+            'last_page' => $businesses->lastPage(),
+            'per_page' => $businesses->perPage(),
+            'total' => $businesses->total(),
+        ]
+    ]);
+}
 
     public function addBusiness(Request $request)
     {
