@@ -33,7 +33,7 @@ class User extends Authenticatable
         'is_active',
         'created_by',
     ];
-    
+
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
     use LogsActivity;
     /**
@@ -76,11 +76,12 @@ class User extends Authenticatable
     {
         return $this->profile_picture ? Storage::url($this->profile_picture) : '';
     }
-    public function scopeInactive($query) {
+    public function scopeInactive($query)
+    {
         return $query->where('is_active', false);
-
     }
-    public function scopeActive($query) {
+    public function scopeActive($query)
+    {
         return $query->where('is_active', true);
     }
     public function getActivitylogOptions(): LogOptions
@@ -141,9 +142,30 @@ class User extends Authenticatable
         return false;
     }
 
+    // app/Models/User.php
     public function businesses()
     {
-        return $this->belongsToMany(Business::class)->withTimestamps();
+        return $this->belongsToMany(Business::class)
+            ->using(Membership::class)
+            ->withPivot('role', 'is_active', 'position', 'department', 'has_joined');
+    }
+
+    // Check if user is owner of a business
+    public function isOwnerOf(Business $business): bool
+    {
+        return $this->getMembershipFor($business)?->isOwner() ?? false;
+    }
+
+    // Check if user is admin of a business
+    public function isAdminOf(Business $business): bool
+    {
+        return $this->getMembershipFor($business)?->isAdmin() ?? false;
+    }
+
+    // Get membership relationship for a specific business
+    protected function getMembershipFor(Business $business): ?Membership
+    {
+        return $this->businesses->firstWhere('id', $business->id)?->pivot;
     }
 
 
@@ -154,13 +176,13 @@ class User extends Authenticatable
     public function preferredCategories()
     {
         return $this->belongsToMany(NewsCategory::class, 'user_news_preferences', 'user_id', 'category_id')
-                    ->select('news_categories.*'); // Specify table name to avoid ambiguous column references
+            ->select('news_categories.*'); // Specify table name to avoid ambiguous column references
     }
 
     public function toggleNewsPreference($category_id)
     {
         $exists = $this->newsPreferences()->where('category_id', $category_id)->exists();
-        
+
         if ($exists) {
             $this->newsPreferences()->where('category_id', $category_id)->delete();
         } else {
@@ -185,7 +207,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserExperience::class);
     }
-    public function preference() {
+    public function preference()
+    {
         return $this->hasOne(UserPreference::class);
     }
 
@@ -195,17 +218,17 @@ class User extends Authenticatable
             ->withPivot('is_subscribed')
             ->withTimestamps();
     }
-    
+
     /**
      * The business notifications that the user has received
      */
     public function businessNotifications()
     {
         return $this->belongsToMany(BusinessNotification::class, 'business_notifications_users', 'user_id', 'notification_id')
-                    ->withPivot('read_at')
-                    ->withTimestamps();
+            ->withPivot('read_at')
+            ->withTimestamps();
     }
-    
+
     public function canAccessFilament(): bool
     {
         return $this->hasRole('super-admin') && $this->hasVerifiedEmail();

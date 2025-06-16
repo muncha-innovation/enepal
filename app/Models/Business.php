@@ -18,7 +18,7 @@ class Business extends Model
     protected $dates = ['deleted_at'];
 
     static $ROLES = ['owner', 'admin', 'member'];
-    static $SETTINGS = [SettingKeys::MAX_NOTIFICATION_PER_DAY, SettingKeys::MAX_NOTIFICATION_PER_MONTH];    
+    static $SETTINGS = [SettingKeys::MAX_NOTIFICATION_PER_DAY, SettingKeys::MAX_NOTIFICATION_PER_MONTH];
 
     protected $guarded = [];
 
@@ -48,7 +48,7 @@ class Business extends Model
 
     public function scopeFollowing($query): void
     {
-         $query->whereHas('users', function ($q) {
+        $query->whereHas('users', function ($q) {
             $q->where('user_id', auth()->id());
         });
     }
@@ -57,12 +57,12 @@ class Business extends Model
     {
         return $this->belongsToMany(User::class)->withPivot(['role', 'position', 'created_at', 'updated_at'])->withTimestamps();
     }
-    
+
     public function notifications()
     {
         return $this->hasMany(BusinessNotification::class);
     }
-    
+
     public function type()
     {
         return $this->belongsTo(BusinessType::class, 'type_id');
@@ -81,7 +81,8 @@ class Business extends Model
     {
         return $this->hasMany(Post::class, 'business_id');
     }
-    public function settings() {
+    public function settings()
+    {
         return $this->hasMany(BusinessSetting::class);
     }
     public function products()
@@ -89,13 +90,15 @@ class Business extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function destinations() {
+    public function destinations()
+    {
         return $this->belongsToMany(Country::class, 'business_destinations')
             ->withPivot('num_people_sent')
             ->withTimestamps();
     }
-    public function taughtLanguages() {
-        return $this->belongsToMany(Language::class, 'business_languages')->withPivot(['price','currency'])->where('type', 'taught');
+    public function taughtLanguages()
+    {
+        return $this->belongsToMany(Language::class, 'business_languages')->withPivot(['price', 'currency'])->where('type', 'taught');
     }
     public function facilities()
     {
@@ -119,40 +122,51 @@ class Business extends Model
             ->withTimestamps();
     }
 
-    public function getHasFollowedAttribute() {
-        
+    public function getHasFollowedAttribute()
+    {
+
         $user = $this->users()->where('user_id', auth()->id())->first();
-        return $user && $user->pivot->role!=null;
+        return $user && $user->pivot->role != null;
     }
 
-    public function getIsAdminAttribute() {
-        $user = $this->users()->where('user_id', auth()->id())->first();
-        return $user && $user->pivot->role === 'admin';
+    public function members()
+    {
+        return $this->belongsToMany(User::class)
+            ->using(Membership::class)
+            ->withPivot('role', 'is_active', 'position', 'department', 'has_joined');
+    }
+    
+    public function hasOwner(User $user): bool
+    {
+        return $user->isOwnerOf($this);
     }
 
-    public function getIsOwnerAttribute() {
-        $user = $this->users()->where('user_id', auth()->id())->first();
-        return $user && $user->pivot->role === 'owner';
+    // Check if a user is admin
+    public function hasAdmin(User $user): bool
+    {
+        return $user->isAdminOf($this);
     }
 
     public function getFormattedHoursAttribute()
     {
-        $shortDays = ['Monday' => 'Mon','Tuesday' => 'Tue','Wednesday' => 'Wed','Thursday' => 'Thu','Friday' => 'Fri','Saturday' => 'Sat','Sunday' => 'Sun'];
+        $shortDays = ['Monday' => 'Mon', 'Tuesday' => 'Tue', 'Wednesday' => 'Wed', 'Thursday' => 'Thu', 'Friday' => 'Fri', 'Saturday' => 'Sat', 'Sunday' => 'Sun'];
         $orderedDays = array_keys($shortDays);
 
         $allHours = $this->hours()
             ->where('is_open', true)
             ->get()
-            ->sortBy(function($item) use ($orderedDays) {
+            ->sortBy(function ($item) use ($orderedDays) {
                 return array_search($item->day, $orderedDays);
             });
 
         // Helper to format times
-        $fmt = function($time) { return \Carbon\Carbon::parse($time)->format('g:ia'); };
+        $fmt = function ($time) {
+            return \Carbon\Carbon::parse($time)->format('g:ia');
+        };
 
         $groups = [];
         foreach ($allHours as $hour) {
-            $key = $hour->open_time.'_'.$hour->close_time;
+            $key = $hour->open_time . '_' . $hour->close_time;
             if (! isset($groups[$key])) {
                 $groups[$key] = ['days' => [], 'open' => $hour->open_time, 'close' => $hour->close_time];
             }
@@ -171,19 +185,19 @@ class Business extends Model
                 $current = $days[$i];
                 $prevIndex = array_search($prev, $orderedDays);
                 $currentIndex = array_search($current, $orderedDays);
-                
+
                 // If consecutive in the day list, continue. Otherwise close that range
                 if ($currentIndex !== $prevIndex + 1) {
-                    $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart].'-'.$shortDays[$prev]);
+                    $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart] . '-' . $shortDays[$prev]);
                     $rangeStart = $current;
                 }
                 $prev = $current;
             }
             // Close final range
-            $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart].'-'.$shortDays[$prev]);
+            $finalRanges[] = ($rangeStart === $prev) ? $shortDays[$rangeStart] : ($shortDays[$rangeStart] . '-' . $shortDays[$prev]);
 
             // Example: Mon-Fri 1:00pm to 3:00pm
-            $formatted[] = implode(', ', $finalRanges).' '.$fmt($group['open']).' to '.$fmt($group['close']);
+            $formatted[] = implode(', ', $finalRanges) . ' ' . $fmt($group['open']) . ' to ' . $fmt($group['close']);
         }
 
         return implode('; ', $formatted);
@@ -195,7 +209,8 @@ class Business extends Model
             ->withTimestamps();
     }
 
-    public function conversations() {
+    public function conversations()
+    {
         return $this->hasMany(Conversation::class);
     }
 

@@ -85,6 +85,7 @@ class StoreBusinessRequest extends FormRequest
                     'email' => ['required', 'email'],
                     'phone_1' => ['required'],
                     'phone_2' => ['nullable'],
+                    'contact_person_name' => ['nullable']
                 ];
                 break;
                 
@@ -149,6 +150,7 @@ class StoreBusinessRequest extends FormRequest
                     'email' => ['required', 'email'],
                     'phone_1' => ['required'],
                     'phone_2' => ['sometimes'],
+                    'contact_person_name' => ['sometimes'],
                     
                     // Social Media section
                     'social_networks' => 'nullable|array',

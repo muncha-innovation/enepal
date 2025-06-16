@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
 use App\Models\Business;
+use App\Models\BusinessNotification;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -52,27 +53,27 @@ class CommunicationsController extends Controller
                 'segments'
             ));
         } else {
-            // Get notifications for the notifications tab
-            $notifications = $business->notifications()
-                ->where('is_active', true)
-                ->latest()
-                ->get();
-                
-            // Count unread notifications
-            $unreadNotifications = 0;
-            if (auth()->check()) {
-                $user = auth()->user();
-                $unreadNotificationsQuery = $business->notifications()
-                    ->whereHas('users', function($query) use ($user) {
-                        $query->where('user_id', $user->id)
-                            ->whereNull('read_at');
-                    });
-                    
-                $unreadNotifications = $unreadNotificationsQuery->count();
-            }
-            
-            return view('modules.business.communications.index', 
-                compact('business', 'usersPaginated', 'notifications', 'unreadNotifications','segments'));
+            // Get paginated notifications
+$notifications = $business->notifications()
+    ->where('is_active', true)
+    ->latest()
+    ->paginate(10); // Adjust per page as needed
+
+// Count unread notifications
+$unreadNotifications = 0;
+if (auth()->check()) {
+    $user = auth()->user();
+    $unreadNotificationsQuery = $business->notifications()
+        ->whereHas('users', function($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->whereNull('read_at');
+        });
+    $unreadNotifications = $unreadNotificationsQuery->count();
+}
+
+return view('modules.business.communications.index', 
+    compact('business', 'usersPaginated', 'notifications', 'unreadNotifications', 'segments'));
+
         }
     }
 
@@ -467,4 +468,48 @@ class CommunicationsController extends Controller
     {
         return $this->businessNotificationController->markAllNotificationsAsRead($business);
     }
+
+
+    public function stats(Business $business, BusinessNotification $notification)
+{
+    $totalUsers = $notification->users()->count();
+$opened = $notification->users()->whereNotNull('read_at')->count();
+$unopened = $totalUsers - $opened;
+
+// Paginated users
+$users = $notification->users()->paginate(20);
+
+// Daily stats (in %)
+$dailyStats = \DB::table('business_notifications_users')
+    ->selectRaw("DATE(read_at) as date, COUNT(*) as count")
+    ->where('notification_id', $notification->id)
+    ->whereNotNull('read_at')
+    ->groupByRaw("DATE(read_at)")
+    ->orderBy('date')
+    ->get()
+    ->map(function ($item) use ($totalUsers) {
+        $item->total = $totalUsers > 0 ? round(($item->count / $totalUsers) * 100, 2) : 0;
+        return $item;
+    });
+
+// Weekly stats (in %)
+$weeklyStats = \DB::table('business_notifications_users')
+    ->selectRaw("YEAR(read_at) as year, WEEK(read_at, 1) as week, COUNT(*) as count")
+    ->where('notification_id', $notification->id)
+    ->whereNotNull('read_at')
+    ->groupByRaw("YEAR(read_at), WEEK(read_at, 1)")
+    ->orderByRaw("YEAR(read_at), WEEK(read_at, 1)")
+    ->get()
+    ->map(function ($item) use ($totalUsers) {
+        $start = \Carbon\Carbon::now()->setISODate($item->year, $item->week)->startOfWeek();
+        $item->label = $start->format('Y-m-d');
+        $item->total = $totalUsers > 0 ? round(($item->count / $totalUsers) * 100, 2) : 0;
+        return $item;
+    });
+
+return view('modules.business.communications.notification_stats', compact(
+    'notification', 'totalUsers', 'opened', 'unopened', 'business', 'users', 'dailyStats', 'weeklyStats'
+));
+}
+
 }

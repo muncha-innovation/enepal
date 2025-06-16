@@ -6,25 +6,23 @@
             $images = $gallery->images;
         @endphp
         @foreach ($images as $image)
-            <div class="group flex flex-col items-center gap-2 mb-4">
-                <div class="w-24 h-24 rounded-lg">
-                    <img src="{{ $image->thumbnail }}" alt="" class="w-full h-full rounded-lg object-cover">
-                </div>
-                <input type="text" name="existing_images_titles[{{ $image->id }}]"
-                    class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center"
-                    placeholder="{{ __('Image caption') }}" value="{{ $image->title }}">
-                <div class="mt-4 flex flex-col gap-3">
-
-                    <div class="flex gap-3 justify-between">
-                        <i type="button" data-delete-url="{{ route('galleryImage.destroy', $image->id) }}"
-                            class="delete-image justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-small rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Remove') }}
-                        </i>
-
-                    </div>
-
-                </div>
-            </div>
+           <div class="group flex flex-col items-center gap-2 mb-4">
+    <div class="w-full max-w-[150px] rounded-lg overflow-hidden">
+        <img src="{{ $image->thumbnail }}" alt=""
+             class="w-full h-auto rounded-lg object-contain">
+    </div>
+    <input type="text" name="existing_images_titles[{{ $image->id }}]"
+        class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center "
+        placeholder="{{ __('Image caption') }}" value="{{ $image->title }}">
+    <div class="mt-4 flex flex-col gap-3">
+        <div class="flex gap-3 justify-between">
+            <i type="button" data-delete-url="{{ route('galleryImage.destroy', $image->id) }}"
+                class="delete-image justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-small rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {{ __('Remove') }}
+            </i>
+        </div>
+    </div>
+</div>
         @endforeach
 
 

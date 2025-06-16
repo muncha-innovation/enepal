@@ -49,7 +49,7 @@ class BusinessResource extends JsonResource
                 $distance = round($this->distance * 0.621371, 2);
             }
         }
-
+        $user = auth()->user();
         return [
             'id' => $this->id,
             'title' => $this->name,
@@ -60,7 +60,7 @@ class BusinessResource extends JsonResource
             'email' => $this->email,
             'website' => $this->website,
             'has_followed' => $this->has_followed,
-            'is_admin' => $this->is_admin || $this->is_owner,
+            'is_admin' => $this->hasAdmin($user) || $this->hasOwner($user),
             
             // Only include facilities with value = true
             'facilities' => $this->facilities

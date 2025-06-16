@@ -34,8 +34,10 @@ class BusinessController extends Controller
         ]));
 
         $cacheTTL = 300; // Cache for 5 minutes
-
-        $businesses = Cache::tags(['businesses'])->remember($cacheKey, $cacheTTL, function () use ($request) {
+        $cache = app()->environment('local')
+            ? Cache::store()
+            : Cache::tags(['businesses']);
+        $businesses = $cache->remember($cacheKey, $cacheTTL, function () use ($request) {
             $query = Business::query()
                 ->verified()
                 ->select('businesses.*')

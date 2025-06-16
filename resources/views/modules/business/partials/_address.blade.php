@@ -26,8 +26,16 @@
             class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.contact_person_phone') }}</label>
         <input type="text" name="phone_2" id="phone_2" value="{{ $business->phone_2 ?? old('phone_2') }}"
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder={{ __('Eg:9812312323') }}>
+            placeholder="{{ __('Eg:9812312323') }}"">
     </div>
+     <div class="mb-3">
+    <label for="contact_person_name"
+        class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.contact_person_name') }}</label>
+    <input type="text" name="contact_person_name" id="contact_person_name"
+        value="{{ $business->contact_person_name ?? old('contact_person_name') }}"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        placeholder="{{ __('business.contact_person_name') }}">
+</div>
 </div>
 
 {{-- Address Information --}}
@@ -70,7 +78,7 @@
         <label for="city" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.city') }}</label>
         <input type="text" name="address[city]" id="city" required
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Eg. Kathmandu" value="{{ $business->address?->city ?? old('address.city') }}">
+            placeholder="{{__('Eg. Kathmandu')}}" value="{{ $business->address?->city ?? old('address.city') }}">
         <div class="validation-error" id="city-error">{{ __('City is required') }}</div>
     </div>
 
@@ -80,7 +88,7 @@
         <input type="text" value="{{ $business->address?->address_line_1 ?? old('address.address_line_1') }}"
             name="address[address_line_1]" id="address_line_1"
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Eg. Kathmandu, Nepal">
+            placeholder="{{__('Eg. Kathmandu, Nepal')}}">
     </div>
 
     <div class="mb-3">
@@ -88,7 +96,7 @@
         <input type="text" name="address[address_line_2]"
             value="{{ $business->address?->address_line_2 ?? old('address.address_line_2') }}" id="address_line_2"
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Eg. Kathmandu, Nepal">
+            placeholder="{{__('Eg. Kathmandu, Nepal')}}">
     </div>
 
     <div class="mb-3">
@@ -97,7 +105,7 @@
         <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code ?? old('address.postal_code') }}"
             id="postal_code"
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Eg. 1234">
+            placeholder="{{__('Eg. 1234')}}">
     </div>
 </div>
 

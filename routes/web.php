@@ -96,11 +96,12 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('/', [CommunicationsController::class, 'getConversations'])->name('business.communications.index');
         Route::post('/chat/create', [CommunicationsController::class, 'createChat'])->name('business.communications.createChat');
         Route::post('/notification/send', [BusinessNotificationController::class, 'sendNotification'])->name('business.communications.sendNotification');
+        Route::get('/notification/{notification}/stats', [CommunicationsController::class,'stats'])->name('business.notification.stats');
         Route::get('conversation/{conversation}', [CommunicationsController::class, 'getMessages'])->name('business.communications.messages');
         Route::post('/conversation/{conversation}/send', [CommunicationsController::class, 'sendMessage'])->name('business.communications.send');
         Route::post('/conversation/{conversation}/thread', [CommunicationsController::class, 'createThread'])->name('business.communications.createThread');
         Route::delete('/conversation/{conversation}/thread/{thread}', [CommunicationsController::class, 'deleteThread'])->name('business.communications.deleteThread');
-        Route::post('/notifications/{notification}/read', [BusinessNotificationController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
+        Route::get('/notifications/{notification}/read', [BusinessNotificationController::class, 'markNotificationAsRead'])->name('business.communications.markRead');
         Route::post('/notifications/read-all', [BusinessNotificationController::class, 'markAllNotificationsAsRead'])->name('business.communications.markAllRead');
     });
     Route::get('/search-users', [CommunicationsController::class, 'searchUsers'])->name('search-users');

@@ -13,14 +13,17 @@
         <div class="mb-4">
             <h2 class="text-2xl font-semibold mb-2">{{__('Gallery Images')}}</h2>
         </div>
-        <div class="grid grid-cols-3 gap-4">
-            @foreach($gallery->images as $image)
-                <div class="relative">
-                    <img src="{{ getImage($image->image, '/') }}" alt={{__("Gallery Image")}} class="w-full h-40 object-cover rounded-lg">
-                    <p>{{$image->title}}</p>
-                </div>
-            @endforeach
+     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    @foreach($gallery->images as $image)
+        <div class="relative">
+            <div class="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden rounded-lg">
+                <img src="{{ getImage($image->image, '/') }}" alt="{{ __('Gallery Image') }}"
+                     class="max-w-full max-h-full object-contain rounded-md">
+            </div>
+            <p class="text-center text-sm mt-2 text-gray-700">{{ $image->title }}</p>
         </div>
+    @endforeach
+</div>
         <div class="flex justify-between items-center mt-6">
             <a href="{{ route('gallery.index',$business) }}" class="text-blue-500 hover:underline">&larr; {{__('Back to Galleries')}}</a>
             <div class="text-sm text-gray-600">{{__('Created by')}} {{ $gallery->user->name }} {{__('on')}} {{ getFormattedDate($gallery->created_at) }}</div>

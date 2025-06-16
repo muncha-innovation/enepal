@@ -194,7 +194,7 @@ class MembersController extends Controller
     public function destroy(Business $business, User $user)
     {
         // Prevent the owner from removing themselves
-        if ($user->id === auth()->id() && $business->is_owner) {
+        if ($user->id === auth()->id() && $business->hasOwner($user)) {
             return redirect()
                 ->route('members.index', $business)
                 ->with('error', 'You cannot remove yourself as the business owner.');

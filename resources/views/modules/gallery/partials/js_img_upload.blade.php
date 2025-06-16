@@ -21,9 +21,11 @@
         <input type="hidden" name="images_name[${counter}]" value="${name}">
         <input type="hidden" name="images[${counter}]" value="${event.target.result}">
         
-        <div class="w-24 h-24 rounded-lg">
-          <img src="${extension=='pdf'?@json(asset('pfd_icon.png')):event.target.result}" alt="" class="w-full h-full rounded-lg object-cover">
-        </div>
+        <div class="w-full max-w-[150px] rounded-lg overflow-hidden">
+  <img src="${extension=='pdf' ? @json(asset('pfd_icon.png')) : event.target.result}" 
+       alt="" 
+       class="w-full h-auto rounded-lg object-contain">
+</div>
 
         <input type="text" name="images_title[${counter}]" class="form-input w-full border border-gray-300 rounded-md p-2 text-sm text-center" placeholder=@json(trans('Image caption'))>
         

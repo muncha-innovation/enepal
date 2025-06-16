@@ -88,7 +88,9 @@ class BusinessNotificationController extends Controller
 
     public function markNotificationAsRead(Business $business, $notificationId)
     {
+        
         $notification = $business->notifications()->findOrFail($notificationId);
+        
         $notification->users()->updateExistingPivot(auth()->id(), ['read_at' => now()]);
 
         if (request()->ajax()) {
@@ -117,4 +119,5 @@ class BusinessNotificationController extends Controller
 
         return redirect()->back();
     }
+
 }

@@ -16,6 +16,7 @@ return [
     'email' => 'इमेल',
     'phone_number' => 'फोन नम्बर',
     'contact_person_phone' => 'सम्पर्क व्यक्तिको फोन',
+    'contact_person_name' => 'सम्पर्क व्यक्ति',
     'established_year' => 'स्थापना वर्ष',
     'custom_email_message' => 'कस्टम इमेल सन्देश',
     'status' => 'स्थिति',

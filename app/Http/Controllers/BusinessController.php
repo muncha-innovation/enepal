@@ -580,6 +580,7 @@ class BusinessController extends Controller
             'email' => $data['email'] ?? $business->email,
             'phone_1' => $data['phone_1'] ?? $business->phone_1,
             'phone_2' => $data['phone_2'] ?? null,
+            'contact_person_name' => $data['contact_person_name']??null,
         ]);
         
         // Update or create address
@@ -612,7 +613,10 @@ class BusinessController extends Controller
         $business->update([
             'email' => $data['email'],
             'phone_1' => $data['phone_1'],
+
             'phone_2' => $data['phone_2'] ?? null,
+            'contact_person_name' => $data['contact_person_name']??null,
+
             'established_year' => $data['established_year'] ?? null,
             'custom_email_message' => $data['custom_email_message'] ?? null,
             'is_active' => $data['is_active'],

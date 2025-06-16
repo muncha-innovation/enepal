@@ -16,6 +16,7 @@ return [
     'email' => 'Email',
     'phone_number' => 'Phone Number',
     'contact_person_phone' => 'Contact Person Phone',
+    'contact_person_name' => 'Contact Person Name',
     'established_year' => 'Established Year',
     'custom_email_message' => 'Custom Email Message',
     'status' => 'Status',
