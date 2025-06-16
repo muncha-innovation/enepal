@@ -195,7 +195,23 @@ class BusinessController extends Controller
     }
     public function getById($id)
     {
-        return new BusinessResource(Business::verified()->with(['type', 'address', 'posts', 'products', 'galleries'])->findOrFail($id));
+        $business = Business::verified()
+            ->with([
+                'type',
+                'address',
+                'posts' => function ($query) {
+                    $query->latest()->limit(10);
+                },
+                'products' => function ($query) {
+                    $query->latest()->limit(10);
+                },
+                'galleries' => function ($query) {
+                    $query->latest()->limit(10);
+                },
+            ])
+            ->findOrFail($id);
+
+        return new BusinessResource($business);
     }
 
     public function followUnfollow($businessId)
