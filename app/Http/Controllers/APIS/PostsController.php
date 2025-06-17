@@ -113,7 +113,7 @@ class PostsController extends Controller
 
     // Use tags for better cache management (requires Redis or compatible driver)
     $post = Cache::tags(['post_'.$id])->remember($postCacheKey, now()->addDays(2), function () use ($id) {
-        return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,address_line_1,address_line_2', 'business:id,type_id,name', 'business.address:id,business_id,address_line'])
+        return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,address_line_1,address_line_2', 'business:id,type_id,name', 'business.address:id,address_line_1'])
             ->findOrFail($id);
     });
 
