@@ -203,6 +203,7 @@ class BusinessController extends Controller
                 'posts' => function ($query) {
                     $query->latest()->limit(10);
                 },
+                'posts.business',
                 'products' => function ($query) {
                     $query->latest()->limit(10);
                 },
