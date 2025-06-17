@@ -72,10 +72,10 @@ class Business extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    public function contactPerson()
-    {
-        return $this->belongsTo(User::class, 'contact_person_id');
-    }
+    // public function contactPerson()
+    // {
+    //     return $this->belongsTo(User::class, 'contact_person_id');
+    // }
 
     public function posts()
     {
