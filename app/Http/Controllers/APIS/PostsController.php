@@ -113,12 +113,12 @@ class PostsController extends Controller
 
     // Use tags for better cache management (requires Redis or compatible driver)
     $post = Cache::tags(['post_'.$id])->remember($postCacheKey, now()->addDays(2), function () use ($id) {
-        return Post::with(['user:id,name,email', 'user.addresses:id,user_id,address_line', 'business:id,type_id,name', 'business.address:id,business_id,address_line'])
+        return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,user_id,address_line', 'business:id,type_id,name', 'business.address:id,business_id,address_line'])
             ->findOrFail($id);
     });
 
     $similarPosts = Cache::tags(['post_'.$id])->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
-        return Post::with(['user:id,name,email', 'business:id,type_id,name'])
+        return Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name'])
             ->where('id', '!=', $post->id)
             ->where(function ($query) use ($post) {
                 $query->whereHas('business', function ($q) use ($post) {

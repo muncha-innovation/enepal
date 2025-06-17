@@ -21,7 +21,7 @@ class PostResource extends JsonResource
             'body' => $this->getTranslation('content', $lang),
             'created_at' => $this->created_at,
             'image' => getImage($this->image, 'posts/'),
-            'business' => BusinessResource::make($this->business),
+            'business' => BusinessResource::make($this->whenLoaded('business')),
             'likes' => $this->likes->count(),
             'comments_count' => $this->comments->count(), 
             'user' => UserResource::make($this->user),
