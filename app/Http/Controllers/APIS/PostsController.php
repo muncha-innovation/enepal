@@ -140,7 +140,7 @@ class PostsController extends Controller
 
     public function likeUnlike($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::with(['business:id,type_id,name'])->findOrFail($id);
         $post->toggleLike();
 
         // Clear the cache for this post since its data changed
@@ -156,7 +156,7 @@ class PostsController extends Controller
         $cacheKey = "post_comments_{$postId}_page{$page}_limit{$limit}";
 
         $comments = Cache::remember($cacheKey, 60 * 60 * 24 * 2, function () use ($postId, $limit, $page) {
-            $post = Post::findOrFail($postId);
+            $post = Post::with(['business:id,type_id,name'])->findOrFail($postId);
             $offset = ($page - 1) * $limit;
             return $post->comments()->latest()->offset($offset)->limit($limit)->get();
         });
