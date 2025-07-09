@@ -13,17 +13,6 @@ use Illuminate\Support\Facades\Request;
 
 class NewsApiController extends Controller
 {
-    public function getNews(Request $request) {
-        $request->validate([
-            'query' => 'nullable|string|min:2',
-            'page' => 'nullable|integer|min:1',
-            'per_page' => 'nullable|integer|min:1|max:50',
-            'locality' => 'nullable|string',
-            'lang' => 'nullable|string',
-            'filter' => 'nullable|string',
-            'reverse_language' => 'boolean'
-        ]);
-    }
 
     public function show(NewsItem $newsItem)
     {

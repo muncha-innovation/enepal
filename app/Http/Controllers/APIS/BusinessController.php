@@ -21,23 +21,8 @@ class BusinessController extends Controller
 
     public function getBusinesses(Request $request)
     {
-        $cacheKey = 'businesses:' . md5(json_encode([
-            'per_page' => $request->get('per_page', 10),
-            'type_id' => $request->get('type_id'),
-            'featured' => $request->get('featured'),
-            'query' => $request->get('query'),
-            'filter' => $request->get('filter', 'latest'),
-            'lat' => $request->header('Latitude'),
-            'lng' => $request->header('Longitude'),
-            'user_id' => auth()->id(),
-            'page' => $request->get('page', 1),
-        ]));
-
-        $cacheTTL = 300; // Cache for 5 minutes
-        $cache = app()->environment('local')
-            ? Cache::store()
-            : Cache::tags(['businesses']);
-        $businesses = $cache->remember($cacheKey, $cacheTTL, function () use ($request) {
+        
+        
             $query = Business::query()
                 ->verified()
                 ->select('businesses.*')
@@ -135,8 +120,8 @@ class BusinessController extends Controller
                     break;
             }
 
-            return $query->paginate($perPage);
-        });
+            $businesses = $query->paginate($perPage);
+      
 
         return response()->json([
             'data' => BusinessResource::collection($businesses),

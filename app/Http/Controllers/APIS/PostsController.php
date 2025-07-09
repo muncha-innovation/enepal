@@ -16,20 +16,11 @@ use Illuminate\Support\Facades\Cache;
 class PostsController extends Controller
 {
     public function index(Request $request)
-{
-    $page = $request->get('page', 1);
-    $limit = $request->get('limit', 10);
-    $queryParams = $request->all();
+    {
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
+        $queryParams = $request->all();
 
-    // Cache key includes all params and pagination info
-    $cacheKey = 'posts_index_' . md5(json_encode($queryParams) . "_page{$page}_limit{$limit}");
-
-    // Recommended cache tagging if possible (e.g., Redis)
-    $cacheTags = ['posts_index'];
-    $cache = app()->environment('local')
-    ? Cache::store()
-    : Cache::tags([$cacheTags]);
-    $posts = $cache->remember($cacheKey, now()->addDays(2), function () use ($request, $limit) {
         $query = Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name', 'likes:id,post_id,user_id']);
 
         // Search filter
@@ -37,7 +28,7 @@ class PostsController extends Controller
             $searchTerm = $request->query('query');
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('short_description', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('short_description', 'LIKE', "%{$searchTerm}%");
             });
         }
 
@@ -47,13 +38,13 @@ class PostsController extends Controller
         if ($filter === 'foryou' && auth()->check() && auth()->user()->primaryAddress?->location) {
             $userLocation = auth()->user()->primaryAddress->location;
             $query->select('posts.*')
-                  ->join('businesses', 'posts.business_id', '=', 'businesses.id')
-                  ->join('addresses', function ($join) {
-                      $join->on('businesses.id', '=', 'addresses.addressable_id')
-                          ->where('addresses.addressable_type', Business::class);
-                  })
-                  ->whereNotNull('addresses.location')
-                  ->orderByDistance('addresses.location', $userLocation);
+                ->join('businesses', 'posts.business_id', '=', 'businesses.id')
+                ->join('addresses', function ($join) {
+                    $join->on('businesses.id', '=', 'addresses.addressable_id')
+                        ->where('addresses.addressable_type', Business::class);
+                })
+                ->whereNotNull('addresses.location')
+                ->orderByDistance('addresses.location', $userLocation);
         } elseif ($filter === 'popular') {
             $query->withCount('likes')->orderBy('likes_count', 'desc');
         } elseif ($filter === 'trending') {
@@ -75,19 +66,19 @@ class PostsController extends Controller
         $query->when($request->filled('businessId'), fn($q) => $q->where('posts.business_id', $request->businessId));
         $query->when($request->filled('userId'), fn($q) => $q->where('posts.user_id', $request->userId));
 
-        return $query->paginate($limit);
-    });
+        $posts = $query->paginate($limit);
 
-    return response()->json([
-        'data' => PostResource::collection($posts),
-        'meta' => [
-            'current_page' => $posts->currentPage(),
-            'last_page' => $posts->lastPage(),
-            'per_page' => $posts->perPage(),
-            'total' => $posts->total(),
-        ],
-    ]);
-}
+
+        return response()->json([
+            'data' => PostResource::collection($posts),
+            'meta' => [
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'per_page' => $posts->perPage(),
+                'total' => $posts->total(),
+            ],
+        ]);
+    }
     public function addComment(Request $request)
     {
         $request->validate([
@@ -104,49 +95,50 @@ class PostsController extends Controller
 
         // Optionally clear cache for comments on this post
         Cache::forget("post_comments_{$post->id}_page1_limit10");
+        Cache::forget("post_{$post->id}_details");
+
 
         return CommentResource::make($comment);
     }
 
-   public function getById(Request $request, $id)
-{
-    $postCacheKey = "post_{$id}_details";
-    $similarPostsCacheKey = "post_{$id}_similar_posts";
-    $cache = app()->environment('local')
-    ? Cache::store()
-    : Cache::tags(['post_'.$id]);
-    $post = $cache->remember($postCacheKey, now()->addDays(2), function () use ($id) {
-        return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,address_line_1,address_line_2', 'business:id,type_id,name', 'business.address:id,address_line_1'])
-            ->findOrFail($id);
-    });
+    public function getById(Request $request, $id)
+    {
+        $postCacheKey = "post_{$id}_details";
+        $similarPostsCacheKey = "post_{$id}_similar_posts";
+        $cache = app()->environment('local')
+            ? Cache::store()
+            : Cache::tags(['post_' . $id]);
+        $post = $cache->remember($postCacheKey, now()->addDays(2), function () use ($id) {
+            return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,address_line_1,address_line_2', 'business:id,type_id,name', 'business.address:id,address_line_1'])
+                ->findOrFail($id);
+        });
 
-    $similarPosts = $cache->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
-        return Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name'])
-            ->where('id', '!=', $post->id)
-            ->where(function ($query) use ($post) {
-                $query->whereHas('business', function ($q) use ($post) {
-                    $q->where('type_id', $post->business->type_id);
-                })->orWhere('business_id', $post->business_id);
-            })
-            ->latest('created_at')
-            ->limit(5)
-            ->get();
-    });
+        $similarPosts = $cache->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
+            return Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name'])
+                ->where('id', '!=', $post->id)
+                ->where(function ($query) use ($post) {
+                    $query->whereHas('business', function ($q) use ($post) {
+                        $q->where('type_id', $post->business->type_id);
+                    })->orWhere('business_id', $post->business_id);
+                })
+                ->latest('created_at')
+                ->limit(5)
+                ->get();
+        });
 
-    return response()->json([
-        'data' => [
-            'post' => new PostResource($post),
-            'similar_posts' => PostResource::collection($similarPosts),
-        ]
-    ]);
-}
+        return response()->json([
+            'data' => [
+                'post' => new PostResource($post),
+                'similar_posts' => PostResource::collection($similarPosts),
+            ]
+        ]);
+    }
 
     public function likeUnlike($id)
     {
         $post = Post::with(['business:id,type_id,name'])->findOrFail($id);
         $post->toggleLike();
 
-        // Clear the cache for this post since its data changed
         Cache::forget("post_{$id}_details");
 
         return new PostResource($post->refresh());
@@ -156,13 +148,10 @@ class PostsController extends Controller
     {
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
-        $cacheKey = "post_comments_{$postId}_page{$page}_limit{$limit}";
+        $post = Post::with(['business:id,type_id,name'])->findOrFail($postId);
+        $offset = ($page - 1) * $limit;
+        $comments = $post->comments()->latest()->offset($offset)->limit($limit)->get();
 
-        $comments = Cache::remember($cacheKey, 60 * 60 * 24 * 2, function () use ($postId, $limit, $page) {
-            $post = Post::with(['business:id,type_id,name'])->findOrFail($postId);
-            $offset = ($page - 1) * $limit;
-            return $post->comments()->latest()->offset($offset)->limit($limit)->get();
-        });
 
         return CommentResource::collection($comments);
     }
@@ -170,17 +159,7 @@ class PostsController extends Controller
     public function nearby(Request $request)
     {
         $limit = $request->get('limit', 10);
-
-        // Build cache key based on location or user id or fallback random
-        if ($request->has(['lat', 'lng'])) {
-            $cacheKey = 'posts_nearby_lat_' . $request->lat . '_lng_' . $request->lng . "_limit_{$limit}";
-        } elseif (Auth::check() && Auth::user()->primaryAddress?->location) {
-            $cacheKey = 'posts_nearby_user_' . Auth::id() . "_limit_{$limit}";
-        } else {
-            $cacheKey = 'posts_nearby_random_limit_' . $limit;
-        }
-
-        $posts = Cache::remember($cacheKey, 60 * 60 * 24 * 2, function () use ($request, $limit) {
+ {
             $query = Post::with(['user', 'business', 'business.address'])
                 ->select('posts.*')
                 ->join('businesses', 'posts.business_id', '=', 'businesses.id')
@@ -200,10 +179,10 @@ class PostsController extends Controller
                 $query->inRandomOrder();
             }
 
-            return $query->latest()
+            $posts = $query->latest()
                 ->limit($limit)
                 ->get();
-        });
+      
 
         return PostResource::collection($posts);
     }

@@ -322,7 +322,6 @@ class BusinessController extends Controller
     {
         abort_unless(auth()->user()->hasRole('super-admin'), 403);
         $business->update(['is_verified' => !$business->is_verified]);
-        $this->removeCache($business->id);
 
         if ($business->is_verified) {
             $notify = new NotifyProcess();
