@@ -159,7 +159,7 @@ class PostsController extends Controller
     public function nearby(Request $request)
     {
         $limit = $request->get('limit', 10);
- {
+ 
             $query = Post::with(['user', 'business', 'business.address'])
                 ->select('posts.*')
                 ->join('businesses', 'posts.business_id', '=', 'businesses.id')
