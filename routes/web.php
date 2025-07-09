@@ -131,22 +131,18 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 
     
     Route::resource('galleryImage', GalleryImageController::class);
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
-    // Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    // Logs Route
-    // Route::get('logs/all', [LogsController::class, 'getAllLogs'])->name('logs.all');
-    // Route::match(['get', 'post'], 'logs/{userId}', [LogsController::class, 'getLogsByUser'])->name('user.logs');
-    // Route::match(['get', 'post'], 'logs/{subjectId}/{subjectType}', [LogsController::class, 'getLogsBySubject'])->name('subject.logs');
-
-
-    // Route::post('logs/add', [LogsController::class, 'store'])->name('logs.store');
 
     // User preferences routes
     Route::get('/profile/preferences', [ProfileController::class, 'preferences'])->name('profile.preferences');
     Route::post('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences.update');
 
+});
+
+// Profile routes - separate middleware group to avoid redirect loop with user.inactive.check
+Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update']], function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });
 
 Route::group(['middleware' => ['auth']], function () {
