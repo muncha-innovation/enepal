@@ -42,71 +42,42 @@
 <div class="mb-4">
     <h3 class="text-lg font-medium text-gray-900">{{ __('business.business_address') }}</h3>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-        <div>
-            <label for="country" class="block text-sm font-medium text-gray-700 required">
-                {{ __('business.country') }}</label>
-            <div class="mt-1">
-                <select id="country" name="address[country_id]" required
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    @foreach ($countries ?? [] as $country)
-                        <option value="{{ $country->id }}" @if ($country->id == ($business->address?->country_id ?? old('address.country_id'))) selected @endif>
-                            {{ $country->name }} ({{ $country->dial_code }})
-                        </option>
-                    @endforeach
-                </select>
-                <div class="validation-error" id="country-error">{{ __('Country is required') }}</div>
-            </div>
-        </div>
-        <div>
-            <label for="state" class="block text-sm font-medium text-gray-700">
-                {{ __('business.region_state') }}</label>
-            <div class="mt-1">
-                <select id="state" name="address[state_id]"
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    @if (isset($business->address?->state_id))
-                        <option value="{{ $business->address?->state_id }}" selected>
-                            {{ $business->address?->state->name }}
-                        </option>
-                    @endif
-                </select>
-            </div>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+        <label for="address_line_1" class="block text-sm font-medium text-gray-700">{{ __('Address Line 1') }}</label>
+        <input type="text" name="address[address_line_1]" id="address_line_1" value="{{ old('address.address_line_1', $business->address->address_line_1 ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+        <div data-error-for="address.address_line_1" class="validation-error"></div>
     </div>
-
-    <div class="mb-3">
-        <label for="city" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.city') }}</label>
-        <input type="text" name="address[city]" id="city" required
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="{{__('Eg. Kathmandu')}}" value="{{ $business->address?->city ?? old('address.city') }}">
-        <div class="validation-error" id="city-error">{{ __('City is required') }}</div>
+    <div>
+        <label for="address_line_2" class="block text-sm font-medium text-gray-700">{{ __('Address Line 2') }}</label>
+        <input type="text" name="address[address_line_2]" id="address_line_2" value="{{ old('address.address_line_2', $business->address->address_line_2 ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+        <div data-error-for="address.address_line_2" class="validation-error"></div>
     </div>
-
-    <!-- Additional address fields -->
-    <div class="mb-3">
-        <label for="address_line_1" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_1') }}</label>
-        <input type="text" value="{{ $business->address?->address_line_1 ?? old('address.address_line_1') }}"
-            name="address[address_line_1]" id="address_line_1"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="{{__('Eg. Kathmandu, Nepal')}}">
+    <div>
+        <label for="city" class="block text-sm font-medium text-gray-700 required">{{ __('City') }}</label>
+        <input type="text" name="address[city]" id="city" value="{{ old('address.city', $business->address->city ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+        <div data-error-for="address.city" class="validation-error"></div>
     </div>
-
-    <div class="mb-3">
-        <label for="address_line_2" class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.address_2') }}</label>
-        <input type="text" name="address[address_line_2]"
-            value="{{ $business->address?->address_line_2 ?? old('address.address_line_2') }}" id="address_line_2"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="{{__('Eg. Kathmandu, Nepal')}}">
+    <div>
+        <label for="state_province" class="block text-sm font-medium text-gray-700">{{ __('State/Province') }}</label>
+        <input type="text" name="address[state_province]" id="state_province" value="{{ old('address.state_province', $business->address->state_province ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+        <div data-error-for="address.state_province" class="validation-error"></div>
     </div>
-
-    <div class="mb-3">
-        <label for="postal_code"
-            class="block text-sm font-medium leading-6 text-gray-900">{{ __('business.postal_code') }}</label>
-        <input type="text" name="address[postal_code]" value="{{ $business->address?->postal_code ?? old('address.postal_code') }}"
-            id="postal_code"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="{{__('Eg. 1234')}}">
+    <div>
+        <label for="postal_code" class="block text-sm font-medium text-gray-700">{{ __('Postal/Zip Code') }}</label>
+        <input type="text" name="address[postal_code]" id="postal_code" value="{{ old('address.postal_code', $business->address->postal_code ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+        <div data-error-for="address.postal_code" class="validation-error"></div>
     </div>
+    <div>
+        <label for="country" class="block text-sm font-medium text-gray-700 required">{{ __('Country') }}</label>
+        <select name="address[country_id]" id="country" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            @foreach($countries as $country)
+                <option value="{{ $country->id }}" {{ (old('address.country_id', $business->address->country_id ?? '') == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
+            @endforeach
+        </select>
+        <div data-error-for="address.country_id" class="validation-error"></div>
+    </div>
+</div>
 </div>
 
 {{-- Map Location --}}
@@ -120,6 +91,6 @@
             placeholder="{{ __('business.please_select_from_map') }}" disabled>
         <input type="hidden" name="address[location]" id='location'>
     </div>
-    <div id="map" class="mt-3" style="height: 400px;"></div>
     <input id="pac-input" class="controls" type="text" placeholder="{{ __('business.search_box') }}">
+    <div id="map" class="mt-3" style="height: 400px;"></div>
 </div>

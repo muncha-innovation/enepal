@@ -152,6 +152,7 @@ class BusinessController extends Controller
 
     /**
      * Display the specified resource.
+     * 
      *
      * @param  \App\Models\Business  $business
      * @return \Illuminate\Http\Response
@@ -667,42 +668,24 @@ class BusinessController extends Controller
     /**
      * Save or update business social media information
      */
-    public function saveSocialMedia(Request $request, Business $business)
+    public function saveSocialMedia(StoreBusinessRequest $request, Business $business)
     {
-        $data = $request->validate([
-            'social_networks' => 'nullable|array',
-            'social_networks.*.network_id' => 'required_with:social_networks.*.url|exists:social_networks,id',
-            'social_networks.*.url' => 'nullable|string',
-            'social_networks.*.is_active' => 'boolean',
-        ]);
+        $data = $request->validated();
         $this->removeCache($business->id);
-        
         // Process social networks data
         if (isset($data['social_networks'])) {
             $socialNetworks = collect($data['social_networks'])
-                ->filter(function ($item) {
-                    return !empty($item['url']) && isset($item['network_id']);
-                })
-                ->mapWithKeys(function ($item) {
-                    return [$item['network_id'] => [
-                        'url' => $item['url'], 
-                        'is_active' => $item['is_active'] ?? true
-                    ]];
-                })
-                ->all();
-                
-            // Sync the social networks
+                ;
             $business->socialNetworks()->sync($socialNetworks);
         } else {
-            // If no social networks provided, detach all
             $business->socialNetworks()->detach();
         }
         
-        // Return JSON response for Ajax requests
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Social media information updated successfully!'
+                'message' => 'Social media information updated successfully!',
+                'redirect' => route('business.setting', $business)
             ]);
         }
         
@@ -773,6 +756,8 @@ class BusinessController extends Controller
     private function removeCache($id) {
         $cacheKey = "business:full:{$id}";
         Cache::forget($cacheKey);
-        Cache::tags(['businesses'])->flush();
+        if(!app()->environment('local')) {
+            Cache::tags(['businesses'])->flush();
+        }
     }
 }

@@ -1,27 +1,19 @@
 {{-- General Information Section --}}
-<div class="mb-2">
-    <label for="name" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.business_name') }}</label>
-    <div class="mt-2 rounded-md shadow-sm">
-        <input required type="text" name="name" id="name" value="{{ $business->name ?? old('name') }}"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Eg. Nepalese Association of Houston">
-        <div class="validation-error" id="name-error">{{ __('Business name is required') }}</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 required">{{ __('Business Name') }}</label>
+        <input type="text" name="name" id="name" value="{{ old('name', $business->name) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+        <div data-error-for="name" class="validation-error"></div>
     </div>
-</div>
-
-<div class="mb-2">
-    <label for="type_id" class="block text-sm font-medium leading-6 text-gray-900 required">{{ __('business.type') }}</label>
-    <select required id="type_id" name="type_id"
-        class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        onchange="toggleManpowerTab(this.value)">
-        <option value="">{{ __('Select business type') }}</option>
-        @foreach ($businessTypes ?? [] as $type)
-            <option value="{{ $type->id }}" @if ($type->id == ($business->type_id ?? old('type_id'))) selected @endif>
-                {{ $type->title }}
-            </option>
-        @endforeach
-    </select>
-    <div class="validation-error" id="type_id-error">{{ __('Business type is required') }}</div>
+    <div>
+        <label for="type_id" class="block text-sm font-medium text-gray-700 required">{{ __('Business Type') }}</label>
+        <select name="type_id" id="type_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            @foreach($businessTypes as $type)
+                <option value="{{ $type->id }}" {{ (old('type_id', $business->type_id) == $type->id) ? 'selected' : '' }}>{{ $type->title }}</option>
+            @endforeach
+        </select>
+        <div data-error-for="type_id" class="validation-error"></div>
+    </div>
 </div>
 
 {{-- Description in multiple languages --}}

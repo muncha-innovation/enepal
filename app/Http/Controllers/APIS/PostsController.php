@@ -26,8 +26,10 @@ class PostsController extends Controller
 
     // Recommended cache tagging if possible (e.g., Redis)
     $cacheTags = ['posts_index'];
-
-    $posts = Cache::tags($cacheTags)->remember($cacheKey, now()->addDays(2), function () use ($request, $limit) {
+    $cache = app()->environment('local')
+    ? Cache::store()
+    : Cache::tags([$cacheTags]);
+    $posts = $cache->remember($cacheKey, now()->addDays(2), function () use ($request, $limit) {
         $query = Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name', 'likes:id,post_id,user_id']);
 
         // Search filter
@@ -110,14 +112,15 @@ class PostsController extends Controller
 {
     $postCacheKey = "post_{$id}_details";
     $similarPostsCacheKey = "post_{$id}_similar_posts";
-
-    // Use tags for better cache management (requires Redis or compatible driver)
-    $post = Cache::tags(['post_'.$id])->remember($postCacheKey, now()->addDays(2), function () use ($id) {
+    $cache = app()->environment('local')
+    ? Cache::store()
+    : Cache::tags(['post_'.$id]);
+    $post = $cache->remember($postCacheKey, now()->addDays(2), function () use ($id) {
         return Post::with(['user:id,first_name,last_name,email', 'user.addresses:id,address_line_1,address_line_2', 'business:id,type_id,name', 'business.address:id,address_line_1'])
             ->findOrFail($id);
     });
 
-    $similarPosts = Cache::tags(['post_'.$id])->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
+    $similarPosts = $cache->remember($similarPostsCacheKey, now()->addDays(2), function () use ($post) {
         return Post::with(['user:id,first_name,last_name,email', 'business:id,type_id,name'])
             ->where('id', '!=', $post->id)
             ->where(function ($query) use ($post) {

@@ -7,6 +7,7 @@
             'typeFacilities' => $typeFacilities ?? []
         ])
     </div>
+    <div data-error-for="facilities" class="validation-error"></div>
 </div>
 
 {{-- Business Hours Section --}}

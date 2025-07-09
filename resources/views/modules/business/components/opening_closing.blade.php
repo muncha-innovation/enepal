@@ -9,6 +9,13 @@
         </button>
     </div>
 
+    @if($errors->has('hours'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ $errors->first('hours') }}</span>
+        </div>
+    @endif
+    <div data-error-for="hours" class="validation-error"></div>
+
     @php
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $hours = $business->hours ?? collect();

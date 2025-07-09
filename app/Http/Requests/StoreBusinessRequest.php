@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\SettingKeys;
+use App\Models\SocialNetwork;
+use App\Rules\ValidBusinessHours;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -61,11 +63,7 @@ class StoreBusinessRequest extends FormRequest
                 $rules = [
                     'facilities' => ['sometimes', 'array'],
                     'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
-                    'hours' => 'sometimes|array',
-                    'hours.*' => 'array',
-                    'hours.*.is_open' => 'sometimes|boolean',
-                    'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
-                    'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                    'hours' => ['sometimes', 'array', new ValidBusinessHours],
                 ];
                 break;
                 
@@ -129,11 +127,7 @@ class StoreBusinessRequest extends FormRequest
                     // Details section
                     'facilities' => ['sometimes', 'array'],
                     'facilities.*' => ['nullable', 'string', 'valid_facility_value'],
-                    'hours' => 'sometimes|array',
-                    'hours.*' => 'array',
-                    'hours.*.is_open' => 'sometimes|boolean',
-                    'hours.*.open_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
-                    'hours.*.close_time' => 'exclude_if:hours.*.is_open,0|required_if:hours.*.is_open,1|nullable|date_format:H:i',
+                    'hours' => ['sometimes', 'array', new ValidBusinessHours],
                     
                     // Address section
                     'address.city' => ['required'],
@@ -203,6 +197,7 @@ class StoreBusinessRequest extends FormRequest
             'logo.required' => 'Business logo is required',
             'address.country_id.required' => 'Country is required',
             'custom_email_message.max' => 'Custom email message cannot be longer than 1000 characters',
+            'hours.valid_business_hours' => 'Please enter both opening and closing times for selected days.',
         ];
     }
 
@@ -239,7 +234,7 @@ class StoreBusinessRequest extends FormRequest
                 ->mapWithKeys(function ($item) {
                     return [$item['network_id'] => [
                         'url' => $this->normalizeUrl($item['url'], $item['network_id']),
-                        'is_active' => $item['is_active'] ?? true
+                        'is_active' => isset($item['is_active']) ? (bool)$item['is_active'] : false
                     ]];
                 })->all();
         }
@@ -252,52 +247,59 @@ class StoreBusinessRequest extends FormRequest
      */
     protected function normalizeUrl($url, $networkId)
     {
-        // Remove whitespace and convert to lowercase
         $url = trim(strtolower($url));
         
-        // Get network info from database
-        $network = \App\Models\SocialNetwork::find($networkId);
+        $network = SocialNetwork::find($networkId);
+        
         if (!$network) return $url;
 
-        switch ($network->name) {
-            case 'Facebook':
-                return $this->normalizeSocialUrl($url);
-                break;
+        return $this->normalizeSocialUrl($url, strtolower($network->name));
 
-           case 'Instagram':
-            return $this->normalizeSocialUrl($url, 'instagram');
-                break;
-      }
-
-        return $url;
     }
 
     function normalizeSocialUrl($url, $platform = 'facebook')
     {
         $url = trim($url);
-    
-        if (empty($url)) {
-            return null; // User entered nothing
+
+        // Empty input → nothing to normalise
+        if ($url === '') {
+            return null;
         }
-    
-        if (preg_match('/^@/', $url)) {
-            $username = ltrim($url, '@');
-        } elseif (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-            // No http(s):// → assume it's just a username
-            $username = ltrim($url, '/');
-        } else {
-            // If already a full URL, just return it
+
+        // If the user already provided a full URL (e.g. https://facebook.com/ujwal),
+        // return it untouched to avoid double-prefixing.
+        if (preg_match('~^(?:f|ht)tps?://~i', $url)) {
             return $url;
         }
-    
-        // Now build the correct link based on platform
-        switch (strtolower($platform)) {
-            case 'instagram':
-                return "https://www.instagram.com/{$username}";
-            case 'facebook':
-            default:
-                return "https://www.facebook.com/{$username}";
+
+        // Extract a username/identifier from shorthand input
+        if (strpos($url, '@') === 0) {
+            $username = ltrim($url, '@');
+        } else {
+            // Treat anything without protocol as a raw username/path and trim leading slashes
+            $username = ltrim($url, '/');
         }
+
+        $platformUrls = [
+            'facebook'  => 'https://www.facebook.com/%s',
+            'instagram' => 'https://www.instagram.com/%s',
+            'tiktok'    => 'https://www.tiktok.com/@%s',
+            'twitter'   => 'https://twitter.com/%s',
+            'x'         => 'https://x.com/%s',
+            'linkedin'  => 'https://www.linkedin.com/in/%s',
+            'youtube'   => 'https://www.youtube.com/%s',
+            'whatsapp'  => 'https://wa.me/%s',
+            'snapchat'  => 'https://www.snapchat.com/add/%s',
+            'viber'     => 'viber://add?number=%s',
+        ];
+
+        // Build the full URL using the mapping table if one exists for this platform
+        if (isset($platformUrls[$platform])) {
+            return sprintf($platformUrls[$platform], $username);
+        }
+
+        // Fallback – return the original input
+        return $url;
     }
 
 }

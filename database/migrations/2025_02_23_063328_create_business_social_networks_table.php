@@ -19,7 +19,7 @@ class CreateBusinessSocialNetworksTable extends Migration
             $table->foreignId('social_network_id')->constrained('social_networks')->onDelete('cascade');
             $table->string('url');
             $table->unique(['business_id', 'social_network_id']);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }

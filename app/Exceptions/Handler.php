@@ -47,11 +47,10 @@ class Handler extends ExceptionHandler
      */
     protected function shouldReturnJson($request, Throwable $e)
     {
-        if ($request->is('api/*')) {
+        if ($request->is('api/*') || $request->expectsJson()) {
             return true;
-
         }
-        return false;
+        return parent::shouldReturnJson($request, $e);
     }
 
     //redirecting to dashboard if the user is not authorized
