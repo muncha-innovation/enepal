@@ -55,7 +55,7 @@
                     <div class="flex flex-col gap-3 pb-3 border-b border-gray-200">
                         <div class="flex justify-between items-center">
                             <h2 class="text-xl py-0.5">Conversations</h2>
-                            <button onclick="document.getElementById('newChatModal').classList.remove('hidden')"
+                            <button onclick="document.getElementById('newChatModal').classList.remove('hidden'); setTimeout(initializeChatSelect2, 100);"
                                 class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 New Chat
                             </button>
@@ -124,6 +124,20 @@
                 </div>
             </div>
         @else
+            {{-- Notifications Header --}}
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">Notifications</h2>
+                @if (auth()->user()->isOwnerOf($business) || auth()->user()->isAdminOf($business))
+                    <button onclick="document.getElementById('newNotificationModal').classList.remove('hidden'); setTimeout(initializeNotificationSelect2, 100);"
+                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        New Notification
+                    </button>
+                @endif
+            </div>
+            
             <ul role="list" class="divide-y divide-gray-200">
                 @forelse($notifications as $notification)
                     @php
@@ -210,12 +224,9 @@
                         @csrf
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Select User</label>
-                            <select name="user_id" required
+                            <select name="user_id" id="chat-user-select" required
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="">Select a user...</option>
-                                @foreach ($users ?? [] as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="mb-4">
@@ -270,10 +281,6 @@
                             <select name="users[]" multiple="multiple" id="select-users"
                                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                 <option value="all" selected>All Users</option>
-                                @foreach ($users ?? [] as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
                             </select>
                         </div>
 
@@ -320,5 +327,7 @@
 @endsection
 
 @push('js')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/communications.js') }}"></script>
 @endpush

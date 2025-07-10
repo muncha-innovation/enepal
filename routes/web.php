@@ -209,6 +209,11 @@ Route::prefix('news')->name('news.')->group(function () {
     Route::get('/category/{category}', [NewsController::class, 'publicCategory'])->name('public.category');
 });
 
+// Public Post Routes  
+Route::prefix('post')->name('frontend.post.')->group(function () {
+    Route::get('/{post}', [PostController::class, 'frontendShow'])->name('show');
+});
+
 Route::get('/telescope-status', fn() => [
     'enabled' => config('telescope.enabled'),
     'app_env' => app()->environment(),

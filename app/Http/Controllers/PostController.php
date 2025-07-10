@@ -129,4 +129,30 @@ class PostController extends Controller
         ]);
     }
 
+    /**
+     * Display the specified post on the frontend (public view).
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function frontendShow(Post $post)
+    {
+        // Only show active posts
+        if (!$post->is_active) {
+            abort(404);
+        }
+        
+        // Load related data
+        $post->load(['user', 'business', 'business.address', 'comments.user']);
+        
+        // Get related posts from the same business
+        $relatedPosts = Post::where('business_id', $post->business_id)
+            ->where('id', '!=', $post->id)
+            ->where('is_active', true)
+            ->latest()
+            ->limit(4)
+            ->get();
+        
+        return view('modules.frontend.post.show', compact('post', 'relatedPosts'));
+    }
 }

@@ -179,8 +179,9 @@ class NewsController extends Controller
     // Public methods
     public function publicIndex()
     {
-        $news = NewsItem::with(['source', 'categories'])
+        $news = NewsItem::with(['sourceable', 'categories'])
             ->where('is_active', true)
+            ->where('sourceable_type', 'App\Models\User') // Only show internal news created by users
             ->latest('published_at')
             ->paginate(12);
 
@@ -189,12 +190,24 @@ class NewsController extends Controller
 
     public function publicShow(NewsItem $newsItem)
     {
+        // Only allow viewing internal news (created by users, not external sources)
+        if ($newsItem->sourceable_type !== 'App\Models\User') {
+            abort(404);
+        }
+        
+        // Only show active news
+        if (!$newsItem->is_active) {
+            abort(404);
+        }
+        
         $relatedNews = $newsItem->categories()
             ->first()
-            ->newsItems()
+            ?->newsItems()
             ->where('id', '!=', $newsItem->id)
+            ->where('sourceable_type', 'App\Models\User') // Only internal news in related
+            ->where('is_active', true)
             ->limit(4)
-            ->get();
+            ->get() ?? collect();
 
         return view('modules.frontend.news.show', compact('newsItem', 'relatedNews'));
     }
@@ -203,6 +216,7 @@ class NewsController extends Controller
     {
         $news = $category->newsItems()
             ->where('is_active', true)
+            ->where('sourceable_type', 'App\Models\User') // Only show internal news
             ->latest('published_at')
             ->paginate(12);
 

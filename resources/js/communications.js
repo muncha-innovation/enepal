@@ -211,6 +211,60 @@ function scrollToBottom() {
     }
 }
 
+/**
+ * Initialize Select2 for notification modal
+ */
+window.initializeNotificationSelect2 = function() {
+    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined' && document.getElementById('select-users')) {
+        $('#select-users').select2({
+            placeholder: 'Select users',
+            allowClear: true,
+            dropdownParent: $('#newNotificationModal'),
+            ajax: {
+                url: '/search-users',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results 
+                    };
+                },
+                cache: true
+            }
+        });
+    }
+};
+
+/**
+ * Initialize Select2 for chat modal
+ */
+window.initializeChatSelect2 = function() {
+    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined' && document.getElementById('chat-user-select')) {
+        $('#chat-user-select').select2({
+            placeholder: 'Select a user...',
+            allowClear: true,
+            dropdownParent: $('#newChatModal'),
+            ajax: {
+                url: '/search-users',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results 
+                    };
+                },
+                cache: true
+            }
+        });
+    }
+};
+
 // Initialize event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize recipient type toggle for notification modal
@@ -229,14 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     segmentSelection.classList.remove('hidden');
                 }
             });
-        });
-    }
-    
-    // Initialize Select2 for user selection if available
-    if (typeof $.fn.select2 !== 'undefined' && document.getElementById('select-users')) {
-        $('#select-users').select2({
-            placeholder: 'Select users',
-            allowClear: true
         });
     }
 });
