@@ -326,6 +326,9 @@
             });
 
             updateLocationFields(initialLat, initialLng);
+            
+            // Add address field listeners for auto-geocoding
+            addAddressListeners();
         }
         
         function updateLocationFields(lat, lng) {
@@ -355,8 +358,16 @@
                         if (cityEl) cityEl.value = value;
                         break;
                     case 'administrative_area_level_1':
-                        const stateEl = document.getElementById('state_province');
-                        if (stateEl) stateEl.value = value;
+                        // For state, we need to find the matching state in the dropdown
+                        const stateSelect = document.getElementById('state');
+                        if (stateSelect) {
+                            for (let i = 0; i < stateSelect.options.length; i++) {
+                                if (stateSelect.options[i].text.toLowerCase().includes(value.toLowerCase())) {
+                                    stateSelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case 'country':
                         const countrySelect = document.getElementById('country');
@@ -364,6 +375,8 @@
                             for (let i = 0; i < countrySelect.options.length; i++) {
                                 if (countrySelect.options[i].text === value) {
                                     countrySelect.selectedIndex = i;
+                                    // Trigger country change event to load states
+                                    countrySelect.dispatchEvent(new Event('change'));
                                     break;
                                 }
                             }
@@ -379,6 +392,61 @@
             const streetAddress = `${address.street_number || ''} ${address.route || ''}`.trim();
             const addressEl = document.getElementById('address_line_1');
             if (addressEl) addressEl.value = streetAddress;
+        }
+
+        // Function to geocode address from form fields
+        function geocodeAddress() {
+            const country = document.getElementById('country').selectedOptions[0]?.text || '';
+            const state = document.getElementById('state').selectedOptions[0]?.text || '';
+            const city = document.getElementById('city').value || '';
+            const address1 = document.getElementById('address_line_1').value || '';
+            const address2 = document.getElementById('address_line_2').value || '';
+            const postal = document.getElementById('postal_code').value || '';
+
+            // Build address string
+            const addressParts = [address1, address2, city, state, country, postal].filter(part => part.trim());
+            const fullAddress = addressParts.join(', ');
+
+            if (fullAddress.trim().length < 10) return; // Too short to geocode
+
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: fullAddress }, (results, status) => {
+                if (status === 'OK' && results[0] && map) {
+                    const location = results[0].geometry.location;
+                    map.setCenter(location);
+                    map.setZoom(15);
+                    if (marker) {
+                        marker.setPosition(location);
+                    }
+                    updateLocationFields(location.lat(), location.lng());
+                }
+            });
+        }
+
+        // Add event listeners for address fields to trigger geocoding
+        function addAddressListeners() {
+            const addressFields = ['country', 'state', 'city', 'address_line_1', 'address_line_2', 'postal_code'];
+            
+            addressFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', debounce(geocodeAddress, 1000));
+                    field.addEventListener('change', debounce(geocodeAddress, 500));
+                }
+            });
+        }
+
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
         function reverseGeocode(latLng) {

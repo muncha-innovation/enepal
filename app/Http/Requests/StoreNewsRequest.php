@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\State;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Support\Facades\Cache;
 use Google\Cloud\Core\Exception\NotFoundException;
@@ -28,6 +29,8 @@ class StoreNewsRequest extends FormRequest
             'image' => 'nullable|url',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:news_categories,id',
+            'genders' => 'nullable|array',
+            'genders.*' => 'exists:user_genders,id',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50',
             'language' => 'nullable|string|max:4',
@@ -50,6 +53,9 @@ class StoreNewsRequest extends FormRequest
         }
         if(empty($validated['categories'])) {
             $validated['categories'] = [];
+        }
+        if(empty($validated['genders'])) {
+            $validated['genders'] = [];
         }
         if(empty($validated['age_groups'])) {
             $validated['age_groups'] = [];
@@ -152,7 +158,7 @@ class StoreNewsRequest extends FormRequest
                 return $transformedResult;
             }
         } catch (\Exception $e) {
-            \Log::error('Place Details API Error: ' . $e->getMessage());
+            Log::error('Place Details API Error: ' . $e->getMessage());
         }
 
         return [];
