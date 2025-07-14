@@ -11,7 +11,6 @@
   <div class="flex gap-2">
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
       <a href="{{ route('posts.create', $business) }}" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add Post</a>
-     
     </div>
 
     <div class="mt-4 sm:mt-0 relative rounded-md shadow-sm">
@@ -35,6 +34,7 @@
               <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Image</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Comments</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created By</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At</th>
               <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Action</th>
@@ -49,6 +49,18 @@
                 @if($post->image)
                 <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" class="w-10 h-10 rounded-lg">
                 @endif
+              </td>
+              <td class="px-3 py-3.5 text-sm font-medium text-gray-900">
+                <div class="flex items-center space-x-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    {{ $post->comments_count }} Total
+                  </span>
+                  @if($post->pending_comments_count > 0)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {{ $post->pending_comments_count }} Pending
+                    </span>
+                  @endif
+                </div>
               </td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ $post->user->name }}</td>
               <td class="px-3 py-3.5 text-sm font-medium text-gray-900">{{ getFormattedDate($post->created_at) }}</td>

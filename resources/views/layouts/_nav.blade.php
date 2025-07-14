@@ -48,6 +48,24 @@
 
 <nav class="flex flex-col justify-between flex-1 px-2 mt-5 space-y-4 divide-y-2 divide-gray-300">
     <div class="space-y-1">
+        <!-- Dashboard -->
+        <div class="space-y-1">
+            <a href="{{ route('dashboard') }}">
+                <button
+                    class="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-900 group @if(request()->routeIs('dashboard')) bg-gray-200 @endif">
+                    <div class="flex items-center pointer-events-none">
+                        <div>
+                            <svg class="flex-shrink-0 w-6 h-6 mr-3 text-gray-500 group-hover:text-gray-500"
+                                fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                            </svg>
+                        </div>
+                        {{ __('Dashboard') }}
+                    </div>
+                </button>
+            </a>
+        </div>
+
         <div x-data="{ open: {{ $isProfileRoute }} }" class="space-y-1">
             <a href="{{ route('profile') }}">
                 <button

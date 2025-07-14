@@ -68,16 +68,20 @@
                     <div class="mt-1">
                         <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp,image/svg" autocomplete="cover_image"
                             class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
-                    @if ($isEdit)
-                        @if ($gallery->cover_image)
-                            <img src="{{ getImage($gallery->cover_image, '/') }}" alt="Gallery Image"
-                                class="w-20 h-20 rounded-lg">
-                        @else
-                            -
-                        @endif
                         
-                    @endif
+                        <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+                            <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 16:9 (Widescreen)</p>
+                            <p>Recommended size: 1920x1080 pixels for best quality</p>
+                        </div>
+                        
+                        @if ($isEdit && $gallery->cover_image)
+                            <div class="mt-2">
+                                <img src="{{ getImage($gallery->cover_image, '/') }}" alt="Gallery Cover Image"
+                                    class="rounded-lg border border-gray-200 object-cover" 
+                                    style="width: 200px; aspect-ratio: 16 / 9;">
+                            </div>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     <button type="submit"

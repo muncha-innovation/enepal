@@ -141,8 +141,12 @@
         <input type="text" name="coordinates" id="coordinates"
             value="{{ $business->address?->location ? $business->address->location->getLat().','.$business->address->location->getLng() : '' }}"
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="{{ __('business.please_select_from_map') }}" disabled>
+            placeholder="Enter coordinates (lat,lng) or select from map below">
         <input type="hidden" name="address[location]" id='location'>
+        <div class="mt-1 text-xs text-gray-500">
+            {{ __('Enter coordinates as latitude,longitude (e.g., 27.7172,85.3240) or use the map below') }}
+        </div>
+        <div data-error-for="coordinates" class="validation-error text-red-600 text-sm mt-1" style="display: none;"></div>
     </div>
     <input id="pac-input" class="controls" type="text" placeholder="{{ __('business.search_box') }}">
     <div id="map" class="mt-3" style="height: 400px;"></div>

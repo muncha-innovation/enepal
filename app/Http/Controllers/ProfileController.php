@@ -8,6 +8,8 @@ use App\Models\UserPreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -15,6 +17,12 @@ class ProfileController extends Controller
     {
         $countries = Country::all();
         $user = auth()->user();
+        
+        // Clear the active tab session unless it's specifically set to show a different tab
+        // This ensures the general tab shows by default when visiting /profile
+        if (!request()->has('tab')) {
+            session()->forget('active_profile_tab');
+        }
         
         return view('modules.profile.show', compact(['user', 'countries']));
     }
@@ -24,12 +32,13 @@ class ProfileController extends Controller
         $user = auth()->user();
         $data = collect($request->validated());
         $userData = $data->except(['address', 'original_password'])->toArray();
-        if ($request->hasFile('profile_picture')) {
-            $userData['profile_picture'] = upload('profile/', 'png', $request->file('profile_picture'));
-        }
+        
+        // Profile picture is now handled separately via AJAX
+        
         if (isset($userData['password']) && $userData['password'] != '') {
             $userData['force_update_password'] = false;
         }
+        
         $user->update($userData);
 
         $address = $user->primaryAddress;
@@ -44,6 +53,54 @@ class ProfileController extends Controller
         session(['active_profile_tab' => 'general']);
         
         return redirect()->route('profile')->with('success', 'Profile updated successfully');
+    }
+    
+    /**
+     * Upload profile image via AJAX
+     */
+    public function uploadImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'profile_picture' => 'required|image|mimes:jpeg,jpg,png,gif|max:1024', // 1MB max
+            ]);
+
+            $user = auth()->user();
+            $file = $request->file('profile_picture');
+            
+            // Delete old profile picture if exists
+            if ($user->profile_picture && $user->profile_picture !== 'def.png') {
+                try {
+                    Storage::disk('public')->delete($user->profile_picture);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to delete old profile picture: ' . $e->getMessage());
+                }
+            }
+            
+            // Upload new image
+            $imagePath = upload('profile/', 'png', $file);
+            
+            // Update user record
+            $user->update(['profile_picture' => $imagePath]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile image uploaded successfully!',
+                'image_url' => getImage($imagePath, 'profile/')
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first('profile_picture')
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Profile image upload failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to upload image. Please try again.'
+            ], 500);
+        }
     }
 
     public function getWorkExperience()

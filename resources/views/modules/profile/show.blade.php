@@ -13,8 +13,8 @@
     <div class="border-b border-gray-200 mb-6">
         <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="profileTabs" role="tablist">
             <li class="mr-2" role="presentation">
-                <button class="inline-block p-4 border-b-2 {{ session('active_profile_tab') != 'security' && session('active_profile_tab') != 'work-experience' && session('active_profile_tab') != 'education' && session('active_profile_tab') != 'preferences' ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
-                    id="general-tab" data-tab="general" type="button" role="tab" aria-selected="{{ session('active_profile_tab') ? 'false' : 'true' }}">
+                <button class="inline-block p-4 border-b-2 {{ (!session('active_profile_tab') || session('active_profile_tab') == 'general') ? 'border-indigo-600 text-indigo-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}" 
+                    id="general-tab" data-tab="general" type="button" role="tab" aria-selected="{{ (!session('active_profile_tab') || session('active_profile_tab') == 'general') ? 'true' : 'false' }}">
                     {{ __('General') }}
                 </button>
             </li>
@@ -48,7 +48,7 @@
     <!-- Tab Content -->
     <div class="tab-content">
         <!-- General Tab -->
-        <div id="general" class="tab-pane {{ session('active_profile_tab') ? 'hidden' : 'active' }}">
+        <div id="general" class="tab-pane {{ (!session('active_profile_tab') || session('active_profile_tab') == 'general') ? 'active' : 'hidden' }}">
             @include('modules.profile.partials.general')
         </div>
 
@@ -104,24 +104,7 @@
             });
         });
 
-        document.getElementById('file-selector').addEventListener('click', function() {
-            document.getElementById('file-input').click();
-        });
-        document.getElementById('file-input').addEventListener('change', function() {
-            const fileInput = this;
-            const selectedImage = document.getElementById('profile-picture');
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    selectedImage.setAttribute('src', e.target.result);
-                    console.log('atr set');
-                };
-
-                reader.readAsDataURL(fileInput.files[0]);
-            }
-        });
+        // File upload handling is now done in general.blade.php partial
 
         // Client-side validation
         document.getElementById('profileForm').addEventListener('submit', function(e) {

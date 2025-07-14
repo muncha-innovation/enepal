@@ -22,6 +22,68 @@ return [
 
     /**
     |--------------------------------------------------------------------------
+    | Image aspect ratio configurations
+    |--------------------------------------------------------------------------
+     */
+
+    'aspect_ratios' => [
+        '16:9' => [
+            'dimensions' => [16, 9],
+            'use_case' => 'Primary images, cover images, banners',
+            'recommended_size' => '1920x1080',
+            'description' => 'Widescreen format ideal for hero banners and cover images'
+        ],
+        '1:1' => [
+            'dimensions' => [1, 1],
+            'use_case' => 'Thumbnails, profile pictures, listings',
+            'recommended_size' => '400x400',
+            'description' => 'Square format perfect for profile pictures and thumbnails'
+        ],
+        '4:3' => [
+            'dimensions' => [4, 3],
+            'use_case' => 'Traditional photography, card images',
+            'recommended_size' => '800x600',
+            'description' => 'Traditional format for standard photography'
+        ],
+        '3:2' => [
+            'dimensions' => [3, 2],
+            'use_case' => 'Professional photography, article images',
+            'recommended_size' => '900x600',
+            'description' => 'Professional photography format close to golden ratio'
+        ],
+    ],
+
+    /**
+    |--------------------------------------------------------------------------
+    | Image type configurations
+    |--------------------------------------------------------------------------
+     */
+
+    'image_types' => [
+        'primary' => [
+            'aspect_ratio' => '16:9',
+            'use_case' => 'Primary images, cover images, banners',
+            'max_size_mb' => 2,
+        ],
+        'listing' => [
+            'aspect_ratio' => '1:1',
+            'use_case' => 'Thumbnails, profile pictures, listings',
+            'max_size_mb' => 1,
+        ],
+        'card' => [
+            'aspect_ratio' => '4:3',
+            'use_case' => 'Card images, featured content',
+            'max_size_mb' => 2,
+        ],
+        'profile' => [
+            'aspect_ratio' => '1:1',
+            'use_case' => 'Profile pictures and avatars',
+            'max_size_mb' => 1,
+        ],
+    ],
+
+    /**
+    |--------------------------------------------------------------------------
     | User specific configurations
     |--------------------------------------------------------------------------
      */

@@ -54,6 +54,12 @@
         .pac-container {
             z-index: 10000 !important;
         }
+        
+        /* Coordinate input error styling */
+        .ring-red-500 {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 1px #ef4444 !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -270,7 +276,12 @@
             let initialLat = 27.7172;
             let initialLng = 85.3240;
 
-            if (coordinatesInput && coordinatesInput.value) {
+            // Check for pending coordinates first (manually entered before map load)
+            if (window.pendingCoordinates) {
+                initialLat = window.pendingCoordinates.lat;
+                initialLng = window.pendingCoordinates.lng;
+                delete window.pendingCoordinates;
+            } else if (coordinatesInput && coordinatesInput.value) {
                 const parts = coordinatesInput.value.split(',');
                 if (parts.length === 2) {
                     initialLat = parseFloat(parts[0]);
@@ -325,10 +336,27 @@
                 reverseGeocode(event.latLng);
             });
 
+            // Add click event to map to place marker at clicked location
+            map.addListener('click', (event) => {
+                const clickedLocation = event.latLng;
+                
+                // Move marker to clicked location
+                marker.setPosition(clickedLocation);
+                
+                // Update coordinate fields
+                updateLocationFields(clickedLocation.lat(), clickedLocation.lng());
+                
+                // Reverse geocode to update address fields
+                reverseGeocode(clickedLocation);
+            });
+
             updateLocationFields(initialLat, initialLng);
             
             // Add address field listeners for auto-geocoding
             addAddressListeners();
+            
+            // Add coordinate input listener for manual entry
+            addCoordinateInputListener();
         }
         
         function updateLocationFields(lat, lng) {
@@ -449,6 +477,78 @@
             };
         }
 
+        // Add coordinate input listener for manual entry
+        function addCoordinateInputListener() {
+            const coordinatesInput = document.getElementById('coordinates');
+            const errorElement = document.querySelector('[data-error-for="coordinates"]');
+            
+            if (!coordinatesInput) return;
+            
+            coordinatesInput.addEventListener('input', debounce(function(event) {
+                const value = event.target.value.trim();
+                
+                // Clear previous errors
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                    errorElement.textContent = '';
+                }
+                coordinatesInput.classList.remove('ring-red-500');
+                
+                if (!value) {
+                    return; // Allow empty value
+                }
+                
+                // Validate coordinate format (lat,lng)
+                const coordinatePattern = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+                
+                if (!coordinatePattern.test(value)) {
+                    showCoordinateError('Invalid coordinate format. Please use: latitude,longitude (e.g., 27.7172,85.3240)');
+                    return;
+                }
+                
+                const parts = value.split(',');
+                const lat = parseFloat(parts[0].trim());
+                const lng = parseFloat(parts[1].trim());
+                
+                // Additional validation for coordinate ranges
+                if (lat < -90 || lat > 90) {
+                    showCoordinateError('Latitude must be between -90 and 90 degrees');
+                    return;
+                }
+                
+                if (lng < -180 || lng > 180) {
+                    showCoordinateError('Longitude must be between -180 and 180 degrees');
+                    return;
+                }
+                
+                // Update the hidden location field immediately
+                updateLocationFields(lat, lng);
+                
+                // Update map if it exists
+                if (map && marker) {
+                    const newPosition = { lat: lat, lng: lng };
+                    map.setCenter(newPosition);
+                    map.setZoom(15);
+                    marker.setPosition(newPosition);
+                    
+                    // Reverse geocode to update address fields
+                    reverseGeocode(new google.maps.LatLng(lat, lng));
+                } else {
+                    // Store coordinates for when map initializes
+                    window.pendingCoordinates = { lat: lat, lng: lng };
+                }
+                
+            }, 500));
+            
+            function showCoordinateError(message) {
+                coordinatesInput.classList.add('ring-red-500');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+        }
+
         function reverseGeocode(latLng) {
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode({ location: latLng }, (results, status) => {
@@ -462,6 +562,9 @@
             const tabs = document.querySelectorAll('#businessTabs button');
             const tabPanes = document.querySelectorAll('.tab-pane');
             const prevButtons = document.querySelectorAll('.prev-btn');
+            
+            // Initialize coordinate input listener immediately (even before map loads)
+            addCoordinateInputListener();
 
             function switchTab(tabId) {
                 tabs.forEach(tab => {

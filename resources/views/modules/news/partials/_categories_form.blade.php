@@ -7,7 +7,9 @@
                         @foreach ($categoryGroup as $category)
                             <label class="inline-flex items-center">
                                 <input type="checkbox" name="categories[]" value="{{ $category->id }}"
-                                    @if($news->exists) 
+                                    @if(old('categories'))
+                                        {{ in_array($category->id, old('categories', [])) ? 'checked' : '' }}
+                                    @elseif($news->exists) 
                                         {{ $news->categories->contains($category->id) ? 'checked' : '' }}
                                     @else
                                         checked

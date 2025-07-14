@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 use Spatie\Permission\Models\Role;
@@ -231,11 +232,18 @@ class UsersController extends Controller
     public function destroy(User $user)
     {
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
+        
         if ($user->id == auth()->user()->id) {
             return response()->json([
                 'message' => trans('Sorry, you cannot delete yourself.'),
             ], 400);
         }
+        
+        // Check if user is inactive - only inactive users can be deleted
+        if ($user->is_active) {
+            return back()->with('error', __('Only inactive users can be deleted. Please deactivate the user first.'));
+        }
+        
         $user->delete();
         $user->addresses()->delete();
         $user->roles()->detach();
@@ -253,7 +261,7 @@ class UsersController extends Controller
         abort_unless(auth()->user()->hasRole(User::SuperAdmin), Response::HTTP_FORBIDDEN);
         
         // Generate a random password (8 characters)
-        $password = \Str::random(8);
+        $password = Str::random(8);
         
         // Update the user's password
         $user->password = Hash::make($password);

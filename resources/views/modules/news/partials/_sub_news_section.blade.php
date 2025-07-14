@@ -48,4 +48,10 @@
             </div>
         @endforelse
     </div>
+    
+    @if($subNews->hasPages())
+        <div class="px-4 pb-4">
+            {{ $subNews->appends(request()->query())->links() }}
+        </div>
+    @endif
 </div> 

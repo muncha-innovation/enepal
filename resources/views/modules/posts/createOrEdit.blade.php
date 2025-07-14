@@ -82,12 +82,23 @@
 
                 <div class="mb-2">
                     <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover Image</label>
-                    <input type="file" @if (!$isEdit) required @endif name="image" accept="image/*"
-                        class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-                    
-                    @if ($post->image)
-                        <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" class="mt-2 rounded-lg w-20">
-                    @endif
+                    <div class="mt-1">
+                        <input type="file" @if (!$isEdit) required @endif name="image" accept="image/*"
+                            class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                        
+                        <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+                            <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 16:9 (Widescreen)</p>
+                            <p>Recommended size: 1920x1080 pixels for best quality</p>
+                        </div>
+                        
+                        @if ($post->image)
+                            <div class="mt-2">
+                                <img src="{{ getImage($post->image, 'posts/') }}" alt="Post Image" 
+                                    class="rounded-lg border border-gray-200 object-cover" 
+                                    style="width: 200px; aspect-ratio: 16 / 9;">
+                            </div>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     <button type="submit"

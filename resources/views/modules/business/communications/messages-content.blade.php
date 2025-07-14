@@ -21,6 +21,15 @@
   <div class="bg-gray-50 border-b px-4 py-2">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2 overflow-x-auto pb-1 thread-selector">
+        <!-- All Messages Thread -->
+        <div class="relative thread-container">
+          <a href="#" 
+             data-thread-id="all" 
+             class="thread-tab px-3 py-1 text-sm rounded-full whitespace-nowrap {{ ($thread->id ?? null) == 'all' ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
+             onclick="threadManagement.switchThread(event, 'all')">
+            📋 All Messages
+          </a>
+        </div>
         @foreach($conversation->threads as $t)
           <div class="relative thread-container">
             <a href="#" 
@@ -67,40 +76,47 @@
     <div class="space-y-4">
       @forelse($messages as $message)
           <div class="flex {{ $message->sender_type == 'App\\Models\\Business' ? 'justify-end' : 'justify-start' }}">
-            <div class="max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 {{ $message->sender_type == 'App\\Models\\Business' ? 'bg-indigo-100 text-gray-800' : 'bg-gray-100 text-gray-800' }}">
-              <p class="text-sm">{{ $message->content }}</p>
-              
-              @if(!empty($message->attachments))
-                <div class="mt-2 space-y-2 p-2 bg-white bg-opacity-50 rounded-md">
-                  @foreach($message->attachments as $attachment)
-                    <div class="mb-1">
-                      @if(isset($attachment['mime']) && strpos($attachment['mime'], 'image/') === 0)
-                        <div class="mb-1">
-                          <img src="{{ asset('storage/' . ($attachment['path'] ?? '')) }}" alt="{{ $attachment['name'] ?? 'Image' }}" 
-                              class="max-h-48 rounded border">
-                        </div>
-                      @endif
-                      <a href="{{ asset('storage/' . ($attachment['path'] ?? '')) }}" target="_blank" 
-                         class="flex items-center text-xs text-blue-600 hover:underline">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                               d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                        </svg>
-                        {{ $attachment['name'] ?? 'Attachment' }}
-                        @if(isset($attachment['size']))
-                          <span class="text-gray-500 ml-1">({{ number_format($attachment['size'] / 1024, 0) }} KB)</span>
-                        @endif
-                      </a>
-                    </div>
-                  @endforeach
+            <div class="max-w-xs md:max-w-md lg:max-w-lg">
+              @if(($isAllThread ?? false) && $message->thread)
+                <div class="text-xs text-gray-500 mb-1 {{ $message->sender_type == 'App\\Models\\Business' ? 'text-right' : 'text-left' }}">
+                  <span class="bg-gray-200 px-2 py-1 rounded-full">{{ $message->thread->title }}</span>
                 </div>
               @endif
+              <div class="rounded-lg px-4 py-2 {{ $message->sender_type == 'App\\Models\\Business' ? 'bg-indigo-100 text-gray-800' : 'bg-gray-100 text-gray-800' }}">
+                <p class="text-sm">{{ $message->content }}</p>
               
-              <div class="mt-1 text-xs text-gray-500 text-right">
-                {{ $message->created_at ? $message->created_at->format('h:i A') : '' }}
-                @if($message->is_read && $message->sender_type == 'App\\Models\\Business')
-                  <span class="ml-1 text-green-600">✓</span>
+                @if(!empty($message->attachments))
+                  <div class="mt-2 space-y-2 p-2 bg-white bg-opacity-50 rounded-md">
+                    @foreach($message->attachments as $attachment)
+                      <div class="mb-1">
+                        @if(isset($attachment['mime']) && strpos($attachment['mime'], 'image/') === 0)
+                          <div class="mb-1">
+                            <img src="{{ asset('storage/' . ($attachment['path'] ?? '')) }}" alt="{{ $attachment['name'] ?? 'Image' }}" 
+                                class="max-h-48 rounded border">
+                          </div>
+                        @endif
+                        <a href="{{ asset('storage/' . ($attachment['path'] ?? '')) }}" target="_blank" 
+                           class="flex items-center text-xs text-blue-600 hover:underline">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                 d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                          </svg>
+                          {{ $attachment['name'] ?? 'Attachment' }}
+                          @if(isset($attachment['size']))
+                            <span class="text-gray-500 ml-1">({{ number_format($attachment['size'] / 1024, 0) }} KB)</span>
+                          @endif
+                        </a>
+                      </div>
+                    @endforeach
+                  </div>
                 @endif
+                
+                <div class="mt-1 text-xs text-gray-500 text-right">
+                  {{ $message->created_at ? $message->created_at->format('h:i A') : '' }}
+                  @if($message->is_read && $message->sender_type == 'App\\Models\\Business')
+                    <span class="ml-1 text-green-600">✓</span>
+                  @endif
+                </div>
               </div>
             </div>
           </div>
@@ -118,33 +134,42 @@
   
   <!-- Message Input -->
   <div class="p-3 border-t bg-white">
-    <form action="{{ route('business.communications.send', [$business, $conversation]) }}" method="POST" enctype="multipart/form-data" class="message-form" id="messageForm" onsubmit="handleMessageSubmit(event)">
-      @csrf
-      <input type="hidden" name="thread_id" value="{{ $thread->id }}">
-      <div class="flex flex-col">
-        <div class="flex items-end space-x-2">
-          <div class="flex-grow">
-            <textarea name="message" rows="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type a message..."></textarea>
-          </div>
-          <div>
-            <label for="attachments" class="cursor-pointer p-2 rounded-full hover:bg-gray-100 inline-flex items-center justify-center relative">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-              </svg>
-              <input id="attachments" name="attachments[]" type="file" multiple class="hidden" onchange="handleFileSelection(this)">
-            </label>
-          </div>
-          <button type="submit" class="bg-indigo-600 text-white rounded-full p-2 hover:bg-indigo-700">
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </button>
-        </div>
-        
-        <!-- Selected Files Preview -->
-        <div id="selected-files" class="mt-2 flex flex-wrap gap-2"></div>
+    @if(($isAllThread ?? false))
+      <div class="text-center py-4 text-gray-500">
+        <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-sm">Select a specific thread to send messages</p>
       </div>
-    </form>
+    @else
+      <form action="{{ route('business.communications.send', [$business, $conversation]) }}" method="POST" enctype="multipart/form-data" class="message-form" id="messageForm" onsubmit="handleMessageSubmit(event)">
+        @csrf
+        <input type="hidden" name="thread_id" value="{{ $thread->id }}">
+        <div class="flex flex-col">
+          <div class="flex items-end space-x-2">
+            <div class="flex-grow">
+              <textarea name="message" rows="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type a message..."></textarea>
+            </div>
+            <div>
+              <label for="attachments" class="cursor-pointer p-2 rounded-full hover:bg-gray-100 inline-flex items-center justify-center relative">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                </svg>
+                <input id="attachments" name="attachments[]" type="file" multiple class="hidden" onchange="handleFileSelection(this)">
+              </label>
+            </div>
+            <button type="submit" class="bg-indigo-600 text-white rounded-full p-2 hover:bg-indigo-700">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Selected Files Preview -->
+          <div id="selected-files" class="mt-2 flex flex-wrap gap-2"></div>
+        </div>
+      </form>
+    @endif
   </div>
 </div>
 
@@ -161,7 +186,7 @@
         </button>
       </div>
       
-      <form id="newThreadForm" method="POST" class="space-y-4" onsubmit="threadManagement.createNewThread(event)">
+      <form id="newThreadForm" action="{{ route('business.communications.createThread', [$business, $conversation]) }}" method="POST" class="space-y-4" onsubmit="threadManagement.createNewThread(event)">
         @csrf
         <div>
           <label for="thread_title" class="block text-sm font-medium text-gray-700">Thread Title</label>

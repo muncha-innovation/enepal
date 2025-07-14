@@ -33,8 +33,9 @@
                     <div class="mt-2 rounded-md shadow-sm">
                         <select name="role" id="role"
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option value="admin" @if(session()->get('role')=='admin') selected @endif>{{__('Admin')}}</option>
+
                             <option value="member" @if(session()->get('role')=='member') selected @endif >{{__('Member')}}</option>
+                            <option value="admin" @if(session()->get('role')=='admin') selected @endif>{{__('Admin')}}</option>
                         </select>
                     </div>
                 </div>

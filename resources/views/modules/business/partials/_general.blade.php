@@ -26,30 +26,52 @@
     </div>
 @endforeach
 
-{{-- Logo Upload --}}
+{{-- Business Logo Upload --}}
 <div class="mb-4">
     <label for="logo" class="block text-sm font-medium leading-6 text-gray-900 {{ !isset($business->logo) ? 'required' : '' }}">{{ __('business.logo') }}</label>
-    <input type="file" {{ !isset($business->logo) ? 'required' : '' }} name="logo" id="logo"
-        accept="image/*"
-        class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-    <div class="validation-error" id="logo-error">{{ __('Logo image is required') }}</div>
-    @if (isset($business->logo))
-        <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo"
-            class="w-20 h-20 mt-2">
-    @endif
+    <div class="mt-1">
+        <input type="file" {{ !isset($business->logo) ? 'required' : '' }} name="logo" id="logo"
+            accept="image/*"
+            class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+        
+        <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+            <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 1:1 (Square)</p>
+            <p>Recommended size: 400x400 pixels minimum</p>
+        </div>
+        
+        <div class="validation-error" id="logo-error">{{ __('Logo image is required') }}</div>
+        @if (isset($business->logo))
+            <div class="mt-2">
+                <img src="{{ getImage($business->logo, 'business/logo/') }}" alt="logo"
+                    class="w-20 h-20 object-cover rounded-lg border border-gray-200" 
+                    style="aspect-ratio: 1 / 1;">
+            </div>
+        @endif
+    </div>
 </div>
 
 {{-- Cover Image Upload --}}
 <div class="mb-4">
     <label for="cover_image" class="block text-sm font-medium leading-6 text-gray-900 {{ !isset($business->cover_image) ? 'required' : '' }}">{{ __('business.cover_image') }}</label>
-    <input type="file" {{ !isset($business->cover_image) ? 'required' : '' }} name="cover_image"
-        id="cover_image" accept="image/*"
-        class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
-    <div class="validation-error" id="cover_image-error">{{ __('Cover image is required') }}</div>
-    @if (isset($business->cover_image))
-        <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="cover_image"
-            class="w-20 h-20 mt-2">
-    @endif
+    <div class="mt-1">
+        <input type="file" {{ !isset($business->cover_image) ? 'required' : '' }} name="cover_image"
+            id="cover_image" accept="image/*"
+            class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2 focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+        
+        <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+            <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 16:9 (Widescreen)</p>
+            <p>Recommended size: 1920x1080 pixels for best quality</p>
+        </div>
+        
+        <div class="validation-error" id="cover_image-error">{{ __('Cover image is required') }}</div>
+        @if (isset($business->cover_image))
+            <div class="mt-2">
+                <img src="{{ getImage($business->cover_image, 'business/cover_image/') }}" alt="cover_image"
+                    class="w-32 h-18 object-cover rounded-lg border border-gray-200" 
+                    style="aspect-ratio: 16 / 9;">
+            </div>
+        @endif
+    </div>
 </div>
 
 {{-- Established Year --}}

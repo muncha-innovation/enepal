@@ -88,6 +88,10 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::get('edit/{business}/{post}', [PostController::class, 'edit'])->name('edit');
         Route::put('update/{business}/{post}', [PostController::class, 'update'])->name('update');
         Route::delete('delete/{business}/{post}', [PostController::class, 'destroy'])->name('destroy');
+        
+        // Comment routes
+        Route::post('{business}/{post}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+        Route::get('{business}/{post}/comments', [App\Http\Controllers\CommentController::class, 'getPostComments'])->name('comments.get');
     });
     Route::resource('business', BusinessController::class);
     
@@ -129,6 +133,13 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
         Route::delete('delete/{business}/{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
     });
 
+    // Comment management routes
+    Route::group(['prefix' => 'comments', 'as' => 'comments.'], function() {
+        Route::get('/{business}', [App\Http\Controllers\CommentController::class, 'index'])->name('index');
+        Route::post('/{business}/{comment}/approve', [App\Http\Controllers\CommentController::class, 'approve'])->name('approve');
+        Route::delete('/{business}/{comment}', [App\Http\Controllers\CommentController::class, 'destroy'])->name('destroy');
+    });
+
     
     Route::resource('galleryImage', GalleryImageController::class);
 
@@ -142,6 +153,7 @@ Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super
 Route::group(['middleware' => ['auth', StatusMiddleware::class, 'role:user|super-admin', 'force.password.update']], function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/upload-image', [ProfileController::class, 'uploadImage'])->name('profile.upload-image');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });
 

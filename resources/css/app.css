@@ -8,6 +8,7 @@
     .wrapper {
         @apply max-w-7xl mx-auto px-4 md:px-8 sm:px-6;
     }
+    
     @font-face {
         font-family: 'BrandonText';
         src: url('/fonts/BrandonText-Regular.otf') format('opentype');
@@ -30,6 +31,96 @@
         font-family: BrandonText, Helvetica Neue, Helvetica, Arial;
     }
 
+    /* Aspect Ratio Utilities */
+    .aspect-16-9 {
+        aspect-ratio: 16 / 9;
+    }
+    
+    .aspect-1-1 {
+        aspect-ratio: 1 / 1;
+    }
+    
+    .aspect-3-2 {
+        aspect-ratio: 3 / 2;
+    }
+    
+    .aspect-21-9 {
+        aspect-ratio: 21 / 9;
+    }
+    
+    .aspect-9-16 {
+        aspect-ratio: 9 / 16;
+    }
+
+    /* Image Container Utilities */
+    .image-container {
+        @apply relative overflow-hidden rounded-lg;
+    }
+    
+    .image-container img {
+        @apply absolute inset-0 w-full h-full object-cover;
+    }
+    
+    .image-container.aspect-16-9 {
+        aspect-ratio: 16 / 9;
+    }
+    
+    .image-container.aspect-1-1 {
+        aspect-ratio: 1 / 1;
+    }
+
+    /* Responsive Image Utilities */
+    .responsive-image {
+        @apply w-full h-auto object-cover;
+    }
+    
+    .responsive-image.primary {
+        @apply aspect-16-9;
+    }
+    
+    .responsive-image.square {
+        @apply aspect-1-1;
+    }
+    
+    .responsive-image.traditional {
+        aspect-ratio: 4 / 3;
+    }
+
+    /* Image Upload Guidance */
+    .image-upload-guide {
+        @apply mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md;
+    }
+    
+    .image-upload-guide p:first-child {
+        @apply font-medium text-blue-700;
+    }
+    
+    .image-upload-guide p:not(:first-child) {
+        @apply text-gray-600;
+    }
+
+    /* Gallery Grid with Consistent Aspect Ratios */
+    .gallery-grid {
+        @apply grid gap-4;
+    }
+    
+    .gallery-grid.primary {
+        @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+    }
+    
+    .gallery-grid.square {
+        @apply grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+    }
+    
+    .gallery-grid-item {
+        @apply relative overflow-hidden rounded-lg bg-gray-100;
+    }
+    
+    .gallery-grid-item img {
+        @apply absolute inset-0 w-full h-full object-cover transition-transform hover:scale-105;
+    }
+
+    /* Legacy Gallery Grid (keeping for backward compatibility) */
     .grid-image-gallery {
         display: grid;
         display: -ms-grid;
@@ -44,6 +135,7 @@
         grid-column: span 1;
         grid-row: span 1;
     }
+    
     .grid-image-gallery img:nth-child(1){
         grid-column: span 2;
         grid-row: span 2;
@@ -52,5 +144,123 @@
     .grid-image-gallery img:nth-child(3), .grid-image-gallery img:nth-child(4) {
         grid-column: span 1;
         grid-row: span 1;
+    }
+
+    /* Profile Image Utilities */
+    .profile-image {
+        @apply aspect-1-1 rounded-full object-cover;
+    }
+    
+    .profile-image.small {
+        @apply w-8 h-8;
+    }
+    
+    .profile-image.medium {
+        @apply w-12 h-12;
+    }
+    
+    .profile-image.large {
+        @apply w-24 h-24;
+    }
+
+    /* Business Logo Utilities */
+    .business-logo {
+        @apply aspect-1-1 rounded-lg object-cover;
+    }
+    
+    .business-logo.small {
+        @apply w-16 h-16;
+    }
+    
+    .business-logo.medium {
+        @apply w-20 h-20;
+    }
+    
+    .business-logo.large {
+        @apply w-32 h-32;
+    }
+
+    /* Cover Image Utilities */
+    .cover-image {
+        @apply aspect-16-9 object-cover rounded-lg;
+    }
+    
+    .cover-image.small {
+        @apply w-48;
+    }
+    
+    .cover-image.medium {
+        @apply w-64;
+    }
+    
+    .cover-image.large {
+        @apply w-full;
+    }
+
+    /* Card Image Utilities */
+    .card-image {
+        aspect-ratio: 4 / 3;
+        @apply object-cover rounded-lg;
+    }
+    
+    .card-image.small {
+        @apply w-32;
+    }
+    
+    .card-image.medium {
+        @apply w-48;
+    }
+    
+    .card-image.large {
+        @apply w-64;
+    }
+
+    /* News Image Utilities */
+    .news-image {
+        @apply aspect-16-9 object-cover rounded-lg;
+    }
+    
+    .news-image.thumbnail {
+        @apply w-32;
+    }
+    
+    .news-image.card {
+        @apply w-48;
+    }
+    
+    .news-image.featured {
+        @apply w-full;
+    }
+
+    /* Product Image Utilities */
+    .product-image {
+        @apply aspect-1-1 object-cover rounded-lg;
+    }
+    
+    .product-image.thumbnail {
+        @apply w-20;
+    }
+    
+    .product-image.card {
+        @apply w-32;
+    }
+    
+    .product-image.featured {
+        @apply w-48;
+    }
+
+    /* Responsive Image Containers */
+    @media (max-width: 768px) {
+        .responsive-image-container {
+            @apply mx-auto;
+        }
+        
+        .responsive-image-container.primary {
+            @apply max-w-full;
+        }
+        
+        .responsive-image-container.square {
+            @apply max-w-xs;
+        }
     }
 }

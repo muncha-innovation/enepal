@@ -57,7 +57,7 @@ class NewsController extends Controller
         $validated = $request->validated();
         
         
-        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups'])->toArray();
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups', 'genders'])->toArray();
         $newsData['published_at'] = now();
         $newsData['sourceable_id'] = auth()->id();
         $newsData['sourceable_type'] = 'App\Models\User';
@@ -92,6 +92,11 @@ class NewsController extends Controller
             }
         }
 
+        // Sync genders
+        if ($request->has('genders')) {
+            $news->genders()->sync($request->genders);
+        }
+
         // Sync age groups
         if ($request->has('age_groups')) {
             $news->ageGroups()->sync($request->age_groups);
@@ -105,8 +110,8 @@ class NewsController extends Controller
     {
         $validated = $request->validated();
         
-        // Remove locations and categories from the data going into news_items table
-        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups'])->toArray();
+        // Remove locations, categories, tags, genders, and age_groups from the data going into news_items table
+        $newsData = collect($validated)->except(['locations', 'categories', 'tags', 'age_groups', 'genders'])->toArray();
         
         $news->update($newsData);
 
@@ -239,24 +244,30 @@ class NewsController extends Controller
                 $query->where('news_items.title', 'like', '%' . request('search') . '%');
             })
             ->latest()
-            ->paginate(10);
+            ->paginate(20);
 
         // Filter available news by the same language as the current news item
+        // Also exclude news that are already children of this news to prevent duplicates
         $availableNews = NewsItem::where('news_items.id', '!=', $news->id)
             ->where('language', $news->language) // Filter by the same language
+            ->whereNotIn('news_items.id', $news->childNews()->pluck('child_news_id'))
             ->when(request('available_search'), function($query) {
                 $query->where('news_items.title', 'like', '%' . request('available_search') . '%');
             })
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
         $categories = NewsCategory::orderBy('name')->get()->groupBy('type');
         $genders = UserGender::all();
         $ageGroups = AgeGroup::all();
         $countries = Country::orderBy('name')->get();
         
-        // Get formatted locations using the accessor
-        $locations = $news->formatted_locations;
+        // Get formatted locations, prioritizing old() values from failed validation
+        $locations = old('locations') 
+            ? collect(old('locations'))->map(function($location) {
+                return ['id' => $location, 'text' => $location];
+            })->toArray()
+            : $news->formatted_locations;
         
         return view('modules.news.manage-related', compact(
             'news',
@@ -273,9 +284,10 @@ class NewsController extends Controller
     public function addRelated(NewsItem $news, NewsItem $related)
     {
         DB::transaction(function() use ($news, $related) {
-            $related->parentNews()->detach();
-
-            $news->childNews()->syncWithoutDetaching($related->id);
+            // Check if already related to prevent duplicates
+            if (!$news->childNews()->where('child_news_id', $related->id)->exists()) {
+                $news->childNews()->attach($related->id);
+            }
         });
 
         return back()->with('success', 'Related news added successfully');

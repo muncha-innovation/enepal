@@ -66,7 +66,7 @@
                     <div class="w-72">
                         @forelse($conversations ?? [] as $conv)
                             <a href="#"
-                                onclick="loadConversation('{{ route('business.communications.messages', ['business' => $business, 'conversation' => $conv->id]) }}')"
+                                onclick="loadConversation('{{ route('business.communications.messages', ['business' => $business, 'conversation' => $conv->id]) }}', event)"
                                 class="flex cursor-pointer hover:bg-gray-200 py-3 px-2 border-b {{ request()->segment(4) == 'conversation' && request()->segment(5) == $conv->id ? 'bg-indigo-50' : '' }}">
                                 <div class="w-8 h-8 bg-gray-300 rounded-full mr-3">
                                     <img class="w-8 h-8 rounded-full"
@@ -85,12 +85,12 @@
                                     <div class="flex justify-between">
                                         <p
                                             class="truncate max-w-[12rem] text-ellipsis overflow-hidden pr-2 italic text-xs text-gray-500">
-                                            {{ $conv->messages->count() > 0 ? Str::limit($conv->messages->sortByDesc('created_at')->first()->content, 30) : 'No messages yet' }}
+                                            {{ $conv->latest_message ? Str::limit($conv->latest_message->content, 30) : 'No messages yet' }}
                                         </p>
-                                        @if ($conv->messages->where('is_read', false)->where('sender_type', '!=', 'App\\Models\\Business')->count() > 0)
+                                        @if ($conv->messages_count > 0 && $conv->messages()->where('is_read', false)->where('sender_type', '!=', 'App\\Models\\Business')->count() > 0)
                                             <span
                                                 class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-indigo-600 rounded-full">
-                                                {{ $conv->messages->where('is_read', false)->where('sender_type', '!=', 'App\\Models\\Business')->count() }}
+                                                {{ $conv->messages()->where('is_read', false)->where('sender_type', '!=', 'App\\Models\\Business')->count() }}
                                             </span>
                                         @endif
                                     </div>
@@ -223,12 +223,42 @@
                         class="mt-4">
                         @csrf
                         <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Recipient Type</label>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="recipient_type" value="user" checked
+                                        class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-gray-700">Single User</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="recipient_type" value="segment"
+                                        class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-gray-700">User Segment</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Single User Selection -->
+                        <div id="chat-user-selection" class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Select User</label>
-                            <select name="user_id" id="chat-user-select" required
+                            <select name="user_id" id="chat-user-select"
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="">Select a user...</option>
                             </select>
                         </div>
+
+                        <!-- Segment Selection -->
+                        <div id="chat-segment-selection" class="mb-4 hidden">
+                            <label for="chat-segment" class="block text-sm font-medium text-gray-700">Select Segment</label>
+                            <select name="segment_id" id="chat-segment"
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="">-- Select a Segment --</option>
+                                @foreach ($segments as $segment)
+                                    <option value="custom_{{ $segment->id }}">{{ $segment->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Message</label>
                             <textarea name="message" required rows="3"

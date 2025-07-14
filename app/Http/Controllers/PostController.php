@@ -16,10 +16,15 @@ class PostController extends Controller
      */
     public function index(Business $business)
     {
-        //
-        $posts = $business->posts()->paginate(10);
+        $posts = $business->posts()
+            ->withCount(['comments', 'comments as pending_comments_count' => function($query) {
+                $query->pending();
+            }])
+            ->with('user')
+            ->latest()
+            ->paginate(10);
+            
         return view('modules.posts.index', compact('business', 'posts'));
-        
     }
 
     /**
@@ -71,8 +76,21 @@ class PostController extends Controller
      */
     public function show(Request $request,Business $business,  Post $post)
     {
-        //
-        return view('modules.posts.show', compact('post', 'business'));
+        // Load comments with their replies and users
+        $post->load([
+            'comments' => function($query) {
+                $query->topLevel()->approved()->with(['user', 'replies.user'])->latest();
+            },
+            'user'
+        ]);
+
+        $commentStats = [
+            'total' => $post->comments()->count(),
+            'approved' => $post->comments()->approved()->count(),
+            'pending' => $post->comments()->pending()->count(),
+        ];
+
+        return view('modules.posts.show', compact('post', 'business', 'commentStats'));
     }
 
     /**

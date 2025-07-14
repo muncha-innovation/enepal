@@ -86,16 +86,25 @@
                     </div>
 
                     <div class="mb-2">
-                        <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Product
-                            Image</label>
-                        <input type="file" @if (!$isEdit) required @endif name="image"
-                            accept="image/*"
-                            class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+                        <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Product Image</label>
+                        <div class="mt-1">
+                            <input type="file" @if (!$isEdit) required @endif name="image"
+                                accept="image/*"
+                                class="cursor-pointer block w-full mt-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-md file:bg-gray-200 file:text-gray-700 file:text-sm file:px-4 file:border-none file:py-2  focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
 
-                        @if ($product->image)
-                            <img src="{{ getImage($product->image, 'products/') }}" alt="Product Image"
-                                class="mt-2 rounded-lg w-20">
-                        @endif
+                            <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+                                <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 1:1 (Square)</p>
+                                <p>Recommended size: 800x800 pixels for best quality</p>
+                            </div>
+
+                            @if ($product->image)
+                                <div class="mt-2">
+                                    <img src="{{ getImage($product->image, 'products/') }}" alt="Product Image"
+                                        class="rounded-lg border border-gray-200 object-cover" 
+                                        style="width: 120px; aspect-ratio: 1 / 1;">
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <button type="submit"

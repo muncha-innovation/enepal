@@ -178,16 +178,24 @@
                             <!-- Profile Image -->
                             <h3 class="text-lg font-medium text-gray-700 mb-3">{{ __('Profile Image') }}</h3>
                             <div class="mb-2">
-                                <label for="image" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Image') }}</label>
+                                <label for="image" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Profile Picture') }}</label>
                                 <div class="mt-2 rounded-md shadow-sm">
-                                    <input type="file" name="image" id="image"
+                                    <input type="file" name="image" id="image" accept="image/*"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                    
+                                    <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+                                        <p class="font-medium text-blue-700">📐 Preferred aspect ratio: 1:1 (Square)</p>
+                                        <p>Recommended size: 400x400 pixels minimum</p>
+                                    </div>
+                                    
+                                    @if ($isEdit && isset($user->profile_picture))
+                                        <div class="mt-2">
+                                            <img src="{{ getImage($user->profile_picture, 'profile/') }}" alt="{{ __('user image') }}"
+                                                class="rounded-md border border-gray-200 object-cover" 
+                                                style="width: 80px; aspect-ratio: 1 / 1;">
+                                        </div>
+                                    @endif
                                 </div>
-                                @if ($isEdit && isset($user->profile_picture))
-                                    <div class="mt-2">
-                                        <img src="{{ getImage($user->profile_picture, 'profile/') }}" alt="{{ __('user image') }}"
-                                            class="w-20 h-20 rounded-md">
-                                @endif
                             </div>
 
                             <!-- Address Information -->

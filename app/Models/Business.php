@@ -218,4 +218,27 @@ class Business extends Model
     {
         return $this->hasMany(UserSegment::class);
     }
+
+    public function comments()
+    {
+        return $this->hasManyThrough(Comment::class, Post::class, 'business_id', 'post_id');
+    }
+
+    public function getRecentCommentsAttribute()
+    {
+        return $this->comments()
+            ->with(['user', 'post'])
+            ->latest('comments.created_at')
+            ->limit(10)
+            ->get();
+    }
+
+    public function getPendingCommentsAttribute()
+    {
+        return $this->comments()
+            ->pending()
+            ->with(['user', 'post'])
+            ->latest('comments.created_at')
+            ->get();
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\BusinessNotification;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\UserSegment;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -32,11 +33,17 @@ class CommunicationsController extends Controller
             ->get();
         if ($type === 'chat') {
             $conversations = $business->conversations()
-                ->with(['messages' => function ($query) {
-                    $query->latest()->first();
-                }, 'user'])
+                ->with(['user'])
+                ->withCount('messages')
                 ->latest()
                 ->get();
+
+            // Load the latest message for each conversation separately
+            $conversations->each(function ($conversation) {
+                $conversation->latest_message = $conversation->messages()
+                    ->latest()
+                    ->first();
+            });
 
             $unreadChats = Message::whereHas('conversation', function ($query) use ($business) {
                 $query->where('business_id', $business->id);
@@ -106,38 +113,74 @@ class CommunicationsController extends Controller
     public function createChat(Business $business, Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'recipient_type' => 'required|in:user,segment',
+            'user_id' => 'required_if:recipient_type,user|nullable|exists:users,id',
+            'segment_id' => 'required_if:recipient_type,segment|nullable',
             'message' => 'required|string',
             'thread_title' => 'nullable|string|max:255'
         ]);
 
-        $conversation = Conversation::firstOrCreate([
-            'business_id' => $business->id,
-            'user_id' => $request->user_id
-        ]);
+        $userIds = [];
+        
+        if ($request->recipient_type === 'user') {
+            $userIds = [$request->user_id];
+        } else {
+            // Handle segment selection
+            $segmentId = $request->segment_id;
+            
+            if (str_starts_with($segmentId, 'custom_')) {
+                $actualSegmentId = (int) str_replace('custom_', '', $segmentId);
+                
+                $segment = UserSegment::where('id', $actualSegmentId)
+                    ->where('business_id', $business->id)
+                    ->first();
+                    
+                if ($segment) {
+                    $userIds = $segment->users()->pluck('users.id')->toArray();
+                }
+            }
+        }
 
-        // Create or use the thread
-        $threadTitle = $request->thread_title ?: 'General';
-        $thread = $conversation->threads()->firstOrCreate(
-            ['title' => $threadTitle],
-            ['status' => 'open']
-        );
+        if (empty($userIds)) {
+            return redirect()->back()->with('error', 'No users found for the selected recipient.');
+        }
 
-        $message = new Message([
-            'conversation_id' => $conversation->id,
-            'thread_id' => $thread->id,
-            'content' => $request->message,
-            'sender_id' => $business->id,
-            'sender_type' => Business::class,
-        ]);
+        $createdConversations = [];
+        
+        foreach ($userIds as $userId) {
+            $conversation = Conversation::firstOrCreate([
+                'business_id' => $business->id,
+                'user_id' => $userId
+            ]);
 
-        $thread->messages()->save($message);
+            // Create or use the thread
+            $threadTitle = $request->thread_title ?: 'General';
+            $thread = $conversation->threads()->firstOrCreate(
+                ['title' => $threadTitle],
+                ['status' => 'open']
+            );
 
-        // Update last_message_at timestamp
-        $thread->update(['last_message_at' => now()]);
-        $conversation->update(['last_message_at' => now()]);
+            $message = new Message([
+                'conversation_id' => $conversation->id,
+                'thread_id' => $thread->id,
+                'content' => $request->message,
+                'sender_id' => $business->id,
+                'sender_type' => Business::class,
+            ]);
 
-        return redirect()->back();
+            $thread->messages()->save($message);
+
+            // Update last_message_at timestamp
+            $thread->update(['last_message_at' => now()]);
+            $conversation->update(['last_message_at' => now()]);
+            
+            $createdConversations[] = $conversation;
+        }
+
+        $count = count($createdConversations);
+        $successMessage = $count === 1 ? 'Chat started successfully' : "Chats started with {$count} users successfully";
+        
+        return redirect()->back()->with('success', $successMessage);
     }
 
     public function sendNotification(Business $business, Request $request)
@@ -174,49 +217,75 @@ class CommunicationsController extends Controller
             // Get requested thread or default to the main thread
             $threadId = $request->input('thread_id');
             $thread = null;
+            $isAllThread = $threadId === 'all';
+            $messages = collect(); // Initialize messages collection
 
-            if ($threadId) {
-                $thread = $conversation->threads()->find($threadId);
-            }
+            if ($isAllThread) {
+                // Create a virtual "All" thread
+                $thread = (object) [
+                    'id' => 'all',
+                    'title' => 'All Messages',
+                    'conversation_id' => $conversation->id,
+                    'status' => 'open'
+                ];
 
-            if (!$thread) {
-                // Get default thread - get the first thread instead of using defaultThread()
-                $thread = $conversation->threads()->oldest()->first();
-
-                // If still no thread, create one
-                if (!$thread) {
-                    $thread = $conversation->threads()->create([
-                        'title' => 'General',
-                        'status' => 'open',
-                        'last_message_at' => now()
-                    ]);
+                // Get all messages from all threads in chronological order
+                $messages = $conversation->messages()
+                    ->with(['thread'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            } else {
+                if ($threadId) {
+                    $thread = $conversation->threads()->find($threadId);
                 }
+
+                if (!$thread) {
+                    // Get "General" thread first, then fall back to oldest thread
+                    $thread = $conversation->threads()->where('title', 'General')->first();
+                    
+                    if (!$thread) {
+                        $thread = $conversation->threads()->oldest()->first();
+                    }
+
+                    // If still no thread, create a "General" one
+                    if (!$thread) {
+                        $thread = $conversation->threads()->create([
+                            'title' => 'General',
+                            'status' => 'open',
+                            'last_message_at' => now()
+                        ]);
+                    }
+                }
+
+                // Load messages for the specific thread
+                $messages = $thread->messages()
+                    ->orderBy('created_at', 'asc')
+                    ->get();
             }
 
-            // Load messages for the specific thread
-            $messages = $thread->messages()
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            // Mark messages from other senders as read
-            $messages->where('sender_type', '!=', Business::class)
-                ->where('is_read', false)
-                ->each(function ($message) {
-                    $message->update(['is_read' => true]);
-                });
+            // Mark messages from other senders as read (only for specific threads, not "All")
+            if (!$isAllThread) {
+                $messages->where('sender_type', '!=', Business::class)
+                    ->where('is_read', false)
+                    ->each(function ($message) {
+                        $message->update(['is_read' => true]);
+                    });
+            }
 
             if ($request->ajax() || $request->query('ajax') == '1') {
                 Log::info('Returning AJAX response for conversation', [
                     'conversation_id' => $conversation->id,
-                    'thread_id' => $thread->id,
-                    'message_count' => $messages->count()
+                    'thread_id' => $isAllThread ? 'all' : $thread->id,
+                    'message_count' => $messages->count(),
+                    'is_all_thread' => $isAllThread
                 ]);
 
                 return response()->view('modules.business.communications.messages-content', [
                     'business' => $business,
                     'conversation' => $conversation,
                     'messages' => $messages,
-                    'thread' => $thread
+                    'thread' => $thread,
+                    'isAllThread' => $isAllThread
                 ])->header('X-AJAX-Response', 'true');
             }
 
@@ -224,7 +293,8 @@ class CommunicationsController extends Controller
                 'business' => $business,
                 'conversation' => $conversation,
                 'messages' => $messages,
-                'thread' => $thread
+                'thread' => $thread,
+                'isAllThread' => $isAllThread
             ]);
         } catch (Exception $e) {
             Log::error('Error loading conversation', [
@@ -261,12 +331,22 @@ class CommunicationsController extends Controller
             ], 422);
         }
 
-        // Get or create thread
+        // Get or create thread - always default to "General" thread
         $threadId = $request->input('thread_id');
         if ($threadId) {
             $thread = $conversation->threads()->findOrFail($threadId);
         } else {
-            $thread = $conversation->defaultThread();
+            // Look for the "General" thread first
+            $thread = $conversation->threads()->where('title', 'General')->first();
+            
+            // If no "General" thread exists, create it
+            if (!$thread) {
+                $thread = $conversation->threads()->create([
+                    'title' => 'General',
+                    'status' => 'open',
+                    'last_message_at' => now()
+                ]);
+            }
         }
 
         $attachments = [];
@@ -311,11 +391,11 @@ class CommunicationsController extends Controller
         // Broadcast the message to the thread's channel
         broadcast(new MessageSent($message))->toOthers();
 
-        // If this is an AJAX request, return the message view
+        // If this is an AJAX request, return the message data
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Message sent successfully',
+                'message' => $message->toArray(), // Return the actual message data
                 'message_id' => $message->id,
                 'thread_id' => $thread->id
             ]);
@@ -381,6 +461,18 @@ class CommunicationsController extends Controller
         try {
             // Get the thread
             $threadModel = $conversation->threads()->findOrFail($thread);
+            
+            // Prevent deletion of the "General" thread
+            if (strtolower($threadModel->title) === 'general') {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The General thread cannot be deleted.'
+                    ], 422);
+                }
+                
+                return back()->with('error', 'The General thread cannot be deleted.');
+            }
 
             // Check if this is the only thread in the conversation
             $isOnlyThread = $conversation->threads()->count() === 1;
@@ -421,6 +513,13 @@ class CommunicationsController extends Controller
                 'thread_id' => $defaultThread->id
             ])->with('success', 'Thread deleted successfully');
         } catch (\Exception $e) {
+            Log::error('Error deleting thread', [
+                'error' => $e->getMessage(),
+                'thread_id' => $thread,
+                'business_id' => $business->id,
+                'conversation_id' => $conversation->id
+            ]);
+
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,

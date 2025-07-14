@@ -43,4 +43,10 @@
             </div>
         @endforelse
     </div>
+    
+    @if($availableNews->hasPages())
+        <div class="px-4 pb-4">
+            {{ $availableNews->appends(request()->query())->links() }}
+        </div>
+    @endif
 </div> 

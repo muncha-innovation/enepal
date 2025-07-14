@@ -2,20 +2,37 @@
     <div class="bg-white p-4 shadow rounded flex gap-3 divide-x">
         <div class="col-span-full flex items-center gap-x-8">
             <img id="profile-picture" src="{{ getImage(auth()->user()->profile_picture, 'profile/') }}" alt=""
-                class="h-24 w-24 flex-none rounded-lg bg-gray-200 object-cover">
+                class="h-24 w-24 flex-none rounded-lg bg-gray-200 object-cover border border-gray-200" 
+                style="aspect-ratio: 1 / 1;">
             <div>
                 <button type="button" id="file-selector"
-                    class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">{{ __('Change avatar') }}</button>
+                    class="file-selector rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                    <span id="button-text">
+                        {{ auth()->user()->profile_picture ? __('Replace image') : __('Upload image') }}
+                    </span>
+                </button>
                 <p class="mt-2 text-xs leading-5 text-gray-400">{{ __('JPG, GIF or PNG. 1MB max.') }}</p>
+                
+                <!-- Profile picture error display -->
+                @error('profile_picture')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                
+                <!-- File status indicator - hidden by default -->
+                <div id="file-status" class="mt-1 text-xs hidden"></div>
             </div>
         </div>
         <div class="px-4">
-            <h3 class="mb-2">{{ __('Image Requirements') }}</h3>
-            <ul class="list-disc list-inside text-sm text-gray-600">
-                <li>{{ __('Minimum 256x256 pixels') }}</li>
-                <li>{{ __('Maximum 1MB') }}</li>
-                <li>{{ __('Only JPG, GIF or PNG') }}</li>
-            </ul>
+            <h3 class="mb-2 font-semibold text-gray-900">{{ __('Image Requirements') }}</h3>
+            <div class="text-xs text-gray-500 bg-blue-50 p-2 rounded-md">
+                <p class="font-medium text-blue-700 mb-1">📐 Preferred aspect ratio: 1:1 (Square)</p>
+                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                    <li>{{ __('Minimum 400x400 pixels') }}</li>
+                    <li>{{ __('Maximum 1MB') }}</li>
+                    <li>{{ __('Only JPG, GIF or PNG') }}</li>
+                    <li>{{ __('Square format works best for profile pictures') }}</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
@@ -24,10 +41,10 @@
     <div class="bg-white p-4 shadow rounded">
         <h2 class="font-semibold">{{ __('User Details') }}</h2>
 
-        <form id="profileForm" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" novalidate>
+        <form id="profileForm" action="{{ route('profile.update') }}" method="POST" novalidate>
             @csrf
             @include('modules.shared.success_error')
-            <input type="file" id="file-input" name="profile_picture" accept="image/*" style="display: none;">
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
             @if (auth()->user()->force_update_password)
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4">
                     <div class="flex">
@@ -204,26 +221,144 @@
 </section>
 
 <script>
-    document.getElementById('file-selector').addEventListener('click', function() {
-        document.getElementById('file-input').click();
-    });
-    
-    document.getElementById('file-input').addEventListener('change', function() {
-        const fileInput = this;
-        const selectedImage = document.getElementById('profile-picture');
-
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                selectedImage.setAttribute('src', e.target.result);
-            };
-
-            reader.readAsDataURL(fileInput.files[0]);
+    // Ensure script only runs once
+    if (!window.profileImageHandlerInitialized) {
+        window.profileImageHandlerInitialized = true;
+        let isProcessing = false;
+        
+        document.getElementById('file-selector').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const fileInput = document.getElementById('file-input');
+            
+            // Clear previous selection and add small delay to prevent double trigger
+            fileInput.value = '';
+            setTimeout(() => {
+                fileInput.click();
+            }, 10);
+        });
+        
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            if (isProcessing) return; // Prevent multiple simultaneous uploads
+            
+            const fileInput = this;
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            isProcessing = true;
+        
+        // Validate file size (1MB = 1048576 bytes)
+        if (file.size > 1048576) {
+            showFileStatus('error', '{{ __("File size must be less than 1MB") }}');
+            isProcessing = false;
+            return;
         }
+        
+        // Validate file type
+        if (!file.type.match(/^image\/(jpeg|jpg|png|gif)$/)) {
+            showFileStatus('error', '{{ __("Please select a valid image file (JPG, PNG, GIF)") }}');
+            isProcessing = false;
+            return;
+        }
+        
+        // Show preview and upload via AJAX
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profile-picture').setAttribute('src', e.target.result);
+            showFileStatus('info', '{{ __("New image selected") }}');
+        };
+        reader.readAsDataURL(file);
+        
+        // Upload image via AJAX
+        uploadProfileImage(file);
     });
 
-    // Client-side validation
+    function uploadProfileImage(file) {
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        formData.append('_token', '{{ csrf_token() }}');
+        
+        // Show uploading status
+        showFileStatus('loading', '{{ __("Uploading...") }}');
+        
+        fetch('{{ route("profile.upload-image") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showFileStatus('success', '{{ __("Image uploaded successfully!") }}');
+                document.getElementById('button-text').textContent = '{{ __("Replace image") }}';
+                
+                // Hide status after 3 seconds
+                setTimeout(() => {
+                    hideFileStatus();
+                }, 3000);
+            } else {
+                showFileStatus('error', data.message || '{{ __("Upload failed. Please try again.") }}');
+            }
+            isProcessing = false;
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            showFileStatus('error', '{{ __("Upload failed. Please try again.") }}');
+            isProcessing = false;
+        });
+    }
+
+    function showFileStatus(type, message) {
+        const statusDiv = document.getElementById('file-status');
+        statusDiv.classList.remove('hidden');
+        
+        let iconSvg = '';
+        let colorClass = '';
+        
+        switch(type) {
+            case 'success':
+                colorClass = 'text-green-600';
+                iconSvg = `<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>`;
+                break;
+            case 'error':
+                colorClass = 'text-red-600';
+                iconSvg = `<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>`;
+                break;
+            case 'loading':
+                colorClass = 'text-blue-600';
+                iconSvg = `<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>`;
+                break;
+            case 'info':
+                colorClass = 'text-blue-600';
+                iconSvg = `<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+                </svg>`;
+                break;
+        }
+        
+        statusDiv.innerHTML = `
+            <span class="${colorClass} flex items-center gap-1">
+                ${iconSvg}
+                ${message}
+            </span>
+        `;
+    }
+
+    function hideFileStatus() {
+        document.getElementById('file-status').classList.add('hidden');
+    }
+
+    // Client-side validation for main form (no image upload)
     document.getElementById('profileForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -290,4 +425,6 @@
         // If validation passes, submit the form
         this.submit();
     });
+    
+    } // End of profileImageHandlerInitialized check
 </script>

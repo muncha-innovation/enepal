@@ -6,7 +6,9 @@
                         @foreach ($genders as $gender)
                             <label class="inline-flex items-center">
                                 <input type="checkbox" name="genders[]" value="{{ $gender->id }}"
-                                    @if($news->exists) 
+                                    @if(old('genders'))
+                                        {{ in_array($gender->id, old('genders', [])) ? 'checked' : '' }}
+                                    @elseif($news->exists) 
                                         {{ $news->genders->contains($gender->id) ? 'checked' : '' }}
                                     @else
                                         checked
