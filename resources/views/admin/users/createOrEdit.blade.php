@@ -446,7 +446,7 @@
                                     multiple>
                                     @foreach ($countries as $country)
                                         <option value="{{ $country->id }}"
-                                            @if (isset($user->preference) && in_array($country->id, $user->preference->countries ?? [])) selected @endif>{{ $country->name }}</option>
+                                            @if (isset($user->preference) && is_array($user->preference->countries) && in_array($country->id, $user->preference->countries)) selected @endif>{{ $country->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
