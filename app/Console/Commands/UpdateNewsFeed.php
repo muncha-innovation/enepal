@@ -107,7 +107,7 @@ class UpdateNewsFeed extends Command
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $this->extractImageFromItem($item);
                 $newsItem->language = $source->language;
-                $newsItem->is_active = true;
+                $newsItem->is_active = false;
                 $newsItem->is_featured = true;
                 $newsItem->save();
                 
@@ -120,7 +120,7 @@ class UpdateNewsFeed extends Command
                 $newsItem->description = $item->get_description();
                 $newsItem->url = $item->get_link();
                 $newsItem->published_at = $item->get_date();
-                $newsItem->is_active = true;
+                $newsItem->is_active = false;
                 $newsItem->is_featured = true;
                 $newsItem->original_id = $item->get_id();
                 $newsItem->image = $this->extractImageFromItem($item);
