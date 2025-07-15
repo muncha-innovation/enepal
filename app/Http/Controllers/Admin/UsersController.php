@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -105,9 +106,7 @@ class UsersController extends Controller
 
         if (isset($data['preferences'])) {
             $preferences = $data['preferences'];
-            if (isset($preferences['countries'])) {
-                $preferences['countries'] = json_encode($preferences['countries']);
-            }
+            $preferences['user_id'] = $user->id;
             $user->preference()->create($preferences);
         }
 
@@ -212,15 +211,25 @@ class UsersController extends Controller
         // Update preferences
         if (isset($data['preferences'])) {
             $preferences = $data['preferences'];
-            if (isset($preferences['countries'])) {
-                $preferences['countries'] = json_encode($preferences['countries']);
-                
+            
+            // Debug: Log the preferences data
+            Log::info('User preferences update', [
+                'user_id' => $user->id,
+                'preferences' => $preferences,
+                'countries' => $preferences['countries'] ?? null
+            ]);
+            
+            if ($user->preference) {
+                // Update existing preference
+                $user->preference->update($preferences);
+            } else {
+                // Create new preference
+                $preferences['user_id'] = $user->id;
+                $user->preference()->create($preferences);
             }
-            $user->preference()->delete();
-            $user->preference()->create($preferences);
         }
 
-        return redirect()->route('admin.users.index')->with('success', __('User updated successfully'));
+        return redirect()->route('admin.users.edit', $user)->with('success', __('User updated successfully'));
     }
 
     /**
